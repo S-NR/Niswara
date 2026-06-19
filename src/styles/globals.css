@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 255 255 255;
+  --fg: 17 24 39;
+  --primary: 79 70 229;
+  --muted: 243 244 246;
+  --card: 255 255 255;
+}
+
+.dark {
+  --bg: 17 24 39;
+  --fg: 243 244 246;
+  --primary: 129 140 248;
+  --muted: 31 41 55;
+  --card: 31 41 55;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: rgb(var(--bg));
+  color: rgb(var(--fg));
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
