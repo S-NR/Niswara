@@ -9,11 +9,11 @@ const Router = (() => {
   let currentUnmount = null;
   const routes = [];
 
-  function add(pattern, page) {
+  function add(pattern, page, opts = {}) {
     // pattern like "#/classes/:id"
     const keys = [];
     const regex = new RegExp("^" + pattern.replace(/:[^/]+/g, (m) => { keys.push(m.slice(1)); return "([^/]+)"; }) + "$");
-    routes.push({ regex, keys, page });
+    routes.push({ regex, keys, page, requiresAuth: !!opts.requiresAuth });
   }
 
   function match(hash) {
@@ -22,7 +22,7 @@ const Router = (() => {
       if (m) {
         const params = {};
         r.keys.forEach((k, i) => (params[k] = decodeURIComponent(m[i + 1])));
-        return { page: r.page, params };
+        return { page: r.page, params, requiresAuth: r.requiresAuth };
       }
     }
     return null;
@@ -48,6 +48,11 @@ const Router = (() => {
       return;
     }
 
+    if (found.requiresAuth && !Auth.isLoggedIn()) {
+      location.hash = `#/login?next=${encodeURIComponent(hash)}`;
+      return;
+    }
+
     container.innerHTML = found.page.render(found.params);
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
     if (typeof found.page.mount === "function") {
@@ -63,6 +68,9 @@ const Router = (() => {
   }
 
   function rerender() { render(); }
+
+  /** Re-renders just the navbar/mobile-nav/FAB — used when auth state changes without a navigation. */
+  function refreshChrome() { updateChrome(currentHash()); }
 
   /** Re-render the current page's markup in place, preserving scroll position. */
   function softRefresh(container, page, params) {
@@ -81,5 +89,5 @@ const Router = (() => {
     render();
   }
 
-  return { add, start, rerender, softRefresh };
+  return { add, start, rerender, softRefresh, refreshChrome };
 })();

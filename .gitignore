@@ -1,0 +1,7 @@
+# Local environment secrets (service-role key, admin scripts) — never commit
+.env
+.env.local
+
+# OS / editor noise
+.DS_Store
+Thumbs.db

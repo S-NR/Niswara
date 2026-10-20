@@ -21,6 +21,9 @@ Components.Navbar = (route) => {
     { href: "#/about", label: "About" },
   ];
   const isActive = (href) => href === "#/" ? route === "#/" : route.startsWith(href);
+  const session = typeof Auth !== "undefined" ? Auth.getSession() : null;
+  const user = session ? session.user : null;
+  const displayName = user ? (user.user_metadata && user.user_metadata.name ? user.user_metadata.name.split(" ")[0] : user.email.split("@")[0]) : "";
 
   return `
   <header class="sticky top-0 z-40 border-b border-white/5 bg-ink-950/80 backdrop-blur-xl">
@@ -28,7 +31,7 @@ Components.Navbar = (route) => {
       <a href="#/" class="flex items-center gap-2.5 shrink-0 group">
         <span class="w-8 h-8 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-ink-950 shadow-glow-sm group-hover:shadow-glow transition-shadow">${icon("note", "w-4 h-4")}</span>
         <span class="hidden sm:flex flex-col leading-tight">
-          <span class="font-display text-[15px] text-ink-50 tracking-wide">First Note <span class="text-gold-400">→</span> Professional</span>
+          <span class="font-display text-[16px] text-ink-50 tracking-[0.08em]">NISWARA</span>
         </span>
       </a>
       <nav class="hidden lg:flex items-center gap-1 text-sm">
@@ -40,11 +43,28 @@ Components.Navbar = (route) => {
         <a href="#/classes/${Store.getState().currentClassId}" id="continue-learning-btn" class="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold-500 text-ink-950 text-sm font-medium hover:bg-gold-400 transition-colors shadow-glow-sm">
           Continue Learning ${icon("arrowRight", "w-3.5 h-3.5")}
         </a>
+        ${user ? `
+          <a href="#/dashboard" class="hidden sm:inline-flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-white/10 text-ink-200 text-sm hover:bg-white/5 transition-colors">
+            <span class="w-7 h-7 rounded-full overflow-hidden bg-white/10 flex items-center justify-center text-xs shrink-0">${user.user_metadata && user.user_metadata.avatar_url ? `<img src="${user.user_metadata.avatar_url}" class="w-full h-full object-cover" alt="">` : icon("user", "w-3.5 h-3.5")}</span>
+            ${Utils.escapeHtml(displayName)}
+          </a>
+        ` : `
+          <a href="#/login" class="hidden sm:inline-flex items-center px-4 py-2 rounded-full border border-white/15 text-ink-100 text-sm hover:bg-white/5 transition-colors">Log In</a>
+        `}
         <button data-action="toggleMobileMenu" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-full border border-white/10 text-ink-200">${icon("menu", "w-5 h-5")}</button>
       </div>
     </div>
     <nav id="mobile-menu" class="hidden lg:hidden border-t border-white/5 px-5 py-3 flex flex-col gap-1 bg-ink-950/95">
       ${links.map(l => `<a href="${l.href}" data-action="closeMobileMenu" class="px-3 py-2.5 rounded-lg text-sm ${isActive(l.href) ? "text-gold-300 bg-white/5" : "text-ink-300"}">${l.label}</a>`).join("")}
+      <div class="border-t border-white/5 my-1"></div>
+      ${user ? `
+        <a href="#/dashboard" data-action="closeMobileMenu" class="px-3 py-2.5 rounded-lg text-sm text-ink-300">Dashboard</a>
+        <a href="#/profile" data-action="closeMobileMenu" class="px-3 py-2.5 rounded-lg text-sm text-ink-300">Profile</a>
+        <button data-action="navLogout" class="text-left px-3 py-2.5 rounded-lg text-sm text-ink-400">Log Out</button>
+      ` : `
+        <a href="#/login" data-action="closeMobileMenu" class="px-3 py-2.5 rounded-lg text-sm text-gold-300">Log In</a>
+        <a href="#/signup" data-action="closeMobileMenu" class="px-3 py-2.5 rounded-lg text-sm text-ink-300">Sign Up</a>
+      `}
     </nav>
   </header>`;
 };
@@ -79,6 +99,32 @@ Components.ContinueFab = () => {
   <a href="#/classes/${id}" class="lg:hidden fixed right-4 bottom-20 z-40 inline-flex items-center gap-2 px-4 py-3 rounded-full bg-gold-500 text-ink-950 text-sm font-medium shadow-glow">
     ${icon("arrowRight", "w-4 h-4")} Continue
   </a>`;
+};
+
+/* ---------- Auth card wrapper (login/signup/forgot/reset) ---------- */
+Components.AuthCard = (eyebrow, title, sub, bodyHtml) => `
+  <section class="min-h-[70vh] flex items-center justify-center px-5 py-16">
+    <div class="w-full max-w-sm">
+      <div class="text-center mb-8">
+        <a href="#/" class="inline-flex items-center gap-2 mb-6">
+          <span class="w-9 h-9 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-ink-950 shadow-glow-sm">${icon("note", "w-5 h-5")}</span>
+        </a>
+        <p class="text-xs tracking-[0.2em] uppercase text-gold-400/80 mb-2">${eyebrow}</p>
+        <h1 class="font-display text-2xl text-ink-50">${title}</h1>
+        ${sub ? `<p class="text-sm text-ink-500 mt-2">${sub}</p>` : ""}
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-7">${bodyHtml}</div>
+    </div>
+  </section>`;
+
+/** Inline form error/notice banner */
+Components.FormNotice = (kind, text) => {
+  const styles = {
+    error: "border-red-400/20 bg-red-500/[0.06] text-red-300",
+    success: "border-emerald-400/20 bg-emerald-500/[0.06] text-emerald-300",
+    info: "border-white/10 bg-white/[0.03] text-ink-400",
+  };
+  return `<div class="rounded-xl border px-4 py-3 text-sm mb-4 ${styles[kind] || styles.info}">${text}</div>`;
 };
 
 /* ---------- Section heading ---------- */

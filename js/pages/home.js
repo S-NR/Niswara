@@ -23,16 +23,18 @@ const HomePage = {
       <div class="absolute inset-0 -z-10 bg-studio-glow"></div>
       <div class="absolute inset-0 -z-10 opacity-40" aria-hidden="true">${heroWaveform()}</div>
       <div class="max-w-7xl mx-auto px-5 lg:px-8 pt-20 pb-16 sm:pt-28 sm:pb-24 relative">
-        <p class="text-xs tracking-[0.25em] uppercase text-gold-400/80 mb-5">A personal music academy</p>
+        <p class="text-xs tracking-[0.25em] uppercase text-gold-400/80 mb-5">NISWARA · A STRUCTURED MUSIC LEARNING PLATFORM</p>
         <h1 class="font-display text-4xl sm:text-6xl text-ink-50 leading-[1.08] max-w-3xl">From First Note <span class="text-gold-400">→</span> Professional</h1>
         <p class="text-ink-400 text-base sm:text-lg max-w-xl mt-6 leading-relaxed">
-          I'm starting from the basics — learning to sing, understand music, record, produce, mix and master.
-          One class, one practice session and one song at a time.
+          Learn to sing, read music, train your ear, play keyboard, write songs, record, produce, mix and
+          master — step by step, starting from the absolute basics. One class, one practice session and
+          one song at a time.
         </p>
         <div class="flex flex-wrap gap-3 mt-8">
-          <a href="#/classes/${current.id}" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gold-500 text-ink-950 font-medium hover:bg-gold-400 transition-colors shadow-glow-sm">
-            Start Class ${current.number} ${icon("arrowRight", "w-4 h-4")}
-          </a>
+          ${Auth.isLoggedIn()
+            ? `<a href="#/dashboard" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gold-500 text-ink-950 font-medium hover:bg-gold-400 transition-colors shadow-glow-sm">Go to Dashboard ${icon("arrowRight", "w-4 h-4")}</a>`
+            : `<a href="#/classes/${current.id}" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gold-500 text-ink-950 font-medium hover:bg-gold-400 transition-colors shadow-glow-sm">Start Class ${current.number} ${icon("arrowRight", "w-4 h-4")}</a>`
+          }
           <a href="#/journey" class="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/15 text-ink-100 hover:bg-white/5 transition-colors">
             View My Journey
           </a>

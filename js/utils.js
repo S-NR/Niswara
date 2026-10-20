@@ -26,6 +26,14 @@ const Utils = {
     return `${m}:${s}`;
   },
 
+  /** Reads a query-style param tacked onto a hash route, e.g. "#/login?next=%23%2Fdashboard" -> getHashQuery("next") -> "#/dashboard" */
+  getHashQuery(key) {
+    const qIndex = location.hash.indexOf("?");
+    if (qIndex === -1) return null;
+    const params = new URLSearchParams(location.hash.slice(qIndex + 1));
+    return params.get(key);
+  },
+
   escapeHtml(str = "") {
     return str.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   },

@@ -11,12 +11,12 @@ const APP_DATA = (() => {
   const LEVELS = [
     { id: 1, title: "Foundation", role: "Beginner", skills: ["Voice awareness", "Breathing", "Pitch", "Rhythm", "Ear training", "Basic music concepts"] },
     { id: 2, title: "Singer", role: "Vocalist", skills: ["Vocal technique", "Range", "Resonance", "Dynamics", "Expression", "Performance"] },
-    { id: 3, title: "Musician", role: "Theory & Keys", skills: ["Music theory", "Keyboard", "Scales", "Intervals", "Chords", "Harmony"] },
-    { id: 4, title: "Recording Artist", role: "Studio Craft", skills: ["Microphone technique", "Recording", "Editing", "Pitch correction", "Vocal production"] },
-    { id: 5, title: "Producer", role: "Songcraft", skills: ["Songwriting", "Arrangement", "Instrumentation", "Production", "Sound selection"] },
-    { id: 6, title: "Mixing Engineer", role: "Mix Craft", skills: ["EQ", "Compression", "De-essing", "Reverb", "Delay", "Automation", "Vocal mixing"] },
-    { id: 7, title: "Mastering Engineer", role: "Final Polish", skills: ["Loudness", "Dynamics", "Limiting", "True peak", "Stereo processing", "Streaming preparation"] },
-    { id: 8, title: "Professional Artist", role: "Release & Identity", skills: ["Complete songs", "Portfolio", "Releases", "Performance", "Artist identity"] },
+    { id: 3, title: "Musician", role: "Theory & Keys", skills: ["Music theory", "Keyboard", "Scales", "Intervals", "Chords", "Harmony", "Rhythm", "Melody"] },
+    { id: 4, title: "Recording Artist", role: "Studio Craft", skills: ["Microphone", "Recording", "Editing", "Comping", "Pitch correction", "Vocal production"] },
+    { id: 5, title: "Producer", role: "Songcraft", skills: ["Songwriting", "Arrangement", "Instrumentation", "Sound selection", "Production"] },
+    { id: 6, title: "Mixing Engineer", role: "Mix Craft", skills: ["EQ", "Compression", "De-essing", "Saturation", "Reverb", "Delay", "Automation", "Bus processing", "Stereo imaging"] },
+    { id: 7, title: "Mastering Engineer", role: "Final Polish", skills: ["Dynamics", "Loudness", "True peak", "Limiting", "Stereo", "Reference tracks", "Streaming preparation"] },
+    { id: 8, title: "Professional Artist", role: "Release & Identity", skills: ["Complete songs", "Portfolio", "Release preparation", "Performance", "Artist identity"] },
   ];
 
   /* ---------- Level 1 : fully authored classes ---------- */
@@ -315,19 +315,19 @@ const APP_DATA = (() => {
 
   const levelClassDefs = {
     2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate",
-      titles: ["Vocal Technique Foundations", "Exploring Your Range", "Resonance & Placement", "Dynamics: Soft to Loud", "Expression & Emotion", "Performance Presence"] },
+      titles: ["Vocal Placement", "Resonance", "Chest Voice", "Head Voice", "Mixed Voice", "Vocal Range", "Dynamics", "Expression", "Phrasing", "First Performance Assessment"] },
     3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
-      titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony"] },
+      titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
-      titles: ["Microphone Technique", "Home Recording Setup", "Vocal Editing Basics", "Pitch Correction", "Vocal Production"] },
+      titles: ["Microphone Technique", "Recording Fundamentals", "Editing Basics", "Comping Takes", "Pitch Correction", "Vocal Production"] },
     5: { category: "Production", skillTag: "recording", difficulty: "Intermediate",
-      titles: ["Songwriting Fundamentals", "Arrangement Basics", "Instrumentation Choices", "Production Workflow", "Sound Selection"] },
+      titles: ["Songwriting Fundamentals", "Arrangement Basics", "Instrumentation Choices", "Sound Selection", "Production Workflow"] },
     6: { category: "Mixing", skillTag: "mixing", difficulty: "Advanced",
-      titles: ["EQ Fundamentals", "Compression Basics", "De-essing", "Reverb & Space", "Delay", "Automation", "Vocal Mixing"] },
+      titles: ["EQ Fundamentals", "Compression Basics", "De-essing", "Saturation", "Reverb & Space", "Delay", "Automation", "Bus Processing", "Stereo Imaging"] },
     7: { category: "Mastering", skillTag: "mastering", difficulty: "Advanced",
-      titles: ["Loudness Fundamentals", "Dynamics & Limiting", "True Peak", "Stereo Processing", "Reference Tracks", "Streaming Preparation"] },
+      titles: ["Dynamics", "Loudness", "True Peak", "Limiting", "Stereo Processing", "Reference Tracks", "Streaming Preparation"] },
     8: { category: "Professional Practice", skillTag: "vocal", difficulty: "Professional",
-      titles: ["Completing a Song End-to-End", "Building a Portfolio", "Preparing a Release", "Live Performance", "Defining Your Artist Identity"] },
+      titles: ["Completing Full Songs", "Building a Portfolio", "Release Preparation", "Live Performance", "Artist Identity"] },
   };
 
   const CLASSES = [
