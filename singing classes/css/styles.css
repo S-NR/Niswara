@@ -1,0 +1,64 @@
+/* ============================================================
+   GLOBAL STYLES
+   Small, hand-written layer on top of Tailwind for things the
+   utility classes don't cover cleanly: fonts, scrollbars,
+   selection color, reusable form fields, and subtle motion.
+   ============================================================ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: "Fraunces", serif;
+  font-feature-settings: "ss01";
+}
+
+::selection {
+  background: rgba(214, 162, 67, 0.35);
+  color: #fff;
+}
+
+/* Scrollbars — quiet, studio-dark */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.16); }
+
+/* Shared form field style (journal textareas etc.) */
+.field {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #f4f4f5;
+  resize: none;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.field::placeholder { color: #5c5d68; }
+.field:focus { border-color: rgba(231, 191, 108, 0.4); }
+
+/* Gentle entrance animation for page sections */
+#app > section {
+  animation: rise 0.35s ease both;
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  #app > section { animation: none; }
+}

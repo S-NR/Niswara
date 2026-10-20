@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From First Note to Professional</title>
+<meta name="description" content="A personal, long-term journey from complete beginner to professional singer, musician, recording artist, producer, mixing engineer and mastering engineer.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        fontFamily: {
+          display: ['"Fraunces"', "serif"],
+          sans: ['"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
+        },
+        colors: {
+          ink: {
+            50: "#f4f4f5", 100: "#e7e7ea", 200: "#cfd0d6", 300: "#a8a9b3",
+            400: "#7c7d89", 500: "#5c5d68", 600: "#43434c", 700: "#2d2d34",
+            800: "#1c1c21", 900: "#121216", 950: "#09090b",
+          },
+          gold: {
+            300: "#f3da9e", 400: "#e7bf6c", 500: "#d6a243", 600: "#b5832c",
+          },
+          teal: {
+            300: "#8fd8cb", 500: "#349c8c",
+          },
+        },
+        boxShadow: {
+          glow: "0 0 50px rgba(214,162,67,0.30)",
+          "glow-sm": "0 0 20px rgba(214,162,67,0.25)",
+        },
+        backgroundImage: {
+          "studio-glow": "radial-gradient(55% 45% at 50% 0%, rgba(214,162,67,0.16) 0%, rgba(9,9,11,0) 70%)",
+        },
+      },
+    },
+  };
+</script>
+
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-ink-950 text-ink-100 font-sans antialiased">
+
+<div id="navbar"></div>
+<main id="app" class="min-h-screen pb-20 lg:pb-0"></main>
+<div id="mobile-nav"></div>
+<div id="mobile-fab"></div>
+<div id="footer"></div>
+
+<script src="js/data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/timer.js"></script>
+<script src="js/components.js"></script>
+<script src="js/router.js"></script>
+<script src="js/pages/home.js"></script>
+<script src="js/pages/journey.js"></script>
+<script src="js/pages/classes.js"></script>
+<script src="js/pages/classDetail.js"></script>
+<script src="js/pages/practice.js"></script>
+<script src="js/pages/projects.js"></script>
+<script src="js/pages/progress.js"></script>
+<script src="js/pages/resources.js"></script>
+<script src="js/pages/journal.js"></script>
+<script src="js/pages/about.js"></script>
+<script src="js/pages/share.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
