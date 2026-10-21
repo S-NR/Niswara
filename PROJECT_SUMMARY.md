@@ -41,6 +41,8 @@ index.html ─┬─ config.js            public Supabase URL + publishable key 
             ├─ js/lessons/lessonKit.js       shared lesson header, stage tracker, chapters, assignment, loadAndRefresh
             ├─ js/lessons/understandingPitch.js interactive Class 3
             ├─ js/lessons/matchingANote.js   interactive Class 4
+            ├─ js/components/listening.js    Waveform, WaveformPlayer, RecordingMarkers, RecordingCard, ListeningPasses, ObservationChecklist
+            ├─ js/lessons/listeningToYourVoice.js interactive Class 5
             ├─ js/lessons/registry.js        InteractiveLessons (class `interactive` key -> lesson)
             └─ js/pages/*.js        17 pages, each { render(params), mount(container) → cleanup }
 supabase/migrations/0001_profiles.sql          profiles table, signup trigger, RLS, public_profiles view, avatars bucket
@@ -70,6 +72,7 @@ Design seams (all intentional):
 | Class page: lesson, timer, self-evaluation, upload + playback, reflection, complete | ✅ Working (local only) |
 | **Class 3 — Understanding Pitch (interactive)** | ✅ Guided lesson (Understand → Listen → Play → Identify → Sing → Reflect → Complete). Includes a virtual piano (mouse, touch, keyboard), Learn With Piano, three ear-training exercises with scoring, Sing the Note (record and play back, labelled "Self Evaluation"), private notes, reflection, assignment, and an 8-item progress tracker. Completion requires all 8 items. Saves per user to Supabase once `0003` is run; until then, on the device. |
 | **Class 4 — Matching a Note (interactive)** | ✅ Guided lesson (Understand → Hear → Sing → Adjust → Match → Practice → Reflect → Complete):<br>• The Listen → Remember → Sing → Compare → Adjust loop and a prominent "Choose comfort over range" rule.<br>• A reference note picked on the reused `VirtualPiano`, in a configurable range (Middle C4–C5 by default, or Lower C3–C4).<br>• Five exercises: Listen and Sing, Try Again and Adjust (3 attempts), Slide Into the Note, Blind Matching (3 hidden notes), and Note Chain (C–D–E; wider steps configurable but locked).<br>• Flat and sharp, with audio demos.<br>• An optional **pitch estimate**, offered only after you've judged a take yourself, and never a score.<br>• A practice timer logging "Pitch Training" with the class ID, an 8-question self-assessment, My Notes, a 10-item assignment with final reflection, a 10-item progress tracker with recording and self-evaluation counts, and a completion panel with the Class 5 bridge. |
+| **Class 5 — Listening to Your Own Voice (interactive)** | ✅ Guided lesson (Understand → Record → Listen → Observe → Mark → Compare → Practice → Reflect → Complete), built on "Observation before correction":<br>• A listening warm-up on six short examples (piano and a voice-like synth tone, clearly labelled not a real singer). Multi-select "What did you notice?" with "Good observation." and no score.<br>• A body-awareness check, then a 20–30 s baseline recording: honest, no effects.<br>• Three guided listens: just listen → only pitch → words, breath and smoothness. Each unlocks after the last; Listen 1 completes when playback reaches the end.<br>• A self-listening checklist: pitch, words, breath, volume, smoothness, tone, tension. These are observations, not diagnoses.<br>• A **waveform player** (loudness, explicitly *not* pitch) with play, pause, tap/drag/keyboard seek, replay and **replay a section**.<br>• **Timestamped markers** saved per recording, with private notes per recording.<br>• Reference vs your voice, on Class 4's engine and reference note, with no estimate and the learner deciding which was closer.<br>• Speaking vs singing, with notes.<br>• A practice timer logging "Listening / Vocal Awareness" (under the Ear Training task).<br>• An assignment: a 30–60 s song, three listens, three or more marked observations, five questions and **choose ONE thing**.<br>• A 4-question reflection, My Notes, an 11-item progress tracker, and a completion panel with your ONE thing and the Class 6 bridge. |
 | Practice: daily checklist + timer | ✅ Working (local only) |
 | Journal, Projects, Progress, Achievements, Before/After | ✅ Working (local only) |
 | Share-a-class post generator | ✅ Working |
@@ -173,6 +176,17 @@ Status: ✅ fixed · 🔧 fixed, but needs your action · ⏳ open
 | C3 | 🟡 Low | Tested in Chrome desktop and Chrome with phone emulation (390 px, touch). Not yet tried on a real iPhone/Safari (Web Audio unlock, MediaRecorder `audio/mp4`) or a real Android device. | ⏳ Needs a device check |
 | C4 | 🟡 Low | Class 3 recordings stayed on the device (IndexedDB), like other recordings. | ✅ Fixed: uploaded to the private `recordings` bucket and downloaded on other devices |
 
+### Class 5 (interactive) — known limitations and design choices
+
+| # | Severity | Issue | Status |
+|---|---|---|---|
+| F1 | — | By design, nothing in Class 5 analyses or judges the voice. The only visual is a **basic loudness waveform**, labelled as not showing pitch, and every observation is the learner's own. No "AI" wording anywhere. Future analysis (pitch curve, volume envelope, timing, breath, spectral) should start from `PitchAnalysis.decode` and appear as its own labelled panel. | Intended |
+| F2 | 🟡 Low | The warm-up can't demonstrate "Word was unclear": the examples are synthesized, with no real voice or words. The option stays available for the learner's own observations. | Accepted (could add real recorded examples later) |
+| F3 | — | Recordings, markers and notes are **always private**. There's no "make this recording public" feature yet. When one is added, markers and notes on that recording should only become visible if the learner explicitly opts in. | Intended / future |
+| F4 | 🟡 Low | Per-recording notes are stored as `class_notes` rows keyed `L1C05:rec-<mediaId>`, and the speaking/singing notes as `L1C05:speak-sing`. Same table and owner-only rules; no migration needed. | By design |
+| F5 | 🟡 Low | Real iPhone/Safari: recording, waveform decoding of `audio/mp4`, and seeking are untested (as **C3** / **D4**). | ⏳ Device check |
+| F6 | 🟢 Fixed | **Found while testing:** a background sync from another device redrew the page even while recording, which would cancel the take. | ✅ `app.js` now waits until you've stopped recording (and typing) |
+
 ### Class 4 (interactive) — known limitations and design choices
 
 | # | Severity | Issue | Status |
@@ -232,23 +246,73 @@ A generic React/TypeScript "sequential course" engine: day lessons, quizzes, a f
 ### Content & interactive classes
 9. Write Levels 2–8: 50 classes. Remove `comingSoon` from each as it's published.
 10. Fill the "Demonstration" slot with audio or video examples (empty on every class).
-11. Class 4 follow-ups:
+11. Class 5/6 follow-ups:
+    - Build Class 6 "Rhythm & Timing" on `LessonKit` + `RecordingCard` + `WaveformPlayer`. The waveform's loudness view suits tapping and timing exercises.
+    - Optionally record real sung examples for the Class 5 warm-up (**F2**).
+    - Decide how public recordings should work before adding sharing (**F3**).
+12. Class 4 follow-ups:
     - Unlock "Wider steps (C–E–G)" in the note chain when ready (`CHAIN_LEVELS` in `matchingANote.js`).
     - Tune the pitch estimate on real voices (**D2**).
     - Build Class 5, "Listening to Your Own Voice", on `VoiceRecorder`, `PitchMatchExercise` and `LessonKit`.
-12. Class 3 follow-ups:
+13. Class 3 follow-ups:
     - Widen Find the Note beyond C4–F4 as a "harder" level.
     - Add real pitch detection behind `PitchAnalysis` (**C2**).
     - Reuse `VirtualPiano` and `PitchExercise` for Class 4 "Matching a Note" and later scales and intervals.
 
 ### Housekeeping
-13. Replace the Tailwind play CDN with a compiled stylesheet (**S5**).
-14. Decide the future of `web/`: merge or archive (**W4–W6**).
-15. Add automated tests and CI. The checks run so far (below) were one-off scripts and aren't committed.
+14. Replace the Tailwind play CDN with a compiled stylesheet (**S5**).
+15. Decide the future of `web/`: merge or archive (**W4–W6**).
+16. Add automated tests and CI. The checks run so far (below) were one-off scripts and aren't committed.
 
 ---
 
 ## 6. Change log
+
+### 2026-10-21: interactive Class 5 "Listening to Your Own Voice" (uncommitted)
+
+New: `js/components/listening.js` (Waveform, WaveformPlayer, RecordingMarkers, RecordingCard, ListeningPasses, ObservationChecklist) and `js/lessons/listeningToYourVoice.js`.
+
+Changed (all backwards compatible):
+- `js/data.js`: Class 5 content and the `interactive` flag.
+- `js/lessons/registry.js`.
+- `js/audio/pianoSynth.js`: `tone()` glide and `breath()`, for the listening examples.
+- `js/audio/voiceRecorder.js`: a page-wide "audio started" signal, so only one thing plays at a time.
+- `js/audio/pitchAnalysis.js`: `decode` exported, shared with the waveform.
+- `js/components/pitchMatch.js`: a `noEstimate` option.
+- `js/components/personalNotes.js`: optional title and rows.
+- `js/app.js`: a sync redraw now waits until you stop recording or typing.
+- `css/styles.css` and `index.html`.
+
+**No new migration:** markers and answers go in `class_progress`, notes in `class_notes`, and recordings in `learner_state` plus the private `recordings` bucket.
+
+Reuse: recording is still the single `VoiceRecorder` engine, and notes the single `PersonalNotes`/`class_notes` system. The comparison reuses Class 4's `PitchMatchExercise` and its reference note. Practice uses the existing `Timer` and `Store` sessions, the layout uses `LessonKit`, and progress uses `ClassProgress`/`ClassActivity`.
+
+Verified:
+- **Full journey, desktop headless Chrome with a WAV fed into the fake microphone:**
+  - All 16 steps render, and "lesson viewed" is set only after scrolling.
+  - Warm-up: the glide example uses the voice tone, and feedback says "Good observation." both when you heard it and when you didn't.
+  - The body-check tip shows for "A bit tense".
+  - Baseline: 21 s saved, drawn as a 160-bar waveform labelled "does not show pitch".
+  - Listening passes: locked until there's a recording, and unlock in order. Listen 1 completed by real playback to the end.
+  - All five observation areas recorded.
+  - Waveform: tapping the middle jumped to 00:10, and markers at 00:10 and 00:12 were saved per recording with pins. Section replay 00:02→00:03 stopped exactly at 00:03.
+  - The per-recording note was saved under `L1C05:rec-<id>`.
+  - Compare had two takes with no estimate. Speaking and singing were both recorded.
+  - The timer logged `{task: "ear", category: "Listening / Vocal Awareness", classId: "L1C05"}`.
+  - The 31 s song got three marked observations and five answers, and ONE was chosen.
+  - Progress was 91% before the reflection and 100% after. The completion panel showed "My ONE thing", the Class 6 bridge and Continue to Class 6, and Class 6 became current.
+  - After reload everything was restored, and playback works.
+- **Mobile (390 px, touch):** no sideways scroll anywhere. Touch works for record/stop, tap-to-seek, marker chips and adding a marker, and play/pause. A too-short take is honestly flagged. Section-controls wrapping was fixed.
+- **Two users across two devices (mock account server):**
+  - Alice's waveform, 00:02 marker and pin, per-recording note, class note and observation all appeared on a fresh "phone", and her laptop recording played there.
+  - The recording note and class note were stored as separate rows.
+  - Bob saw Class 5 locked. After unlocking it he had 0%, no recordings, markers or answers, and **could not fetch Alice's recording file**. The server kept per-user rows.
+- **Regression:**
+  - All 19 routes render.
+  - The Class 3 journey (recording and completion) and the Class 4 journey (estimate "slightly lower", 100%, Continue to Class 5, reload) still pass.
+  - The merge, Store and pitch-estimator tests pass (11/11).
+
+**Not verified:** real singing voices, real iPhone/Android hardware (**F5**), and a real two-account run on the live Supabase (the logic was tested against a mock with the same contract).
 
 ### 2026-10-21: interactive Class 4 "Matching a Note" (uncommitted)
 

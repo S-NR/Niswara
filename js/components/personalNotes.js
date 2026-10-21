@@ -8,14 +8,15 @@
 const PersonalNotes = (() => {
   const SAVE_DELAY = 800;
 
-  function render(id, { placeholder = "" } = {}) {
+  /** title: heading (default "My Notes"). The notes key passed to wire() decides what they belong to (a class, or one recording). */
+  function render(id, { placeholder = "", title = "My Notes", rows = 6 } = {}) {
     return `
     <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-5 sm:p-7" data-notes="${id}">
       <div class="flex items-center justify-between gap-3 mb-3 flex-wrap">
-        <h3 class="font-display text-xl text-ink-50">My Notes</h3>
+        <h3 class="font-display text-xl text-ink-50">${title}</h3>
         <span class="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-ink-500">${icon("lock", "w-3.5 h-3.5")} Private — only you can see these</span>
       </div>
-      <textarea data-notes-field rows="6" disabled class="field leading-relaxed" placeholder="${Utils.escapeHtml(placeholder)}">Loading…</textarea>
+      <textarea data-notes-field rows="${rows}" disabled class="field leading-relaxed" placeholder="${Utils.escapeHtml(placeholder)}">Loading…</textarea>
       <p class="text-xs text-ink-500 mt-2 min-h-[1rem]" data-notes-status aria-live="polite"></p>
     </div>`;
   }

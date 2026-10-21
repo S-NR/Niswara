@@ -257,6 +257,21 @@ body {
 .pg-key-ref, .pg-key-voice { display: inline-block; width: 16px; height: 0; border-top: 2px dashed rgba(231, 191, 108, 0.75); }
 .pg-key-voice { border-top: 2.5px solid #8fd8cb; }
 
+/* ============================================================
+   SELF-LISTENING (js/components/listening.js, Class 5)
+   ============================================================ */
+.wf-bar { fill: rgba(143, 216, 203, 0.55); }
+.wf-stage:focus-visible { outline: 2px solid rgba(231, 191, 108, 0.7); outline-offset: 2px; }
+.wf-playhead { width: 2px; margin-left: -1px; background: #f3da9e; box-shadow: 0 0 12px rgba(214, 162, 67, 0.7); pointer-events: none; }
+.wf-section { background: rgba(214, 162, 67, 0.12); border-left: 1px solid rgba(231, 191, 108, 0.6); border-right: 1px solid rgba(231, 191, 108, 0.6); pointer-events: none; }
+.wf-pin {
+  position: absolute; top: 4px; width: 8px; height: 8px; margin-left: -4px; border-radius: 999px;
+  background: #e7bf6c; box-shadow: 0 0 0 2px rgba(9, 9, 11, 0.9), 0 0 10px rgba(214, 162, 67, 0.6);
+}
+.wf-pin::after { content: ""; position: absolute; left: 3.5px; top: 8px; width: 1px; height: 64px; background: rgba(231, 191, 108, 0.35); }
+.lp-card { transition: border-color 0.2s, background 0.2s, opacity 0.2s; }
+.lp-card.is-done { border-color: rgba(52, 211, 153, 0.25); background: rgba(16, 185, 129, 0.04); }
+
 .pv-grid { stroke: rgba(255, 255, 255, 0.06); stroke-width: 1; }
 .pv-label { fill: #5c5d68; font-size: 11px; font-family: Inter, sans-serif; }
 .pv-axis { fill: #43434c; font-size: 10px; font-family: Inter, sans-serif; letter-spacing: 0.08em; }

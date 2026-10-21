@@ -176,5 +176,6 @@ const PitchAnalysis = (() => {
     return text;
   }
 
-  return { isAvailable, analyzeBlob, analyzeSamples, compare, describe, toMidi };
+  // decode is shared with the Class 5 waveform (one audio decoder for the whole app)
+  return { isAvailable, analyzeBlob, analyzeSamples, compare, describe, toMidi, decode };
 })();

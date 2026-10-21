@@ -32,6 +32,7 @@ const VoiceRecorder = (() => {
     }
     PianoSynth.stopAll();
     stopPlayback();
+    announce("recorder");
 
     const chunks = [];
     const recorder = new MediaRecorder(stream);
@@ -128,6 +129,7 @@ const VoiceRecorder = (() => {
     if (!url) return false;
     stopPlayback();
     PianoSynth.stopAll();
+    announce("recorder");
     const audio = new Audio(url);
     player = audio;
     audio.onended = () => { if (player === audio) player = null; if (onEnded) onEnded(); };
@@ -143,5 +145,16 @@ const VoiceRecorder = (() => {
 
   function isRecording() { return !!active; }
 
-  return { isSupported, start, saveToClass, play, stopPlayback, isPlaying, isRecording, extFor };
+  /**
+   * Page-wide "audio is starting" signal so only one thing sounds at a time.
+   * Other players (e.g. WaveformPlayer) pause when someone else announces.
+   */
+  function announce(source) {
+    window.dispatchEvent(new CustomEvent("niswara:audio-start", { detail: { source } }));
+  }
+
+  // Another player started: stop our simple playback
+  window.addEventListener("niswara:audio-start", (e) => { if (e.detail.source !== "recorder") stopPlayback(); });
+
+  return { isSupported, start, saveToClass, play, stopPlayback, isPlaying, isRecording, extFor, announce };
 })();

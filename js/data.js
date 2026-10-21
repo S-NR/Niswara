@@ -156,26 +156,33 @@ const APP_DATA = (() => {
     },
     {
       number: 5, title: "Listening to Your Own Voice", category: "Ear Training", skillTag: "ear",
-      difficulty: "Beginner", estMinutes: 20,
-      description: "Build the habit of objective self-listening — the most important long-term skill for a recording artist.",
+      difficulty: "Beginner", estMinutes: 45,
+      // Rendered by the interactive lesson in js/lessons/listeningToYourVoice.js
+      interactive: "listening-to-your-voice",
+      subtitle: "A singer improves faster when they learn to listen like a singer.",
+      description: "An interactive lesson: record yourself, listen three ways, notice what your voice is doing, mark moments — and choose one thing to work on. Observation before correction.",
       content: {
-        whatYoullLearn: "How to listen back to your own recordings objectively, without the discomfort most beginners feel hearing their own voice.",
+        whatYoullLearn: "How to listen back to your own singing calmly and specifically — noticing pitch, words, breath, volume, smoothness and tone — and turn what you hear into simple observations.",
         whyItMatters: "Mixing and mastering engineers spend their entire career critically listening. Learning to do this calmly, about your own voice, starts that muscle early.",
         theory: "Most people feel their voice sounds 'wrong' on playback because they're used to hearing it through bone conduction, not air. That mismatch is normal — the recording is the more accurate version of what others hear.",
         guidedPractice: [
-          "Play back your Class 1 baseline recording once, just listening.",
-          "Play it again, listing 3 neutral observations (not judgements).",
-          "Play it a third time, listening only for pitch accuracy.",
+          "Recorded myself, listened three ways (just listening, only pitch, words/breath/smoothness), marked moments and noted what I observed.",
         ],
         assignment: {
           instructions: [
-            "Listen back to your Class 1 recording three times as guided above.",
-            "Write down your 3 neutral observations and 1 pitch observation.",
+            "Record 30–60 seconds of a song — no effects.",
+            "Listen 1: listen normally.",
+            "Listen 2: listen only for pitch.",
+            "Listen 3: listen for words, breath, volume and smoothness.",
+            "Record at least three observations (mark the moments).",
+            "Answer the five questions below.",
+            "Choose ONE observation to practise next.",
           ],
           questions: [
-            "What surprised me about my own voice?",
-            "Was it easier or harder than I expected to stay neutral?",
-            "What's one specific thing I'd like to improve first?",
+            "What changed when you listened to yourself carefully?",
+            "Did your voice sound different from how you expected?",
+            "Was it easy or difficult to identify problems?",
+            "What is the ONE thing you want to improve next?",
           ]
         }
       }

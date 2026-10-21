@@ -81,24 +81,27 @@ Auth.onChange((session, event) => {
 
 // Progress arrived from another device: show it. Skipped while the learner is
 // typing so a background sync never wipes a half-written answer.
+// Also skipped while recording — a redraw would cancel the take in progress.
 let pendingRemoteRender = false;
+let pendingTimer = null;
+function busyLearner() {
+  const el = document.activeElement;
+  const typing = el && el.closest && el.closest("#app") && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName);
+  return typing || VoiceRecorder.isRecording();
+}
+function renderWhenFree() {
+  clearTimeout(pendingTimer);
+  if (busyLearner()) { pendingTimer = setTimeout(renderWhenFree, 1500); return; }
+  pendingRemoteRender = false;
+  Router.rerender();
+}
 CloudSync.on((event) => {
   if (event !== "remote-changed") return;
-  const el = document.activeElement;
-  if (el && el.closest && el.closest("#app") && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) {
-    pendingRemoteRender = true;
-    return;
-  }
+  if (busyLearner()) { pendingRemoteRender = true; pendingTimer = setTimeout(renderWhenFree, 1500); return; }
   Router.rerender();
 });
 document.addEventListener("focusout", () => {
-  if (!pendingRemoteRender) return;
-  setTimeout(() => {
-    const el = document.activeElement;
-    if (el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return;
-    pendingRemoteRender = false;
-    Router.rerender();
-  }, 0);
+  if (pendingRemoteRender) setTimeout(renderWhenFree, 0);
 });
 
 // Store couldn't save (usually storage quota) — tell the learner instead of failing silently

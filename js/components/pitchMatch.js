@@ -143,7 +143,7 @@ const PitchMatchExercise = (() => {
   function slotHtml(id, cfg, slot, take, recording) {
     const recorded = !!(take && take.mediaId);
     const assessed = !!(take && take.assessment);
-    const canEstimate = recorded && PitchAnalysis.isAvailable && (!cfg.assessment || assessed);
+    const canEstimate = !cfg.noEstimate && recorded && PitchAnalysis.isAvailable && (!cfg.assessment || assessed);
     return `
       <div class="pm-slot rounded-2xl border ${recording ? "border-red-400/30 bg-red-500/[0.04]" : "border-white/5 bg-white/[0.02]"} p-4" data-slot="${slot.key}">
         <div class="flex items-start justify-between gap-3 flex-wrap">

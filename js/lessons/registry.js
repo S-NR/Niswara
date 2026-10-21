@@ -7,4 +7,5 @@
 const InteractiveLessons = {
   "understanding-pitch": UnderstandingPitchLesson,
   "matching-a-note": MatchingANoteLesson,
+  "listening-to-your-voice": ListeningToYourVoiceLesson,
 };

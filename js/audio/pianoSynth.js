@@ -164,5 +164,64 @@ const PianoSynth = (() => {
     [...active].forEach((h) => h.release(false));
   }
 
-  return { isSupported, ensure, noteOn, play, playSequence, stopAll, setVolume, getVolume };
+  /**
+   * A soft, voice-like sustained tone (not a piano) that can glide smoothly from one pitch to
+   * another — used for listening examples ("smooth transition"). Resolves when finished.
+   */
+  function tone(fromMidi, toMidi = fromMidi, { duration = 1.2, glideAt = 0.35, glideTime = 0.4, velocity = 0.7 } = {}) {
+    const ac = ensure();
+    if (!ac) return Promise.resolve();
+    const t = ac.currentTime;
+    const out = ac.createGain();
+    const peak = 0.22 * velocity;
+    out.gain.setValueAtTime(0.0001, t);
+    out.gain.exponentialRampToValueAtTime(peak, t + 0.08);
+    out.gain.setValueAtTime(peak, t + duration - 0.15);
+    out.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    const filter = ac.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 1800;
+    filter.connect(out);
+    out.connect(master);
+    const osc = ac.createOscillator();
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(NoteUtils.freq(fromMidi), t);
+    osc.frequency.setValueAtTime(NoteUtils.freq(fromMidi), t + duration * glideAt);
+    osc.frequency.linearRampToValueAtTime(NoteUtils.freq(toMidi), t + duration * glideAt + glideTime);
+    const vib = ac.createOscillator();
+    const vibGain = ac.createGain();
+    vib.frequency.value = 5;
+    vibGain.gain.value = 2.5;
+    vib.connect(vibGain);
+    vibGain.connect(osc.frequency);
+    osc.connect(filter);
+    osc.start(t); vib.start(t);
+    osc.stop(t + duration + 0.05); vib.stop(t + duration + 0.05);
+    return new Promise((r) => setTimeout(r, duration * 1000));
+  }
+
+  /** A short breath-like noise (filtered noise burst) — for the "breath sound" listening example. */
+  function breath({ duration = 0.6, velocity = 0.5 } = {}) {
+    const ac = ensure();
+    if (!ac) return Promise.resolve();
+    const t = ac.currentTime;
+    const buf = ac.createBuffer(1, Math.floor(ac.sampleRate * duration), ac.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    const src = ac.createBufferSource();
+    src.buffer = buf;
+    const band = ac.createBiquadFilter();
+    band.type = "bandpass";
+    band.frequency.value = 1500;
+    band.Q.value = 0.6;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.18 * velocity, t + duration * 0.35);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    src.connect(band); band.connect(g); g.connect(master);
+    src.start(t);
+    return new Promise((r) => setTimeout(r, duration * 1000));
+  }
+
+  return { isSupported, ensure, noteOn, play, playSequence, stopAll, setVolume, getVolume, tone, breath };
 })();
