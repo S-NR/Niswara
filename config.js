@@ -17,6 +17,7 @@
    ============================================================ */
 
 window.NISWARA_CONFIG = {
-  SUPABASE_URL: "YOUR_SUPABASE_PROJECT_URL",
-  SUPABASE_ANON_KEY: "YOUR_SUPABASE_ANON_PUBLIC_KEY",
+  SUPABASE_URL: "https://phnxdefiyjlvsyapfobf.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_6Anz3-ZA8pDI8OMAWM4ZYw_B-mfBbnf",
 };
+
