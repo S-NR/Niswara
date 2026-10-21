@@ -51,11 +51,13 @@ export const useProgressStore = create<ProgressState>()(
           if (!cp) return s;
           const existing = cp.days[dayId];
           const best = Math.max(existing?.bestScore ?? 0, attempt.score);
+          // A failed retake must not un-complete a passed day (that would re-lock every later day)
           const day = {
             dayId,
-            status: attempt.passed
-              ? ("completed" as const)
-              : ("unlocked" as const),
+            status:
+              attempt.passed || existing?.status === "completed"
+                ? ("completed" as const)
+                : ("unlocked" as const),
             bestScore: best,
             attempts: [...(existing?.attempts ?? []), attempt]
           };

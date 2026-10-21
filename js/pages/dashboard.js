@@ -21,6 +21,7 @@ const DashboardPage = {
     const user = Auth.getUser();
     const root = container.querySelector("#dashboard-root");
     const { data: profile } = await Auth.getProfile(user.id);
+    if (!root.isConnected) return; // navigated away while the profile was loading
     const name = (profile && profile.name) || (user.user_metadata && user.user_metadata.name) || user.email.split("@")[0];
 
     const s = Store.getState();
@@ -32,6 +33,7 @@ const DashboardPage = {
     const latestAchievement = unlocked[unlocked.length - 1];
 
     root.innerHTML = `
+      ${profile && !profile.username ? Components.FormNotice("info", `Your account doesn't have a username yet — the one you chose at sign-up was already taken. <a href="#/profile" class="text-gold-300 underline">Pick one on your profile</a>.`) : ""}
       <div class="flex items-center justify-between flex-wrap gap-4 mb-10">
         <div>
           <p class="text-xs tracking-[0.2em] uppercase text-gold-400/80 mb-2">Dashboard</p>

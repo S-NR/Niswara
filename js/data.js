@@ -302,6 +302,7 @@ const APP_DATA = (() => {
       skillTag,
       difficulty,
       estMinutes: 30,
+      comingSoon: true, // no lesson content yet — can be viewed but not completed (see Store.completeClass)
       description: `Unlocks once Level ${levelId - 1} is complete.`,
       content: {
         whatYoullLearn: "This lesson will unlock as you progress through the curriculum.",
@@ -407,7 +408,7 @@ const APP_DATA = (() => {
     { id: "first-master", icon: "🔊", title: "First Master", desc: "Complete your first Mastering Engineer class." },
     { id: "first-original", icon: "🎼", title: "First Original Song", desc: "Finish a project marked as an original song." },
     { id: "streak-30", icon: "🔥", title: "30-Day Practice Streak", desc: "Practice 30 days in a row." },
-    { id: "hundred-classes", icon: "🏆", title: "100 Classes Completed", desc: "Complete 100 classes across the curriculum." },
+    { id: "all-classes", icon: "🏆", title: "Curriculum Complete", desc: "Complete every class across all eight levels." },
   ];
 
   /* ---------- Quotes ---------- */

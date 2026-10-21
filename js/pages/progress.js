@@ -54,34 +54,57 @@ const ProgressPage = {
       input.addEventListener("change", async () => {
         const file = input.files[0];
         if (!file) return;
-        const dataUrl = await Utils.readFileAsDataUrl(file).catch(() => null);
-        Store.setMilestoneUpload(input.dataset.milestone, { fileName: file.name, dataUrl, date: new Date().toISOString() });
+        const mediaId = await Media.save(file).catch(() => null);
+        if (!mediaId) {
+          window.dispatchEvent(new CustomEvent("store:persist-failed"));
+          return;
+        }
+        Store.setMilestoneUpload(input.dataset.milestone, { fileName: file.name, mediaId, date: new Date().toISOString() });
         Router.softRefresh(container, ProgressPage);
       });
     });
 
-    wireAudioPlayers(container);
+    return wireAudioPlayers(container);
   },
 };
 
-/** Shared audio-player wiring: play/pause toggle + icon swap. Used on Progress & Share pages. */
+/**
+ * Shared audio-player wiring: play/pause toggle + icon swap. Used on Progress, Share and Class pages.
+ * Delegated on the container so players inserted later (new uploads) work too. Returns a cleanup fn
+ * — the container (#app) outlives the page, so the listener must be removed on unmount.
+ */
 function wireAudioPlayers(container) {
-  container.querySelectorAll('[data-action="toggleAudio"]').forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.target;
-      const audio = container.querySelector(`#${id}`);
-      if (!audio) return;
-      const iconHolder = container.querySelector(`[data-audio-icon="${id}"]`);
-      if (audio.paused) {
-        container.querySelectorAll("audio").forEach(a => a !== audio && a.pause());
-        audio.play();
-        if (iconHolder) iconHolder.innerHTML = Icons.pause;
-      } else {
-        audio.pause();
+  async function onClick(e) {
+    const btn = e.target.closest('[data-action="toggleAudio"]');
+    if (!btn || !container.contains(btn)) return;
+    const id = btn.dataset.target;
+    const audio = container.querySelector(`#${id}`);
+    if (!audio) return;
+    const iconHolder = container.querySelector(`[data-audio-icon="${id}"]`);
+
+    if (!audio.getAttribute("src") && audio.dataset.mediaId) {
+      const url = await Media.getUrl(audio.dataset.mediaId).catch(() => null);
+      if (!url) {
+        btn.disabled = true;
+        btn.title = "This recording isn't stored on this device";
+        return;
       }
-      audio.onended = () => { if (iconHolder) iconHolder.innerHTML = Icons.play; };
-      audio.onpause = () => { if (iconHolder) iconHolder.innerHTML = Icons.play; };
-      audio.onplay = () => { if (iconHolder) iconHolder.innerHTML = Icons.pause; };
-    });
-  });
+      audio.src = url;
+    }
+
+    audio.onended = () => { if (iconHolder) iconHolder.innerHTML = Icons.play; };
+    audio.onpause = () => { if (iconHolder) iconHolder.innerHTML = Icons.play; };
+    audio.onplay = () => { if (iconHolder) iconHolder.innerHTML = Icons.pause; };
+    if (audio.paused) {
+      container.querySelectorAll("audio").forEach(a => a !== audio && a.pause());
+      audio.play().catch(() => {});
+    } else {
+      audio.pause();
+    }
+  }
+  container.addEventListener("click", onClick);
+  return () => {
+    container.removeEventListener("click", onClick);
+    container.querySelectorAll("audio").forEach(a => a.pause());
+  };
 }

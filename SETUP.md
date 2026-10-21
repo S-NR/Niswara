@@ -65,16 +65,25 @@ accounts:
    region close to your users.
 3. Wait ~2 minutes for provisioning.
 
-### 2. Run the migration
+### 2. Run the migrations
 
-Dashboard → **SQL Editor** → New query → paste the contents of
-[`supabase/migrations/0001_profiles.sql`](supabase/migrations/0001_profiles.sql)
-→ **Run**.
+Dashboard → **SQL Editor** → New query → paste the contents of each file
+below, **in order**, → **Run**:
 
-This creates the `profiles` table, the trigger that creates a profile row
-on signup, Row Level Security policies, the `public_profiles` view, and an
-`avatars` storage bucket with its own policies. (If you're using the
-Supabase CLI instead: `supabase db push`.)
+1. [`supabase/migrations/0001_profiles.sql`](supabase/migrations/0001_profiles.sql)
+   — the `profiles` table, the trigger that creates a profile row on
+   signup, Row Level Security policies, the `public_profiles` view, and an
+   `avatars` storage bucket with its own policies.
+2. [`supabase/migrations/0002_security_fixes.sql`](supabase/migrations/0002_security_fixes.sql)
+   — stops users from changing their own `role`, makes `public_profiles`
+   readable by visitors (opted-in profiles only), and limits avatars to
+   2 MB images. **Required** — without it any user can make themselves
+   an admin.
+
+Both are safe to re-run. (If you're using the Supabase CLI instead:
+`supabase db push`.) Supabase's database linter will flag
+`public_profiles` as a "security definer view" — that's intentional; the
+view itself only exposes opted-in rows and safe columns.
 
 ### 3. Fill in `config.js`
 
@@ -122,7 +131,7 @@ Visit the live site → Sign Up → check that a row appears in the
 | Auth / Database / Storage | Supabase (already deployed the moment you create the project) |
 
 There is no build step and nothing to deploy for the backend beyond running
-the SQL migration once. Future migrations (`0002_...sql`, etc., as Phase 3+
+the SQL migrations once. Future migrations (`0003_...sql`, etc., as Phase 3+
 lands) are run the same way, in order.
 
 ## Security notes
@@ -170,3 +179,12 @@ the dashboard's class/practice numbers still read from this browser's local
 `Store` — the same data source the public pages already used. That's
 intentional, matches the phase order above, and means nothing here needs to
 be redone once Phase 3 lands.
+
+In the meantime, `Store` keeps a separate local slot per account
+(`ffntp.v1:<user id>`), so two people sharing a browser never see each
+other's progress. The first time an account logs in on a browser, any
+progress made there while logged out moves into that account. Progress
+does **not** follow an account to another device until Phase 3.
+
+Recordings are stored in the browser's IndexedDB (`js/media.js`), not in
+localStorage, and also stay on the device until Phase 5.

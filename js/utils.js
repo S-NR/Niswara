@@ -34,6 +34,13 @@ const Utils = {
     return params.get(key);
   },
 
+  /** The ?next= target after login, accepted only if it's an in-app route (never an auth page, to avoid bouncing back). */
+  safeNextRoute(fallback = "#/dashboard") {
+    const next = this.getHashQuery("next");
+    if (!next || !/^#\/[\w\-/]*$/.test(next) || /^#\/(login|signup)/.test(next)) return fallback;
+    return next;
+  },
+
   escapeHtml(str = "") {
     return str.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   },

@@ -32,16 +32,16 @@ const Auth = (() => {
   let currentSession = null;
   const listeners = new Set();
 
-  function notify() {
+  function notify(event) {
     listeners.forEach((fn) => {
-      try { fn(currentSession); } catch (e) { console.error(e); }
+      try { fn(currentSession, event); } catch (e) { console.error(e); }
     });
   }
 
-  /** Subscribe to session changes. Returns an unsubscribe function. Fires immediately with the current session. */
+  /** Subscribe to session changes: fn(session, event). Returns an unsubscribe function. Fires immediately with the current session. */
   function onChange(fn) {
     listeners.add(fn);
-    fn(currentSession);
+    fn(currentSession, "INITIAL");
     return () => listeners.delete(fn);
   }
 
@@ -49,10 +49,11 @@ const Auth = (() => {
     if (!isConfigured) return null;
     const { data } = await client.auth.getSession();
     currentSession = data.session;
-    notify();
-    client.auth.onAuthStateChange((_event, session) => {
+    notify("INITIAL_SESSION");
+    // event is e.g. SIGNED_IN, SIGNED_OUT, TOKEN_REFRESHED, USER_UPDATED, PASSWORD_RECOVERY
+    client.auth.onAuthStateChange((event, session) => {
       currentSession = session;
-      notify();
+      notify(event);
     });
     return currentSession;
   }
@@ -114,10 +115,16 @@ const Auth = (() => {
     return client.from("public_profiles").select("*").eq("username", username).single();
   }
 
+  // Mirrors the avatars bucket limits set in supabase/migrations/0002_security_fixes.sql
+  const AVATAR_TYPES = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/gif": "gif" };
+  const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
+
   /** Uploads a new avatar for the given user and returns its public URL (does not update the profile row itself). */
   async function uploadAvatar(userId, file) {
     if (!isConfigured) return { data: null, error: NOT_CONFIGURED_ERROR };
-    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const ext = AVATAR_TYPES[file.type];
+    if (!ext) return { data: null, error: { message: "Avatar must be a PNG, JPEG, WebP or GIF image." } };
+    if (file.size > AVATAR_MAX_BYTES) return { data: null, error: { message: "Avatar must be 2 MB or smaller." } };
     const path = `${userId}/avatar.${ext}`;
     const { error: uploadError } = await client.storage
       .from("avatars")

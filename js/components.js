@@ -45,7 +45,7 @@ Components.Navbar = (route) => {
         </a>
         ${user ? `
           <a href="#/dashboard" class="hidden sm:inline-flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-white/10 text-ink-200 text-sm hover:bg-white/5 transition-colors">
-            <span class="w-7 h-7 rounded-full overflow-hidden bg-white/10 flex items-center justify-center text-xs shrink-0">${user.user_metadata && user.user_metadata.avatar_url ? `<img src="${user.user_metadata.avatar_url}" class="w-full h-full object-cover" alt="">` : icon("user", "w-3.5 h-3.5")}</span>
+            <span class="w-7 h-7 rounded-full overflow-hidden bg-white/10 flex items-center justify-center text-xs shrink-0">${user.user_metadata && user.user_metadata.avatar_url ? `<img src="${Utils.escapeHtml(user.user_metadata.avatar_url)}" class="w-full h-full object-cover" alt="">` : icon("user", "w-3.5 h-3.5")}</span>
             ${Utils.escapeHtml(displayName)}
           </a>
         ` : `
@@ -187,7 +187,7 @@ Components.ClassCard = (cls, status) => {
   <div class="group relative rounded-2xl border border-white/5 bg-white/[0.02] p-5 flex flex-col gap-3 transition-all hover:border-gold-500/20 hover:bg-white/[0.04] ${locked ? "opacity-60" : ""}">
     <div class="flex items-center justify-between">
       <span class="text-xs text-ink-500 tracking-widest">CLASS ${String(cls.number).padStart(2, "0")}</span>
-      ${statusBadge(status)}
+      ${cls.comingSoon && !locked ? `<span class="text-[11px] px-2.5 py-1 rounded-full bg-white/5 text-ink-400 tracking-wide uppercase">Coming Soon</span>` : statusBadge(status)}
     </div>
     <h3 class="font-display text-lg text-ink-50 leading-snug">${cls.title}</h3>
     <p class="text-sm text-ink-400 leading-relaxed">${cls.description}</p>
@@ -282,7 +282,7 @@ Components.UploadArea = (inputId, accept, label, existingUploads = []) => `
       <div class="flex flex-col items-center gap-2 text-ink-400">
         ${icon("upload", "w-6 h-6")}
         <span class="text-sm">${label}</span>
-        <span class="text-xs text-ink-600">Audio, video or notes · kept for this session</span>
+        <span class="text-xs text-ink-600">Audio or video · saved on this device</span>
       </div>
     </label>
     <div id="${inputId}-list" class="mt-3 flex flex-col gap-2">
@@ -290,29 +290,47 @@ Components.UploadArea = (inputId, accept, label, existingUploads = []) => `
     </div>
   </div>`;
 
-Components.UploadItem = (u) => `
+/** Hidden <audio> for a stored recording. New uploads have a mediaId (loaded from IndexedDB on first play — see wireAudioPlayers); a dataUrl only exists on not-yet-migrated legacy uploads. */
+function recordingAudioTag(id, upload) {
+  if (!upload || !(upload.mediaId || upload.dataUrl)) return "";
+  return upload.mediaId
+    ? `<audio id="${id}" data-media-id="${upload.mediaId}" class="hidden"></audio>`
+    : `<audio id="${id}" src="${upload.dataUrl}" class="hidden"></audio>`;
+}
+
+Components.UploadItem = (u) => {
+  const playable = !!(u.mediaId || u.dataUrl);
+  const audioId = `upload-${u.mediaId || Date.parse(u.date)}`;
+  return `
   <div class="flex items-center justify-between gap-3 rounded-xl bg-white/[0.03] border border-white/5 px-4 py-2.5">
     <div class="flex items-center gap-3 min-w-0">
-      ${icon(u.type && u.type.startsWith("video") ? "play" : "mic", "w-4 h-4 text-gold-300")}
+      ${playable
+        ? `<button data-action="toggleAudio" data-target="${audioId}" title="Play" class="w-7 h-7 rounded-full bg-gold-500 text-ink-950 flex items-center justify-center shrink-0"><span data-audio-icon="${audioId}" class="w-3.5 h-3.5 inline-flex shrink-0">${Icons.play}</span></button>`
+        : icon(u.type && u.type.startsWith("video") ? "play" : "mic", "w-4 h-4 text-gold-300")}
       <span class="text-sm text-ink-200 truncate">${Utils.escapeHtml(u.name)}</span>
     </div>
     <span class="text-xs text-ink-500 shrink-0">${new Date(u.date).toLocaleDateString()}</span>
+    ${recordingAudioTag(audioId, u)}
   </div>`;
+};
 
-/* ---------- Audio player (works with a real object/data URL) ---------- */
-Components.AudioPlayer = (id, src, label) => `
+/* ---------- Audio player (upload = { mediaId } or legacy { dataUrl }) ---------- */
+Components.AudioPlayer = (id, upload, label) => {
+  const playable = !!(upload && (upload.mediaId || upload.dataUrl));
+  return `
   <div class="rounded-xl border border-white/5 bg-white/[0.02] p-3.5 flex items-center gap-3">
-    <button data-action="toggleAudio" data-target="${id}" class="w-9 h-9 rounded-full bg-gold-500 text-ink-950 flex items-center justify-center shrink-0" ${src ? "" : "disabled"}>
+    <button data-action="toggleAudio" data-target="${id}" class="w-9 h-9 rounded-full bg-gold-500 text-ink-950 flex items-center justify-center shrink-0" ${playable ? "" : "disabled"}>
       <span data-audio-icon="${id}" class="w-4 h-4 inline-flex shrink-0">${Icons.play}</span>
     </button>
     <div class="flex-1 min-w-0">
       <p class="text-xs text-ink-400 truncate mb-1">${Utils.escapeHtml(label)}</p>
       <div class="flex items-end gap-[2px] h-6">
-        ${Array.from({ length: 36 }).map((_, i) => `<span class="w-[2px] rounded-full ${src ? "bg-gold-400/50" : "bg-white/10"}" style="height:${6 + Math.round(Math.abs(Math.sin(i * 0.7)) * 18)}px"></span>`).join("")}
+        ${Array.from({ length: 36 }).map((_, i) => `<span class="w-[2px] rounded-full ${playable ? "bg-gold-400/50" : "bg-white/10"}" style="height:${6 + Math.round(Math.abs(Math.sin(i * 0.7)) * 18)}px"></span>`).join("")}
       </div>
     </div>
-    ${src ? `<audio id="${id}" src="${src}" class="hidden"></audio>` : ""}
+    ${recordingAudioTag(id, upload)}
   </div>`;
+};
 
 /* ---------- Empty state ---------- */
 Components.EmptyState = (iconName, title, sub) => `
@@ -346,7 +364,7 @@ Components.MilestoneCard = (milestone, upload) => `
       ${upload ? statusBadge("completed") : statusBadge("available")}
     </div>
     <h4 class="font-display text-base text-ink-50">${milestone.label}</h4>
-    ${Components.AudioPlayer(`milestone-${milestone.id}`, upload ? upload.dataUrl : null, upload ? upload.fileName : "Not recorded yet")}
+    ${Components.AudioPlayer(`milestone-${milestone.id}`, upload, upload ? upload.fileName : "Not recorded yet")}
     <label class="text-xs text-gold-300 underline cursor-pointer">
       ${upload ? "Replace recording" : "Upload recording"}
       <input type="file" accept="audio/*,video/*" class="hidden" data-change="handleMilestoneUpload" data-milestone="${milestone.id}">

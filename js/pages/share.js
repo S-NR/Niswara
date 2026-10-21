@@ -36,7 +36,7 @@ const SharePage = {
         </div>
       </div>
 
-      <div class="mb-6">${Components.AudioPlayer("share-audio", upload ? upload.dataUrl : null, upload ? upload.name : "Not recorded yet")}</div>
+      <div class="mb-6">${Components.AudioPlayer("share-audio", upload, upload ? upload.name : "Not recorded yet")}</div>
 
       <div class="flex flex-wrap gap-3">
         <button id="copy-post-btn" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gold-500 text-ink-950 text-sm font-medium hover:bg-gold-400 transition-colors">${icon("copy", "w-4 h-4")} Copy Post</button>
@@ -49,12 +49,12 @@ const SharePage = {
   },
 
   mount(container, params) {
-    wireAudioPlayers(container);
+    const unwireAudio = wireAudioPlayers(container);
     const copyBtn = container.querySelector("#copy-post-btn");
     const shareBtn = container.querySelector("#share-btn");
     const feedback = container.querySelector("#share-feedback");
     const textarea = container.querySelector("textarea[readonly]");
-    if (!copyBtn) return;
+    if (!copyBtn) return unwireAudio;
 
     copyBtn.addEventListener("click", async () => {
       try {
@@ -77,6 +77,8 @@ const SharePage = {
         setTimeout(() => (feedback.textContent = ""), 2500);
       }
     });
+
+    return unwireAudio;
   },
 };
 

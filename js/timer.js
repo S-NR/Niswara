@@ -30,24 +30,33 @@ const Timer = {
     const resetBtn = root.querySelector(`[data-timer-reset="${id}"]`);
     const logBtn = root.querySelector(`[data-timer-log="${id}"]`);
 
-    let seconds = 0;
-    let running = false;
+    // Elapsed time comes from the clock, not from counting ticks: browsers
+    // throttle intervals in background tabs, which made sessions under-count.
+    let seconds = 0;          // whole seconds banked from previous runs
+    let runStartedAt = null;  // Date.now() when the current run began
     let intervalId = null;
 
+    function elapsed() {
+      const live = runStartedAt === null ? 0 : (Date.now() - runStartedAt) / 1000;
+      return Math.floor(seconds + live);
+    }
     function tick() {
-      seconds += 1;
-      display.textContent = Utils.formatSeconds(seconds);
+      display.textContent = Utils.formatSeconds(elapsed());
     }
     function start() {
-      if (running) return;
-      running = true;
+      if (runStartedAt !== null) return;
+      runStartedAt = Date.now();
       toggleBtn.textContent = "Pause";
       intervalId = setInterval(tick, 1000);
     }
     function pause() {
-      running = false;
+      if (runStartedAt !== null) {
+        seconds += (Date.now() - runStartedAt) / 1000;
+        runStartedAt = null;
+      }
       toggleBtn.textContent = "Start";
       clearInterval(intervalId);
+      tick();
     }
     function reset() {
       pause();
@@ -55,11 +64,11 @@ const Timer = {
       display.textContent = "00:00";
     }
 
-    toggleBtn.addEventListener("click", () => (running ? pause() : start()));
+    toggleBtn.addEventListener("click", () => (runStartedAt !== null ? pause() : start()));
     resetBtn.addEventListener("click", reset);
     if (logBtn) {
       logBtn.addEventListener("click", () => {
-        const minutes = Math.round(seconds / 60);
+        const minutes = Math.round(elapsed() / 60);
         if (onLog) onLog(minutes);
         reset();
       });
@@ -67,7 +76,7 @@ const Timer = {
 
     return {
       destroy() { clearInterval(intervalId); },
-      getElapsed: () => seconds,
+      getElapsed: elapsed,
       reset,
     };
   },

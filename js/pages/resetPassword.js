@@ -12,7 +12,7 @@ const ResetPasswordPage = {
       ? Components.FormNotice("info", "Niswara's backend isn't connected yet. See SETUP.md to connect a Supabase project.")
       : "";
     const noSession = Auth.isConfigured && !Auth.isLoggedIn()
-      ? Components.FormNotice("error", "This reset link looks invalid or expired. Request a new one from the Forgot Password page.")
+      ? Components.FormNotice("error", "This reset link looks invalid or expired. Reset links only work in the same browser you requested them from — request a new one from the <a href=\"#/forgot-password\" class=\"underline\">Forgot Password</a> page.")
       : "";
     const canSubmit = Auth.isConfigured && Auth.isLoggedIn();
 
@@ -22,7 +22,7 @@ const ResetPasswordPage = {
       <form id="reset-form" class="flex flex-col gap-4">
         <div>
           <label class="block text-xs text-ink-500 uppercase tracking-wide mb-1.5">New password</label>
-          <input type="password" name="password" required minlength="8" class="field" placeholder="At least 8 characters" ${canSubmit ? "" : "disabled"}>
+          <input type="password" name="password" autocomplete="new-password" required minlength="8" class="field" placeholder="At least 8 characters" ${canSubmit ? "" : "disabled"}>
         </div>
         <button type="submit" ${canSubmit ? "" : "disabled"} class="w-full px-5 py-3 rounded-full bg-gold-500 text-ink-950 text-sm font-medium hover:bg-gold-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">Update Password</button>
       </form>

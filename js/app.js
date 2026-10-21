@@ -50,16 +50,45 @@ document.addEventListener("click", async (e) => {
 
 // Keep the navbar/avatar in sync with auth state, and bounce the user
 // between the login page and their dashboard as sessions start/end.
-Auth.onChange((session) => {
-  Router.refreshChrome();
+Auth.onChange((session, event) => {
   const hash = location.hash || "#/";
-  const onAuthPage = /^#\/(login|signup)/.test(hash);
-  if (session && onAuthPage) {
-    location.hash = Utils.getHashQuery("next") || "#/dashboard";
+
+  // Recovery link landed somewhere other than the reset page (e.g. the
+  // redirect dropped the hash): send them where they can set a password.
+  if (event === "PASSWORD_RECOVERY" && !hash.startsWith("#/reset-password")) {
+    location.hash = "#/reset-password";
+    return;
+  }
+
+  // Each account has its own local progress; if the account changed, the
+  // current page is showing the wrong person's data, so re-render it.
+  // rerender() also re-applies the requiresAuth guard.
+  const userChanged = Store.switchUser(session ? session.user.id : null);
+  if (userChanged || (!session && Router.currentRequiresAuth())) {
+    Router.rerender();
+  } else {
+    Router.refreshChrome();
+  }
+
+  if (session && /^#\/(login|signup)/.test(hash)) {
+    location.hash = Utils.safeNextRoute();
   }
 });
 
+// Store couldn't save (usually storage quota) — tell the learner instead of failing silently
+window.addEventListener("store:persist-failed", () => {
+  const banner = document.getElementById("save-error");
+  if (!banner) return;
+  banner.innerHTML = Components.FormNotice("error",
+    "Your latest progress couldn't be saved on this device — browser storage may be full. Free some space (or remove old recordings), then try again. <span class=\"underline\">Dismiss</span>");
+  banner.hidden = false;
+  banner.onclick = () => (banner.hidden = true);
+});
+
 (async () => {
+  // Older versions kept recordings inside localStorage; move them out
+  // before anything else writes, so the blob is small again.
+  await Store.migrateLegacyUploads().catch((e) => console.warn("Media migration failed.", e));
   await Auth.init();
   Router.start();
 })();

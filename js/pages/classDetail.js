@@ -85,7 +85,9 @@ const ClassDetailPage = {
             class="w-full rounded-xl bg-white/[0.03] border border-white/10 focus:border-gold-400/40 outline-none px-4 py-3 text-sm text-ink-100 placeholder:text-ink-600 resize-none transition-colors"
           >${Utils.escapeHtml(progress.reflection || "")}</textarea>`)}
 
-        ${lessonBlock("11", "Class Completion", `
+        ${cls.comingSoon ? lessonBlock("11", "Class Completion", `
+          <p class="text-sm text-ink-500">This lesson is still being written, so it can't be completed yet. It'll unlock for completion as soon as its content is published.</p>
+        `) : lessonBlock("11", "Class Completion", `
           <label class="flex items-start gap-3 mb-5 cursor-pointer">
             <input type="checkbox" id="assignment-done-checkbox" ${progress.assignmentDone ? "checked" : ""} ${status === "completed" ? "disabled" : ""}
               class="mt-0.5 w-4 h-4 rounded border-white/20 bg-transparent accent-amber-400">
@@ -140,12 +142,20 @@ const ClassDetailPage = {
       uploadInput.addEventListener("change", async () => {
         const file = uploadInput.files[0];
         if (!file) return;
-        const dataUrl = await Utils.readFileAsDataUrl(file).catch(() => null);
-        Store.addUpload(cls.id, { name: file.name, type: file.type, date: new Date().toISOString(), dataUrl });
+        const mediaId = await Media.save(file).catch(() => null);
+        if (!mediaId) {
+          window.dispatchEvent(new CustomEvent("store:persist-failed"));
+          return;
+        }
+        const upload = { name: file.name, type: file.type, date: new Date().toISOString(), mediaId };
+        Store.addUpload(cls.id, upload);
         const list = container.querySelector("#class-upload-list");
-        if (list) list.insertAdjacentHTML("beforeend", Components.UploadItem({ name: file.name, type: file.type, date: new Date().toISOString() }));
+        if (list) list.insertAdjacentHTML("beforeend", Components.UploadItem(upload));
+        uploadInput.value = ""; // allow re-selecting the same file
       });
     }
+
+    const unwireAudio = wireAudioPlayers(container);
 
     // Assignment checkbox gates the complete button
     const assignmentCheckbox = container.querySelector("#assignment-done-checkbox");
@@ -176,7 +186,10 @@ const ClassDetailPage = {
       });
     }
 
-    return () => timerCtrl.destroy();
+    return () => {
+      timerCtrl.destroy();
+      unwireAudio();
+    };
   },
 };
 

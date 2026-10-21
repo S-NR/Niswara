@@ -7,6 +7,7 @@
 
 const Router = (() => {
   let currentUnmount = null;
+  let started = false;
   const routes = [];
 
   function add(pattern, page, opts = {}) {
@@ -67,7 +68,13 @@ const Router = (() => {
     document.getElementById("mobile-fab").innerHTML = hash.startsWith("#/classes") ? "" : Components.ContinueFab();
   }
 
-  function rerender() { render(); }
+  /** Re-run routing for the current hash (re-applies the requiresAuth guard). No-op until start(). */
+  function rerender() { if (started) render(); }
+
+  function currentRequiresAuth() {
+    const found = match(currentHash().split("?")[0]);
+    return !!(found && found.requiresAuth);
+  }
 
   /** Re-renders just the navbar/mobile-nav/FAB — used when auth state changes without a navigation. */
   function refreshChrome() { updateChrome(currentHash()); }
@@ -85,9 +92,10 @@ const Router = (() => {
   }
 
   function start() {
+    started = true;
     window.addEventListener("hashchange", render);
     render();
   }
 
-  return { add, start, rerender, softRefresh, refreshChrome };
+  return { add, start, rerender, softRefresh, refreshChrome, currentRequiresAuth };
 })();

@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script>
   tailwind.config = {
     darkMode: "class",
@@ -51,6 +51,7 @@
 <body class="bg-ink-950 text-ink-100 font-sans antialiased">
 
 <div id="navbar"></div>
+<div id="save-error" class="fixed bottom-24 lg:bottom-6 inset-x-4 sm:inset-x-auto sm:right-6 sm:max-w-md z-50 [&>div]:mb-0 [&>div]:shadow-2xl [&>div]:bg-ink-900" hidden></div>
 <main id="app" class="min-h-screen pb-20 lg:pb-0"></main>
 <div id="mobile-nav"></div>
 <div id="mobile-fab"></div>
@@ -62,6 +63,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
 
 <script src="js/data.js"></script>
+<script src="js/media.js"></script>
 <script src="js/store.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/utils.js"></script>

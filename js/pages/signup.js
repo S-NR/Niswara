@@ -14,19 +14,19 @@ const SignupPage = {
       <form id="signup-form" class="flex flex-col gap-4">
         <div>
           <label class="block text-xs text-ink-500 uppercase tracking-wide mb-1.5">Name</label>
-          <input type="text" name="name" required class="field" placeholder="Your name" ${Auth.isConfigured ? "" : "disabled"}>
+          <input type="text" name="name" autocomplete="name" required class="field" placeholder="Your name" ${Auth.isConfigured ? "" : "disabled"}>
         </div>
         <div>
           <label class="block text-xs text-ink-500 uppercase tracking-wide mb-1.5">Username</label>
-          <input type="text" name="username" required pattern="[a-zA-Z0-9_]{3,20}" title="3-20 letters, numbers or underscores" class="field" placeholder="yourname" ${Auth.isConfigured ? "" : "disabled"}>
+          <input type="text" name="username" autocomplete="username" required pattern="[a-zA-Z0-9_]{3,20}" title="3-20 letters, numbers or underscores" class="field" placeholder="yourname" ${Auth.isConfigured ? "" : "disabled"}>
         </div>
         <div>
           <label class="block text-xs text-ink-500 uppercase tracking-wide mb-1.5">Email</label>
-          <input type="email" name="email" required class="field" placeholder="you@example.com" ${Auth.isConfigured ? "" : "disabled"}>
+          <input type="email" name="email" autocomplete="email" required class="field" placeholder="you@example.com" ${Auth.isConfigured ? "" : "disabled"}>
         </div>
         <div>
           <label class="block text-xs text-ink-500 uppercase tracking-wide mb-1.5">Password</label>
-          <input type="password" name="password" required minlength="8" class="field" placeholder="At least 8 characters" ${Auth.isConfigured ? "" : "disabled"}>
+          <input type="password" name="password" autocomplete="new-password" required minlength="8" class="field" placeholder="At least 8 characters" ${Auth.isConfigured ? "" : "disabled"}>
         </div>
         <button type="submit" ${Auth.isConfigured ? "" : "disabled"} class="w-full px-5 py-3 rounded-full bg-gold-500 text-ink-950 text-sm font-medium hover:bg-gold-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">Create Account</button>
       </form>

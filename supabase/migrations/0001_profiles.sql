@@ -115,16 +115,20 @@ $$;
 alter table public.profiles enable row level security;
 
 -- Every user can read and update their own full row.
+drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own" on public.profiles
   for select using (auth.uid() = id);
 
+drop policy if exists "profiles_update_own" on public.profiles;
 create policy "profiles_update_own" on public.profiles
   for update using (auth.uid() = id) with check (auth.uid() = id);
 
 -- Admins can read and update any profile (§21/§22 admin dashboard).
+drop policy if exists "profiles_select_admin" on public.profiles;
 create policy "profiles_select_admin" on public.profiles
   for select using (public.is_admin());
 
+drop policy if exists "profiles_update_admin" on public.profiles;
 create policy "profiles_update_admin" on public.profiles
   for update using (public.is_admin());
 
@@ -169,19 +173,23 @@ insert into storage.buckets (id, name, public)
 values ('avatars', 'avatars', true)
 on conflict (id) do nothing;
 
+drop policy if exists "avatars_public_read" on storage.objects;
 create policy "avatars_public_read" on storage.objects
   for select using (bucket_id = 'avatars');
 
+drop policy if exists "avatars_owner_write" on storage.objects;
 create policy "avatars_owner_write" on storage.objects
   for insert with check (
     bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists "avatars_owner_update" on storage.objects;
 create policy "avatars_owner_update" on storage.objects
   for update using (
     bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text
   );
 
+drop policy if exists "avatars_owner_delete" on storage.objects;
 create policy "avatars_owner_delete" on storage.objects
   for delete using (
     bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text

@@ -22,6 +22,7 @@ const ProfilePage = {
     const user = Auth.getUser();
     const root = container.querySelector("#profile-root");
     const { data: profile, error } = await Auth.getProfile(user.id);
+    if (!root.isConnected) return; // navigated away while the profile was loading
     if (error || !profile) {
       root.innerHTML = Components.FormNotice("error", "Couldn't load your profile. Try refreshing the page.");
       return;
@@ -39,12 +40,12 @@ function renderForm(user, p) {
     </label>`;
 
   return `
-    <div id="profile-notice"></div>
+    <div id="profile-notice">${p.username ? "" : Components.FormNotice("info", "You don't have a username yet — the one you chose at sign-up was already taken. Pick another below.")}</div>
     <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-7 mb-6">
       <div class="flex items-center gap-4 mb-6">
         <label class="relative cursor-pointer group shrink-0">
           <div class="w-16 h-16 rounded-full overflow-hidden bg-white/10 flex items-center justify-center">
-            ${p.avatar_url ? `<img id="avatar-preview" src="${p.avatar_url}" class="w-full h-full object-cover" alt="">` : `<span id="avatar-preview-icon">${icon("user", "w-6 h-6 text-ink-400")}</span>`}
+            ${p.avatar_url ? `<img id="avatar-preview" src="${Utils.escapeHtml(p.avatar_url)}" class="w-full h-full object-cover" alt="">` : `<span id="avatar-preview-icon">${icon("user", "w-6 h-6 text-ink-400")}</span>`}
           </div>
           <span class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-[10px] text-white">Change</span>
           <input type="file" id="avatar-input" accept="image/*" class="hidden">

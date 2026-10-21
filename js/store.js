@@ -6,10 +6,16 @@
    ============================================================ */
 
 const Store = (() => {
-  const KEY = "ffntp.v1"; // From First Note To Professional
+  const GUEST_KEY = "ffntp.v1"; // From First Note To Professional
+  // Logged-in users get their own namespace ("ffntp.v1:<uid>") so a shared
+  // browser never shows one account's progress to another. Phase 3 moves
+  // this into Postgres; until then it's per-browser, per-account.
+  let storageKey = GUEST_KEY;
 
+  /** Local calendar date "YYYY-MM-DD" — practice days roll over at the learner's midnight, not UTC's. */
   function todayKey(d = new Date()) {
-    return d.toISOString().slice(0, 10);
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }
 
   function defaultState() {
@@ -20,7 +26,7 @@ const Store = (() => {
       practiceLog: {},       // "YYYY-MM-DD" -> { tasks:{key:bool}, minutesByTask:{key:minutes}, totalMinutes }
       journal: [],           // {id, date, classId, learned, struggled, improved, toPractice, thoughts}
       projects: null,        // seeded on first load
-      milestoneUploads: {},  // milestoneId -> { fileName, dataUrl, note, date }
+      milestoneUploads: {},  // milestoneId -> { fileName, mediaId, date } (file itself lives in Media/IndexedDB)
       createdAt: new Date().toISOString(),
     };
   }
@@ -29,7 +35,7 @@ const Store = (() => {
 
   function load() {
     try {
-      const raw = localStorage.getItem(KEY);
+      const raw = localStorage.getItem(storageKey);
       if (!raw) return seedProjects(defaultState());
       const parsed = JSON.parse(raw);
       return seedProjects({ ...defaultState(), ...parsed });
@@ -49,10 +55,57 @@ const Store = (() => {
 
   function persist() {
     try {
-      localStorage.setItem(KEY, JSON.stringify(state));
+      localStorage.setItem(storageKey, JSON.stringify(state));
     } catch (e) {
       console.warn("Store: failed to persist (storage may be full).", e);
+      // Surfaced to the learner by app.js — a silent failure here means lost progress on reload.
+      window.dispatchEvent(new CustomEvent("store:persist-failed", { detail: e }));
     }
+  }
+
+  /**
+   * Point the Store at a user's namespace (null = guest) and reload state.
+   * The first time an account logs in on this browser, the guest progress
+   * moves into it, so nothing done before signing up is lost — and the
+   * guest slot starts fresh for whoever uses the browser next.
+   * Returns true if the active namespace changed.
+   */
+  function switchUser(userId) {
+    const nextKey = userId ? `${GUEST_KEY}:${userId}` : GUEST_KEY;
+    if (nextKey === storageKey) return false;
+    try {
+      const guestRaw = localStorage.getItem(GUEST_KEY);
+      if (userId && guestRaw && !localStorage.getItem(nextKey)) {
+        localStorage.setItem(nextKey, guestRaw);
+        localStorage.removeItem(GUEST_KEY);
+      }
+    } catch (e) {
+      console.warn("Store: couldn't adopt guest progress.", e);
+    }
+    storageKey = nextKey;
+    state = load();
+    return true;
+  }
+
+  /** One-time move of recordings saved by older versions as base64 dataUrls (inside localStorage) into Media. */
+  async function migrateLegacyUploads() {
+    const toBlob = (dataUrl) => fetch(dataUrl).then((r) => r.blob());
+    let changed = false;
+    for (const progress of Object.values(state.classProgress)) {
+      for (const u of progress.uploads || []) {
+        if (!u.dataUrl) continue;
+        u.mediaId = await Media.save(await toBlob(u.dataUrl));
+        delete u.dataUrl;
+        changed = true;
+      }
+    }
+    for (const m of Object.values(state.milestoneUploads)) {
+      if (!m.dataUrl) continue;
+      m.mediaId = await Media.save(await toBlob(m.dataUrl));
+      delete m.dataUrl;
+      changed = true;
+    }
+    if (changed) persist();
   }
 
   function getState() { return state; }
@@ -106,6 +159,8 @@ const Store = (() => {
   }
 
   function completeClass(id) {
+    const cls = getClassById(id);
+    if (!cls || cls.comingSoon) return; // placeholder lessons can't be completed
     if (!state.completedClassIds.includes(id)) {
       state.completedClassIds.push(id);
     }
@@ -209,8 +264,13 @@ const Store = (() => {
 
   /* ---- Milestone uploads (Before/After) ---- */
   function setMilestoneUpload(milestoneId, data) {
+    const previous = state.milestoneUploads[milestoneId];
     state.milestoneUploads[milestoneId] = data;
     persist();
+    // Replaced recording: drop the old file so IndexedDB doesn't grow forever
+    if (previous && previous.mediaId && previous.mediaId !== data.mediaId) {
+      Media.remove(previous.mediaId).catch(() => {});
+    }
   }
 
   /* ---- Skill progress (0-100) for Progress page bars ---- */
@@ -244,8 +304,8 @@ const Store = (() => {
         return s.projects.some(p => p.isOriginal && isProjectComplete(p));
       case "streak-30":
         return currentStreak() >= 30;
-      case "hundred-classes":
-        return s.completedClassIds.length >= 100;
+      case "all-classes":
+        return APP_DATA.CLASSES.every(c => s.completedClassIds.includes(c.id));
       default:
         return false;
     }
@@ -277,6 +337,6 @@ const Store = (() => {
     addJournalEntry, deleteJournalEntry,
     toggleProjectItem, isProjectComplete,
     setMilestoneUpload, skillProgress, isAchievementUnlocked, overallStats,
-    resetAll, todayKey,
+    resetAll, todayKey, switchUser, migrateLegacyUploads,
   };
 })();

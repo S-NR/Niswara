@@ -4,9 +4,9 @@ Data-driven, sequential course platform (React + TS + Tailwind + Vite, PWA-ready
 
 ## Quick start
 
-npm run dev
-
 npm install
+
+npm run dev
 
 Open http://localhost:5173
 

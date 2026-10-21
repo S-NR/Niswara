@@ -14,7 +14,7 @@ const ForgotPasswordPage = {
       <form id="forgot-form" class="flex flex-col gap-4">
         <div>
           <label class="block text-xs text-ink-500 uppercase tracking-wide mb-1.5">Email</label>
-          <input type="email" name="email" required class="field" placeholder="you@example.com" ${Auth.isConfigured ? "" : "disabled"}>
+          <input type="email" name="email" autocomplete="email" required class="field" placeholder="you@example.com" ${Auth.isConfigured ? "" : "disabled"}>
         </div>
         <button type="submit" ${Auth.isConfigured ? "" : "disabled"} class="w-full px-5 py-3 rounded-full bg-gold-500 text-ink-950 text-sm font-medium hover:bg-gold-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">Send Reset Link</button>
       </form>
@@ -32,7 +32,16 @@ const ForgotPasswordPage = {
       const submitBtn = form.querySelector("button[type=submit]");
       submitBtn.disabled = true;
       submitBtn.textContent = "Sending…";
-      await Auth.sendPasswordReset(email);
+      const { error } = await Auth.sendPasswordReset(email);
+      // Supabase doesn't error for unknown emails, so a real error here
+      // (rate limit, network, misconfigured redirect URL) never reveals
+      // whether an account exists — safe to show.
+      if (error) {
+        notice.innerHTML = Components.FormNotice("error", Utils.escapeHtml(error.message));
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Send Reset Link";
+        return;
+      }
       // Deliberately shown regardless of whether the account exists,
       // so this form can't be used to probe which emails are registered.
       form.classList.add("hidden");
