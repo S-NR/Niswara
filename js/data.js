@@ -120,27 +120,36 @@ const APP_DATA = (() => {
     },
     {
       number: 4, title: "Matching a Note", category: "Pitch", skillTag: "pitch",
-      difficulty: "Beginner", estMinutes: 25,
-      description: "Practice listening to a reference note and matching it with your own voice.",
+      difficulty: "Beginner", estMinutes: 45,
+      // Rendered by the interactive lesson in js/lessons/matchingANote.js
+      interactive: "matching-a-note",
+      subtitle: "Can you hear a note and make your voice meet it?",
+      description: "An interactive lesson: hear a reference note, sing it, listen back and adjust — the ear → brain → voice loop at the heart of singing in tune.",
       content: {
-        whatYoullLearn: "How to listen to a single reference pitch and reproduce it accurately with your own voice.",
+        whatYoullLearn: "How to hear a reference note, remember it, sing it, compare your voice with it and make small adjustments — and what flat and sharp mean.",
         whyItMatters: "Note-matching is the core mechanical skill behind every in-tune performance — it's the bridge between hearing pitch and producing it.",
-        theory: "Matching pitch is a feedback loop: sing, listen, adjust. The goal isn't to get it perfect instantly — it's to train the loop so adjustments get smaller and faster over time.",
+        theory: "Matching pitch is a feedback loop: listen, sing, listen back, adjust. The goal isn't to be perfect instantly — it's to train the loop so the adjustments get smaller and faster over time.",
         guidedPractice: [
-          "Play a comfortable note and hum it back, holding for 5 seconds.",
-          "Try again sliding gently into the note from slightly below.",
-          "Try again sliding gently into the note from slightly above.",
-          "Repeat with 3 different reference notes across your comfortable range."
+          "Listened to reference notes, sang them back, compared my recordings and adjusted — including slides, blind notes and a three-note chain.",
         ],
         assignment: {
           instructions: [
-            "Record yourself matching 5 different reference notes.",
-            "Note which ones felt immediately accurate and which needed adjustment.",
+            "Choose one comfortable note.",
+            "Play the note using the virtual piano.",
+            "Listen carefully.",
+            "Sing the note.",
+            "Record yourself.",
+            "Compare your voice with the reference.",
+            "Try again and make a small adjustment.",
+            "Repeat this with 3 different notes.",
+            "Record your best attempt.",
+            "Write your reflection.",
           ],
           questions: [
-            "Which notes did I match most easily?",
-            "Did I tend to sing slightly above or below the target?",
-            "Did my accuracy improve across the 5 attempts?",
+            "What happened when I first tried to match the note?",
+            "Was my voice generally higher, lower or close?",
+            "What did I do to correct it?",
+            "Did I feel relaxed while singing?",
           ]
         }
       }

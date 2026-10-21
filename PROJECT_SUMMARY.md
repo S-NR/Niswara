@@ -11,7 +11,7 @@ The repo contains **two separate applications**:
 | **Niswara (primary)** | repo root (`index.html`, `js/`, `css/`, `supabase/`) | Active. Phases 1–2 of 10 done | Static, buildless HTML/CSS/vanilla JS. Tailwind via CDN. Supabase (Auth, Postgres, Storage). Hosted on GitHub Pages |
 | **Learning Academy (prototype)** | `web/` | Early prototype, appears dormant | React 18, TypeScript, Vite, Tailwind, Zustand, PWA |
 
-> **Login & sync status:** `config.js` points at the real Supabase project, so the login forms are live. Progress now follows the account to every device (see `js/cloudSync.js`). But **no migrations have been run yet**: checked 2026-10-21, none of `profiles`, `class_progress`, `class_notes` or `learner_state` exist. Until `0001`–`0004` are run, sign-up can't create profiles and all progress stays on the device it was made on. The dashboard says so. See `SETUP.md` §2.
+> **Login & sync status:** ✅ Live. `config.js` points at the real Supabase project, and migrations `0001`–`0004` have been run. Checked 2026-10-21: `profiles` answers, and `class_progress`, `class_notes` and `learner_state` correctly refuse logged-out visitors (`42501`). Progress follows the account to every device (`js/cloudSync.js`).
 
 ---
 
@@ -35,7 +35,13 @@ index.html ─┬─ config.js            public Supabase URL + publishable key 
             ├─ js/components/vocalRecording.js  VocalRecording + PitchAnalysis (placeholder seam, isAvailable: false)
             ├─ js/components/personalNotes.js   PersonalNotes
             ├─ js/components/classProgress.js   ClassProgress
-            ├─ js/lessons/understandingPitch.js interactive Class 3 + InteractiveLessons registry
+            ├─ js/audio/voiceRecorder.js     VoiceRecorder: shared mic/recording/level meter/save/playback engine
+            ├─ js/audio/pitchAnalysis.js     PitchAnalysis: client-side YIN pitch ESTIMATE (honest, octave-aware)
+            ├─ js/components/pitchMatch.js   ReferenceNotePlayer, SelfAssessment, PitchGuide, PitchComparison, PitchMatchExercise
+            ├─ js/lessons/lessonKit.js       shared lesson header, stage tracker, chapters, assignment, loadAndRefresh
+            ├─ js/lessons/understandingPitch.js interactive Class 3
+            ├─ js/lessons/matchingANote.js   interactive Class 4
+            ├─ js/lessons/registry.js        InteractiveLessons (class `interactive` key -> lesson)
             └─ js/pages/*.js        17 pages, each { render(params), mount(container) → cleanup }
 supabase/migrations/0001_profiles.sql          profiles table, signup trigger, RLS, public_profiles view, avatars bucket
 supabase/migrations/0002_security_fixes.sql    role protection, public view fix, avatar limits
@@ -63,6 +69,7 @@ Design seams (all intentional):
 | Curriculum: 8 levels, 60 classes | ✅ Structure done. **Only Level 1 (10 classes) has real content.** Levels 2–8 (50 classes) are marked "Coming Soon" and can't be completed. |
 | Class page: lesson, timer, self-evaluation, upload + playback, reflection, complete | ✅ Working (local only) |
 | **Class 3 — Understanding Pitch (interactive)** | ✅ Guided lesson (Understand → Listen → Play → Identify → Sing → Reflect → Complete). Includes a virtual piano (mouse, touch, keyboard), Learn With Piano, three ear-training exercises with scoring, Sing the Note (record and play back, labelled "Self Evaluation"), private notes, reflection, assignment, and an 8-item progress tracker. Completion requires all 8 items. Saves per user to Supabase once `0003` is run; until then, on the device. |
+| **Class 4 — Matching a Note (interactive)** | ✅ Guided lesson (Understand → Hear → Sing → Adjust → Match → Practice → Reflect → Complete):<br>• The Listen → Remember → Sing → Compare → Adjust loop and a prominent "Choose comfort over range" rule.<br>• A reference note picked on the reused `VirtualPiano`, in a configurable range (Middle C4–C5 by default, or Lower C3–C4).<br>• Five exercises: Listen and Sing, Try Again and Adjust (3 attempts), Slide Into the Note, Blind Matching (3 hidden notes), and Note Chain (C–D–E; wider steps configurable but locked).<br>• Flat and sharp, with audio demos.<br>• An optional **pitch estimate**, offered only after you've judged a take yourself, and never a score.<br>• A practice timer logging "Pitch Training" with the class ID, an 8-question self-assessment, My Notes, a 10-item assignment with final reflection, a 10-item progress tracker with recording and self-evaluation counts, and a completion panel with the Class 5 bridge. |
 | Practice: daily checklist + timer | ✅ Working (local only) |
 | Journal, Projects, Progress, Achievements, Before/After | ✅ Working (local only) |
 | Share-a-class post generator | ✅ Working |
@@ -166,6 +173,16 @@ Status: ✅ fixed · 🔧 fixed, but needs your action · ⏳ open
 | C3 | 🟡 Low | Tested in Chrome desktop and Chrome with phone emulation (390 px, touch). Not yet tried on a real iPhone/Safari (Web Audio unlock, MediaRecorder `audio/mp4`) or a real Android device. | ⏳ Needs a device check |
 | C4 | 🟡 Low | Class 3 recordings stayed on the device (IndexedDB), like other recordings. | ✅ Fixed: uploaded to the private `recordings` bucket and downloaded on other devices |
 
+### Class 4 (interactive) — known limitations and design choices
+
+| # | Severity | Issue | Status |
+|---|---|---|---|
+| D1 | — | By design, nothing in Class 4 is scored for accuracy. Pitch estimates appear only after self-assessment, and progress is about doing the loop, not hitting 100%. (Class 3: hear the difference → Class 4: move toward the note → Class 5: hear your own voice → later: consistent accuracy.) | Intended |
+| D2 | 🟡 Low | The pitch estimate is checked against synthetic voices (11 cases including vibrato, noise, octave traps and slides) and a real recorded take. It hasn't been tried on real singing voices yet: breathy or very quiet singing may come back "couldn't estimate", which is the honest outcome. | ⏳ Try it with your own voice |
+| D3 | 🟡 Low | The note-chain estimate draws the curve against the three reference lines but gives no verdict, because splitting one take into three notes reliably needs onset detection. | ⏳ Future |
+| D4 | 🟡 Low | Recording on real iPhone/Safari hasn't been tested (same as **C3**). | ⏳ Device check |
+| D5 | 🟢 Fixed | **Found in testing:** on a new device, a lesson drew before the account's copy arrived, so exercises (and Class 3's reflection) looked empty until a reload. | ✅ `LessonKit.loadAndRefresh` redraws once when newer data arrives (not while recording or typing) |
+
 ### Cross-device sync — known limitations
 
 | # | Severity | Issue | Status |
@@ -215,19 +232,65 @@ A generic React/TypeScript "sequential course" engine: day lessons, quizzes, a f
 ### Content & interactive classes
 9. Write Levels 2–8: 50 classes. Remove `comingSoon` from each as it's published.
 10. Fill the "Demonstration" slot with audio or video examples (empty on every class).
-11. Class 3 follow-ups:
+11. Class 4 follow-ups:
+    - Unlock "Wider steps (C–E–G)" in the note chain when ready (`CHAIN_LEVELS` in `matchingANote.js`).
+    - Tune the pitch estimate on real voices (**D2**).
+    - Build Class 5, "Listening to Your Own Voice", on `VoiceRecorder`, `PitchMatchExercise` and `LessonKit`.
+12. Class 3 follow-ups:
     - Widen Find the Note beyond C4–F4 as a "harder" level.
     - Add real pitch detection behind `PitchAnalysis` (**C2**).
     - Reuse `VirtualPiano` and `PitchExercise` for Class 4 "Matching a Note" and later scales and intervals.
 
 ### Housekeeping
-12. Replace the Tailwind play CDN with a compiled stylesheet (**S5**).
-13. Decide the future of `web/`: merge or archive (**W4–W6**).
-14. Add automated tests and CI. The checks run so far (below) were one-off scripts and aren't committed.
+13. Replace the Tailwind play CDN with a compiled stylesheet (**S5**).
+14. Decide the future of `web/`: merge or archive (**W4–W6**).
+15. Add automated tests and CI. The checks run so far (below) were one-off scripts and aren't committed.
 
 ---
 
 ## 6. Change log
+
+### 2026-10-21: interactive Class 4 "Matching a Note" (uncommitted)
+
+New: `js/lessons/matchingANote.js`, `js/components/pitchMatch.js`, `js/audio/voiceRecorder.js`, `js/audio/pitchAnalysis.js`, `js/lessons/lessonKit.js`, `js/lessons/registry.js`.
+
+Changed:
+- `js/data.js`: Class 4 content and the `interactive` flag.
+- `js/lessons/understandingPitch.js`: now uses `LessonKit`; output unchanged.
+- `js/components/vocalRecording.js`: now uses `VoiceRecorder`; behaviour unchanged.
+- `js/store.js`: practice sessions can carry `classId`; added `classPracticeMinutes`.
+- `js/classActivity.js`: `bump`/`count` counters; `load` now reports whether the account brought anything new.
+- `js/components/classProgress.js`: optional stats line.
+- `css/styles.css` and `index.html`.
+
+**No new migration:** Class 4 uses the existing `class_progress`, `class_notes`, `learner_state` and `recordings` tables.
+
+Reuse instead of duplicates:
+- **Same components:** Class 4 uses the Class 3 `VirtualPiano` (fixed configurable range), `PianoSynth`, `Timer`, `PersonalNotes`, `ClassProgress`, `ClassActivity`/Supabase and `Media`.
+- **One shared recording engine:** `VoiceRecorder` now serves both Class 3 and Class 4.
+- **Shared lesson structure:** both lessons render through `LessonKit`.
+
+Verified:
+- **Pitch estimator (Node, synthetic voices of known pitch):** 11/11 cases passed. A pure tone came out at 0 c, 255 Hz against C4 at −44 c ("slightly lower"), and +60 c at "slightly higher". A strong-2nd-harmonic tone didn't cause an octave error, and an octave-lower voice counted as a match. Vibrato, noise and slides were handled, and silence, a 0.2 s blip and a wild glide all returned "couldn't estimate". About 30 ms per take.
+- **Class 4 journey, headless Chrome with a WAV fed into the fake microphone (255 Hz voice):**
+  - All 15 steps render, and "lesson viewed" is set only after scrolling.
+  - The piano picks the reference by mouse or touch, and Lower range switches to C3–C4.
+  - All five exercises record, play back and self-assess. The estimate stays hidden until a take has been judged, and said "slightly lower than the reference" for the 255 Hz voice against C4.
+  - Blind notes stay hidden until judged, then are revealed and counted 1/2/3 of 3. The chain lights each note as it plays, and its guide draws three reference lines.
+  - The timer logged `{task: "pitch", minutes: 1, classId: "L1C04"}`, and the throat-tension answer shows the safety note.
+  - Progress was 60% after the exercises and 100% after reflection and assignment. "CLASS 4 COMPLETE" appeared with the Class 5 bridge and Continue to Class 5, and Class 5 became current.
+  - After reload everything was restored, including playback.
+- **Mobile (390 px, touch):** no sideways scroll, and touch works for piano, reference, record/stop and judgement chips.
+- **Two users across two devices (mock account server):**
+  - Alice's Class 4 take, judgement, self-assessment, notes, practice minutes and Class 3 reflection all appeared on a fresh "phone". Her laptop recording played there.
+  - Bob on the same phone saw nothing, and the server kept separate per-user rows.
+- **Regression:** the Class 3 piano, journey (with the refactored recorder) and mobile tests all pass. All 19 routes render, and the merge and Store tests pass.
+- **Bugs found and fixed while testing:**
+  - All final-reflection boxes shared one debounced save, so only the last box typed in was saved.
+  - The blind-note counter was off by one.
+  - On a new device, lessons drew before the account's data arrived (**D5**).
+
+**Not verified:** real singing voices (**D2**), real iPhone/Android hardware (**D4**), and a real two-account run against your live Supabase (the logic was tested against a mock with the same contract).
 
 ### 2026-10-21: progress on every device (uncommitted)
 

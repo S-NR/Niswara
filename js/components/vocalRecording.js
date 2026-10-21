@@ -3,28 +3,10 @@
    Choose a comfortable note -> hear the reference -> sing ->
    record -> play back and self-evaluate.
 
-   There is NO automatic pitch judgement yet. PitchAnalysis is
-   the seam for it: when a real detector exists (e.g. YIN /
-   autocorrelation over the recording), set isAvailable = true
-   and implement analyze(); VocalRecording will then show the
-   pitch curve (reference C4 vs. sung C4 -> C#4 -> C4).
-   Until then the UI only ever says "Self Evaluation".
+   Class 3 is purely "Self Evaluation" by design — the learner is
+   only just meeting pitch. Recording itself is VoiceRecorder;
+   pitch estimates (PitchAnalysis) are introduced in Class 4.
    ============================================================ */
-
-const PitchAnalysis = {
-  isAvailable: false,
-  /**
-   * Future contract:
-   *   analyze(blob, referenceMidi) -> Promise<{
-   *     reference: "C4",
-   *     curve: [{ t: seconds, midi: 60.2, cents: +20 }],
-   *     summary: { averageCents, withinTolerancePct }
-   *   }>
-   */
-  async analyze() {
-    throw new Error("Pitch analysis is not implemented yet.");
-  },
-};
 
 const VocalRecording = (() => {
   const MAX_SECONDS = 30;
@@ -87,19 +69,18 @@ const VocalRecording = (() => {
 
     let note = lastNote ?? null;
     let recording = lastRecording || null;
-    let recorder = null, stream = null, chunks = [], timer = null, startedAt = 0;
-    let meterCtx = null, meterRaf = null;
-    let player = null;
+    let session = null;   // VoiceRecorder session while recording
+    let playing = false;
 
-    const supportsRecording = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+    const supportsRecording = VoiceRecorder.isSupported();
 
     function setStatus(text) { statusEl.textContent = text; }
 
     function syncButtons() {
-      const isRec = !!recorder;
+      const isRec = !!session;
       refBtn.disabled = note === null || isRec;
       recBtn.disabled = note === null || isRec || !supportsRecording;
-      stopBtn.disabled = !isRec && !(player && !player.paused);
+      stopBtn.disabled = !isRec && !playing;
       playBtn.disabled = !recording || isRec;
       recBtn.classList.toggle("is-recording", isRec);
       root.querySelectorAll("[data-vocal-note]").forEach((b) => b.classList.toggle("is-selected", Number(b.dataset.vocalNote) === note));
@@ -113,101 +94,49 @@ const VocalRecording = (() => {
       syncButtons();
     }
 
-    function startMeter() {
-      try {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        meterCtx = new AC();
-        const analyser = meterCtx.createAnalyser();
-        analyser.fftSize = 512;
-        meterCtx.createMediaStreamSource(stream).connect(analyser);
-        const buf = new Uint8Array(analyser.fftSize);
-        const tick = () => {
-          analyser.getByteTimeDomainData(buf);
-          let peak = 0;
-          for (let i = 0; i < buf.length; i++) peak = Math.max(peak, Math.abs(buf[i] - 128));
-          levelEl.style.width = `${Math.min(100, (peak / 128) * 160)}%`;
-          meterRaf = requestAnimationFrame(tick);
-        };
-        tick();
-      } catch (e) { /* the level meter is a nicety; recording still works */ }
-    }
-
-    function stopMeter() {
-      cancelAnimationFrame(meterRaf);
-      if (meterCtx) meterCtx.close().catch(() => {});
-      meterCtx = null;
-      levelEl.style.width = "0";
-    }
-
     async function startRecording() {
       if (!supportsRecording) { setStatus("Recording isn't supported in this browser."); return; }
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        session = await VoiceRecorder.start({
+          maxSeconds: MAX_SECONDS,
+          onTick: (s) => setStatus(`Recording… ${Utils.formatSeconds(s)} — sing ${NoteUtils.name(note)} gently`),
+          onLevel: (v) => { levelEl.style.width = `${Math.round(v * 100)}%`; },
+        });
       } catch (e) {
         setStatus("Microphone access was blocked. Allow it in your browser's site settings, or use “I sang along without recording”.");
         return;
       }
-      PianoSynth.stopAll();
-      chunks = [];
-      recorder = new MediaRecorder(stream);
-      recorder.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
-      recorder.onstop = saveRecording;
-      recorder.start();
-      startedAt = Date.now();
-      startMeter();
-      timer = setInterval(() => {
-        const s = Math.floor((Date.now() - startedAt) / 1000);
-        setStatus(`Recording… ${Utils.formatSeconds(s)} — sing ${NoteUtils.name(note)} gently`);
-        if (s >= MAX_SECONDS) stopRecording();
-      }, 250);
+      playing = false;
       setStatus(`Recording… sing ${NoteUtils.name(note)} gently`);
       syncButtons();
+      const take = await session.ended; // resolves when the recording ends (Stop or time limit); null if cancelled
+      session = null;
+      if (take) await keep(take);
+      else syncButtons();
     }
 
-    function stopRecording() {
-      if (!recorder) return;
-      clearInterval(timer);
-      if (recorder.state !== "inactive") recorder.stop();
-      stopMeter();
-      if (stream) stream.getTracks().forEach((t) => t.stop());
-    }
-
-    async function saveRecording() {
-      const type = recorder.mimeType || "audio/webm";
-      const blob = new Blob(chunks, { type });
-      const seconds = Math.round((Date.now() - startedAt) / 1000);
-      recorder = null; stream = null;
-      if (!blob.size) { setStatus("Nothing was recorded — try again."); syncButtons(); return; }
-      const mediaId = await Media.save(blob).catch(() => null);
-      if (!mediaId) {
-        window.dispatchEvent(new CustomEvent("store:persist-failed"));
-        setStatus("Couldn't save the recording on this device.");
-        syncButtons();
-        return;
-      }
-      const ext = type.includes("mp4") ? "m4a" : type.includes("ogg") ? "ogg" : "webm";
-      const upload = {
-        name: `Sing the note — ${NoteUtils.name(note)}.${ext}`,
-        type, date: new Date().toISOString(), mediaId,
-        exercise: "sing-the-note", referenceNote: NoteUtils.name(note), seconds,
-      };
-      Store.addUpload(classId, upload);
+    async function keep(take) {
+      if (!take.blob.size) { setStatus("Nothing was recorded — try again."); syncButtons(); return; }
+      const upload = await VoiceRecorder.saveToClass(classId, take, {
+        name: `Sing the note — ${NoteUtils.name(note)}`,
+        exercise: "sing-the-note", referenceNote: NoteUtils.name(note),
+      });
+      if (!upload) { setStatus("Couldn't save the recording on this device."); syncButtons(); return; }
       recording = upload;
       evalNote.textContent = "";
       root.querySelectorAll("[data-vocal-eval-choice]").forEach((b) => b.classList.remove("is-selected"));
-      setStatus(`Saved (${seconds}s). Now compare: Play Reference, then Play My Recording.`);
+      setStatus(`Saved (${take.seconds}s). Now compare: Play Reference, then Play My Recording.`);
       syncButtons();
       if (onRecorded) onRecorded(upload);
     }
 
     async function playRecording() {
       if (!recording) return;
-      const url = await Media.getUrl(recording.mediaId).catch(() => null);
-      if (!url) { setStatus("That recording isn't stored on this device any more."); return; }
-      if (player) player.pause();
-      player = new Audio(url);
-      player.onended = () => { setStatus("Playback finished."); syncButtons(); };
-      player.play().catch(() => setStatus("Couldn't play the recording."));
+      const ok = await VoiceRecorder.play(recording.mediaId, {
+        onEnded: () => { playing = false; setStatus("Playback finished."); syncButtons(); },
+      });
+      if (!ok) { setStatus("That recording isn't stored on this device any more."); return; }
+      playing = true;
       setStatus(`Playing your recording${recording.referenceNote ? ` (reference ${recording.referenceNote})` : ""}…`);
       syncButtons();
     }
@@ -217,13 +146,13 @@ const VocalRecording = (() => {
       if (n) { chooseNote(Number(n.dataset.vocalNote)); return; }
       if (e.target.closest("[data-vocal-ref]") && note !== null) {
         setStatus(`Listen to ${NoteUtils.name(note)}… then hum it quietly.`);
-        PianoSynth.play(note, { duration: 1.6 }).then(() => { if (!recorder) setStatus(`When you're ready, press Record and sing ${NoteUtils.name(note)}.`); });
+        PianoSynth.play(note, { duration: 1.6 }).then(() => { if (!session) setStatus(`When you're ready, press Record and sing ${NoteUtils.name(note)}.`); });
         return;
       }
       if (e.target.closest("[data-vocal-record]")) { startRecording(); return; }
       if (e.target.closest("[data-vocal-stop]")) {
-        if (recorder) stopRecording();
-        else if (player) { player.pause(); setStatus("Stopped."); syncButtons(); }
+        if (session) session.stop();
+        else if (playing) { VoiceRecorder.stopPlayback(); playing = false; setStatus("Stopped."); syncButtons(); }
         return;
       }
       if (e.target.closest("[data-vocal-playback]")) { playRecording(); return; }
@@ -262,8 +191,8 @@ const VocalRecording = (() => {
     return {
       destroy() {
         root.removeEventListener("click", onClick);
-        if (recorder) { recorder.onstop = null; stopRecording(); recorder = null; }
-        if (player) player.pause();
+        if (session) { session.cancel(); session = null; }
+        if (playing) VoiceRecorder.stopPlayback();
       },
     };
   }

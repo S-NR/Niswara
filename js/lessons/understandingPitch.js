@@ -53,27 +53,11 @@ const UnderstandingPitchLesson = (() => {
     offPitch: { notes: [60, 60.4], duration: 1.2, gap: 0.2 },
   };
 
-  /* ---------- small view helpers ---------- */
+  /* ---------- small view helpers (shared ones come from LessonKit) ---------- */
 
-  /** A lesson step. Text stays in a readable 3xl column; wide steps (the pianos) let their interactive part use the full width. */
-  function chapter(stage, step, title, body, { id = "", wide = false } = {}) {
-    return `
-    <section ${id ? `id="${id}"` : ""} data-stage="${stage}" class="lesson-chapter w-full ${wide ? "" : "max-w-3xl"} mx-auto scroll-mt-32">
-      <div class="max-w-3xl mx-auto">
-        <p class="text-[11px] tracking-[0.2em] uppercase text-gold-400/80 mb-2">${STAGES.find((s) => s.id === stage).label} · Step ${step}</p>
-        <h2 class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">${title}</h2>
-      </div>
-      ${body}
-    </section>`;
-  }
-
-  const p = (html) => `<p class="text-ink-300 leading-relaxed mb-4">${html}</p>`;
-  const narrow = (html) => `<div class="max-w-3xl mx-auto">${html}</div>`;
+  const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
+  const { p, narrow, tryIt } = LessonKit;
   const demoBtn = (key, label) => `<button type="button" data-demo="${key}" class="ex-chip">${icon("play", "w-3.5 h-3.5")} ${label}</button>`;
-  const tryIt = (html) => `
-    <div class="rounded-2xl border border-gold-400/15 bg-gold-500/[0.04] px-5 py-4 my-5 text-sm text-ink-300 leading-relaxed">
-      <span class="text-gold-300 font-medium">Try it · </span>${html}
-    </div>`;
 
   function waveSvg(cycles, label, cls) {
     const w = 260, h = 70, pts = [];
@@ -143,34 +127,17 @@ const UnderstandingPitchLesson = (() => {
   /* ---------- live sections (re-rendered when progress changes) ---------- */
 
   function renderAssignment(cls, rec) {
-    const items = cls.content.assignment.instructions;
-    const done = items.filter((_, i) => assignmentItemDone(rec, i)).length;
-    return `
-      <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-5 sm:p-7">
-        <div class="flex items-center justify-between gap-3 mb-5">
-          <h3 class="font-display text-xl text-ink-50">Class 3 Assignment</h3>
-          <span class="text-xs text-ink-500 tabular-nums">${done}/${items.length} done</span>
-        </div>
-        <ol class="flex flex-col gap-1">
-          ${items.map((text, i) => {
-            const auto = AUTO_ASSIGNMENT[i];
-            const ok = assignmentItemDone(rec, i);
-            return `<li>
-              <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 ${auto ? "" : "cursor-pointer hover:bg-white/[0.03]"}">
-                <input type="checkbox" data-assignment="${i}" ${ok ? "checked" : ""} ${auto ? "disabled" : ""} class="mt-0.5 w-4 h-4 accent-amber-400 shrink-0">
-                <span class="text-sm ${ok ? "text-ink-400 line-through decoration-ink-600" : "text-ink-200"}"><span class="text-ink-500 tabular-nums mr-1.5">${i + 1}.</span>${text}</span>
-                ${auto ? `<span class="ml-auto text-[10px] uppercase tracking-wider text-ink-600 shrink-0 mt-0.5">${ok ? "done" : "auto"}</span>` : ""}
-              </label></li>`;
-          }).join("")}
-        </ol>
-        <p class="text-xs text-ink-500 mt-4">Items marked “auto” tick themselves when you finish that part of the lesson.</p>
-      </div>`;
+    return LessonKit.renderAssignment({
+      title: "Class 3 Assignment",
+      items: cls.content.assignment.instructions,
+      isDone: (i) => assignmentItemDone(rec, i),
+      isAuto: (i) => !!AUTO_ASSIGNMENT[i],
+    });
   }
 
   function renderComplete(cls, rec, status) {
     const all = PROGRESS_ITEMS.every((i) => rec.checkpoints[i.key]);
-    const next = APP_DATA.CLASSES.slice().sort((a, b) => (a.levelId - b.levelId) || (a.number - b.number))
-      .find((c, i, arr) => arr[i - 1] && arr[i - 1].id === cls.id);
+    const next = LessonKit.nextClass(cls);
     if (status === "completed") {
       return `
         <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.05] p-6 sm:p-8 text-center">
@@ -206,32 +173,8 @@ const UnderstandingPitchLesson = (() => {
 
     return `
     <div class="pitch-lesson">
-      <!-- header -->
-      <section class="max-w-3xl box-content mx-auto px-5 lg:px-8 pt-10 sm:pt-14">
-        <a href="#/classes" class="text-xs text-ink-500 hover:text-ink-300 inline-flex items-center gap-1.5 mb-6">${icon("arrowRight", "w-3 h-3 rotate-180")} All Classes</a>
-        <div class="flex items-center gap-3 mb-3">
-          <span class="text-xs text-ink-500 tracking-widest">LEVEL 1 · CLASS 03</span>
-          ${statusBadge(status)}
-          <span class="text-[11px] px-2.5 py-1 rounded-full bg-teal-500/10 text-teal-300 tracking-wide uppercase">Interactive</span>
-        </div>
-        <h1 class="font-display text-4xl sm:text-5xl text-ink-50 mb-3">${cls.title}</h1>
-        <p class="font-display italic text-lg sm:text-xl text-ink-300 max-w-2xl">“${cls.subtitle}”</p>
-        <div class="flex items-center gap-3 text-xs text-ink-500 mt-4">
-          <span>${cls.category}</span><span class="w-1 h-1 rounded-full bg-ink-600"></span>
-          <span>${cls.difficulty}</span><span class="w-1 h-1 rounded-full bg-ink-600"></span>
-          <span>~${cls.estMinutes} min</span><span class="w-1 h-1 rounded-full bg-ink-600"></span>
-          <span data-lesson-pct>${pct}% complete</span>
-        </div>
-      </section>
-
-      <!-- stage tracker -->
-      <nav class="lesson-stepper sticky top-16 z-30 mt-8 border-y border-white/5 bg-ink-950/85 backdrop-blur-xl" aria-label="Lesson stages">
-        <div class="max-w-5xl mx-auto px-5 lg:px-8 flex items-center gap-1 overflow-x-auto py-2.5">
-          ${STAGES.map((s, i) => `
-            <a href="#/classes/${cls.id}" data-stage-link="${s.id}" class="stage-pill">${i + 1} · ${s.label}</a>
-            ${i < STAGES.length - 1 ? `<span class="text-ink-700 text-xs">›</span>` : ""}`).join("")}
-        </div>
-      </nav>
+      ${LessonKit.header(cls, status, pct)}
+      ${LessonKit.stepper(STAGES, cls)}
 
       <div class="max-w-5xl mx-auto px-5 lg:px-8 py-12 flex flex-col gap-20">
 
@@ -406,7 +349,7 @@ const UnderstandingPitchLesson = (() => {
       syncAssignmentCheckpoint(rec);
       refreshLive(ClassActivity.get(classId));
     }));
-    ClassActivity.load(classId); // pulls this account's saved progress, then onChange refreshes the view
+    LessonKit.loadAndRefresh(container, classId, params); // brings in progress from this account's other devices
 
     /* ---- Demos (sections 2–5) ---- */
     function onDemo(e) {
@@ -550,45 +493,9 @@ const UnderstandingPitchLesson = (() => {
       container.removeEventListener("click", onCompleteArea);
     });
 
-    /* ---- Lesson viewed: only once the learner reaches the end of sections 1–5 ---- */
-    const sentinel = $("[data-lesson-viewed-sentinel]");
-    if (sentinel && "IntersectionObserver" in window) {
-      const io = new IntersectionObserver((entries) => {
-        if (entries.some((en) => en.isIntersecting)) { ClassActivity.markCheckpoint(classId, "lessonViewed"); io.disconnect(); }
-      });
-      io.observe(sentinel);
-      cleanups.push(() => io.disconnect());
-    }
-
-    /* ---- Stage tracker ---- */
-    const links = [...container.querySelectorAll("[data-stage-link]")];
-    const onStageClick = (e) => {
-      const a = e.target.closest("[data-stage-link]");
-      if (!a) return;
-      e.preventDefault(); // keep the hash route; just scroll
-      const target = container.querySelector(`[data-stage="${a.dataset.stageLink}"]`);
-      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-    };
-    container.addEventListener("click", onStageClick);
-    cleanups.push(() => container.removeEventListener("click", onStageClick));
-    if ("IntersectionObserver" in window) {
-      const visible = new Map();
-      const so = new IntersectionObserver((entries) => {
-        entries.forEach((en) => visible.set(en.target, en.isIntersecting));
-        const first = [...container.querySelectorAll("[data-stage]")].find((el) => visible.get(el));
-        if (!first) return;
-        const stage = first.dataset.stage;
-        links.forEach((l) => l.classList.toggle("is-active", l.dataset.stageLink === stage));
-        // On narrow screens keep the active stage visible in the scrollable tracker
-        const active = links.find((l) => l.dataset.stageLink === stage);
-        const bar = active && active.parentElement;
-        if (bar && bar.scrollWidth > bar.clientWidth) {
-          bar.scrollTo({ left: active.offsetLeft - bar.clientWidth / 2 + active.offsetWidth / 2, behavior: "smooth" });
-        }
-      }, { rootMargin: "-120px 0px -55% 0px" });
-      container.querySelectorAll("[data-stage]").forEach((el) => so.observe(el));
-      cleanups.push(() => so.disconnect());
-    }
+    /* ---- Lesson viewed (only once the learner reaches the end of sections 1–5) + stage tracker ---- */
+    cleanups.push(LessonKit.wireViewedSentinel(container, () => ClassActivity.markCheckpoint(classId, "lessonViewed")));
+    cleanups.push(LessonKit.wireStepper(container));
 
     return () => {
       cleanups.forEach((fn) => { try { fn(); } catch (e) { console.error(e); } });
@@ -599,8 +506,3 @@ const UnderstandingPitchLesson = (() => {
 
   return { render, mount, PROGRESS_ITEMS };
 })();
-
-/** Interactive lessons by key (APP_DATA class field `interactive`). */
-const InteractiveLessons = {
-  "understanding-pitch": UnderstandingPitchLesson,
-};

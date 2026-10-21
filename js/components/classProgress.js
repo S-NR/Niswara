@@ -24,12 +24,14 @@ const ClassProgress = {
       </div>`;
   },
 
-  render(title, items, checkpoints) {
+  /** stats (optional): [{ label, value }] shown under the bar — counts, not scores. */
+  render(title, items, checkpoints, stats = []) {
     const pct = ClassProgress.percent(items, checkpoints);
     return `
       <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-5 sm:p-7">
         <h3 class="font-display text-xl text-ink-50 mb-4">${title}</h3>
         ${ClassProgress.bar(pct)}
+        ${stats.length ? `<div class="flex flex-wrap gap-x-6 gap-y-1 mt-4 text-xs text-ink-500">${stats.map((s) => `<span>${s.label}: <span class="text-ink-200 tabular-nums">${s.value}</span></span>`).join("")}</div>` : ""}
         <ul class="grid sm:grid-cols-2 gap-x-6 gap-y-2.5 mt-6">
           ${items.map((i) => {
             const done = !!checkpoints[i.key];

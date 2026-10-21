@@ -411,12 +411,20 @@ const Store = (() => {
     persist();
   }
 
-  function logMinutes(taskKey, minutes) {
+  /** Logs a practice session. extra: e.g. { classId } when it was practised inside a class. */
+  function logMinutes(taskKey, minutes, extra = {}) {
     if (minutes <= 0) return;
     const log = getTodayLog();
-    log.sessions.push({ id: newId("s"), task: taskKey, minutes, at: nowIso() });
+    log.sessions.push({ id: newId("s"), task: taskKey, minutes, at: nowIso(), ...extra });
     recomputeDay(log);
     persist();
+  }
+
+  /** Practice minutes logged from inside a given class (all days). */
+  function classPracticeMinutes(classId) {
+    let total = 0;
+    Object.values(state.practiceLog).forEach((d) => d.sessions.forEach((s) => { if (s.classId === classId) total += s.minutes; }));
+    return total;
   }
 
   function totalPracticeMinutes() {
@@ -552,7 +560,7 @@ const Store = (() => {
   return {
     getState, getClassById, isLevelUnlocked, classStatus,
     getClassProgress, updateClassProgress, addUpload, completeClass, setCurrentClass,
-    getTodayLog, toggleTask, logMinutes, totalPracticeMinutes, minutesForSkill,
+    getTodayLog, toggleTask, logMinutes, classPracticeMinutes, totalPracticeMinutes, minutesForSkill,
     currentStreak, practiceDaysCount,
     addJournalEntry, deleteJournalEntry,
     toggleProjectItem, isProjectComplete,

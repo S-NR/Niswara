@@ -79,19 +79,28 @@ const ClassActivity = (() => {
     return out;
   }
 
-  /** Pull the account's saved progress for a class and merge it into the local copy. */
+  const sameContent = (a, b) => {
+    const strip = (r) => JSON.stringify({ ...r, updatedAt: null });
+    return strip(a) === strip(b);
+  };
+
+  /**
+   * Pull the account's saved progress for a class and merge it into the local copy.
+   * Resolves to true if the account brought anything this device didn't have
+   * (the lesson then redraws so exercises show it).
+   */
   async function load(classId) {
-    if (!canSync()) return get(classId);
+    if (!canSync()) return false;
     const { data, error } = await Auth.fetchClassProgress(classId);
-    if (error) { noteRemoteError(error); return get(classId); }
+    if (error) { noteRemoteError(error); return false; }
     const local = get(classId);
     const merged = merge(local, data);
     Store.setClassActivity(classId, merged);
-    if (!data || JSON.stringify(merged) !== JSON.stringify(merge(Store.emptyClassActivity(), data))) {
+    if (!data || !sameContent(merged, merge(Store.emptyClassActivity(), data))) {
       schedulePush(classId); // this device knows things the server doesn't yet
     }
     emit(classId);
-    return merged;
+    return !sameContent(merged, local);
   }
 
   function schedulePush(classId) {
@@ -166,6 +175,20 @@ const ClassActivity = (() => {
     });
   }
 
+  /** Increments a simple per-class counter (e.g. "recordings", "selfEvaluations"). Stored like exercise stats so merging keeps the larger count. */
+  function bump(classId, counter) {
+    return update(classId, (rec) => {
+      const s = { ...emptyStats(), ...(rec.exerciseStats[counter] || {}) };
+      s.attempts += 1;
+      s.lastPlayedAt = new Date().toISOString();
+      rec.exerciseStats[counter] = s;
+    });
+  }
+
+  function count(classId, counter) {
+    return getStats(classId, counter).attempts;
+  }
+
   function setAnswer(classId, group, key, value) {
     return update(classId, (rec) => {
       rec.answers[group] = { ...(rec.answers[group] || {}), [key]: value };
@@ -209,7 +232,7 @@ const ClassActivity = (() => {
 
   return {
     get, load, onChange, flush, merge,
-    markCheckpoint, getStats, recordAttempt, recordQuestion, recordRound, setAnswer, markCompleted,
+    markCheckpoint, getStats, recordAttempt, recordQuestion, recordRound, setAnswer, markCompleted, bump, count,
     loadNote, saveNote,
   };
 })();

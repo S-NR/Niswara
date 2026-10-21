@@ -216,6 +216,47 @@ body {
 .stair { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); transition: background 0.15s, box-shadow 0.2s, color 0.15s; }
 .stair.is-lit { background: linear-gradient(180deg, rgba(231, 191, 108, 0.55), rgba(214, 162, 67, 0.15)); box-shadow: 0 0 24px rgba(214, 162, 67, 0.35); color: #fbe9c2; }
 
+/* ============================================================
+   PITCH MATCHING (js/components/pitchMatch.js, Class 4)
+   ============================================================ */
+.vr-btn-gold { border-color: rgba(231, 191, 108, 0.45); color: #f3da9e; background: rgba(214, 162, 67, 0.10); }
+.vr-btn-gold:not(:disabled):hover { background: rgba(214, 162, 67, 0.18); }
+.vr-btn-gold.is-playing { box-shadow: 0 0 22px rgba(214, 162, 67, 0.35); }
+
+.ref-key {
+  width: 2.75rem; height: 3.5rem; border-radius: 0 0 8px 8px; flex-shrink: 0;
+  background: linear-gradient(180deg, #e9e5dc 0%, #f7f4ee 15%, #e7bf6c 100%);
+  box-shadow: inset 0 -5px 0 rgba(0, 0, 0, 0.1), 0 0 26px rgba(214, 162, 67, 0.35);
+}
+.chain-dot {
+  font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 999px; color: #a8a9b3;
+  border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.15s;
+}
+.chain-dot.is-lit { color: #3d2c0d; background: #e7bf6c; border-color: #e7bf6c; box-shadow: 0 0 18px rgba(214, 162, 67, 0.45); }
+
+.flow-chip {
+  font-size: 0.75rem; padding: 0.3rem 0.7rem; border-radius: 999px; color: #cfd0d6;
+  background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.assess-dot { width: 0.55rem; height: 0.55rem; border-radius: 999px; display: inline-block; background: #7c7d89; }
+.assess-good { background: #34d399; }
+.assess-maybe { background: #fbbf24; }
+.assess-miss { background: #f87171; }
+.assess-neutral { background: #7c7d89; }
+
+.loop-step { transition: border-color 0.2s, background 0.2s; }
+.loop-step:hover { border-color: rgba(231, 191, 108, 0.3); background: rgba(214, 162, 67, 0.05); }
+
+.pg-ref { stroke: rgba(231, 191, 108, 0.75); stroke-width: 2; stroke-dasharray: 6 5; }
+.pg-band { fill: rgba(52, 211, 153, 0.07); }
+.pg-voice { fill: none; stroke: #8fd8cb; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.pg-voice.is-below, .pg-voice.is-above { stroke: #fbbf24; }
+.pg-voice.is-near { stroke: #34d399; }
+.pg-label { fill: #7c7d89; font-size: 11px; font-family: Inter, sans-serif; }
+.pg-axis { fill: #43434c; font-size: 10px; font-family: Inter, sans-serif; letter-spacing: 0.08em; }
+.pg-key-ref, .pg-key-voice { display: inline-block; width: 16px; height: 0; border-top: 2px dashed rgba(231, 191, 108, 0.75); }
+.pg-key-voice { border-top: 2.5px solid #8fd8cb; }
+
 .pv-grid { stroke: rgba(255, 255, 255, 0.06); stroke-width: 1; }
 .pv-label { fill: #5c5d68; font-size: 11px; font-family: Inter, sans-serif; }
 .pv-axis { fill: #43434c; font-size: 10px; font-family: Inter, sans-serif; letter-spacing: 0.08em; }
