@@ -57,8 +57,178 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+.pitch-lesson > section:first-child { animation: rise 0.35s ease both; }
+
+/* ============================================================
+   VIRTUAL PIANO (js/components/piano.js)
+   ============================================================ */
+.piano { user-select: none; -webkit-user-select: none; }
+
+.piano-case {
+  position: relative;
+  border-radius: 20px;
+  padding: 22px 12px 14px;
+  background: linear-gradient(180deg, #1d1d23 0%, #111115 60%, #0c0c0f 100%);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 30px 70px -30px rgba(0, 0, 0, 0.9),
+    0 0 70px -25px rgba(214, 162, 67, 0.28);
+}
+.piano-felt {
+  position: absolute; left: 12px; right: 12px; top: 18px; height: 4px; border-radius: 2px;
+  background: linear-gradient(90deg, #5a1c22, #7a2630 50%, #5a1c22);
+  opacity: 0.85;
+}
+.piano-octave-labels { position: relative; height: 0; }
+.piano-octave-labels span {
+  position: absolute; top: -20px; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(231, 191, 108, 0.55); padding-left: 4px;
+}
+.piano-bed {
+  position: relative; display: flex; margin-top: 6px;
+  height: clamp(150px, 20vw, 210px);
+  touch-action: none; /* playing, not scrolling, while a finger is on the keys */
+}
+
+.pk {
+  appearance: none; border: 0; padding: 0; margin: 0; cursor: pointer; font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.pk-white {
+  flex: 1 1 0; position: relative; margin: 0 1.5px;
+  display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px;
+  border-radius: 0 0 9px 9px;
+  background: linear-gradient(180deg, #e9e5dc 0%, #f7f4ee 12%, #efebe2 75%, #ded8cc 100%);
+  box-shadow: inset 0 -7px 0 rgba(0, 0, 0, 0.09), inset 0 1px 0 #fff, 0 3px 4px rgba(0, 0, 0, 0.45);
+  color: #7a7366;
+  transition: transform 0.07s ease, background 0.12s ease, box-shadow 0.12s ease, color 0.12s ease;
+}
+.pk-white:hover { background: linear-gradient(180deg, #ece8df 0%, #fbf9f4 12%, #f4f0e8 75%, #e3ddd1 100%); }
+.pk-white.is-down {
+  transform: translateY(2px);
+  background: linear-gradient(180deg, #e5cf9a 0%, #f3dfb0 20%, #e7bf6c 100%);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12), 0 0 26px rgba(214, 162, 67, 0.55);
+  color: #4a3612;
+}
+.pk-black {
+  position: absolute; top: 0; height: 62%; z-index: 2;
+  display: flex; align-items: flex-end; justify-content: center; padding-bottom: 7px;
+  border-radius: 0 0 6px 6px;
+  background: linear-gradient(180deg, #33333b 0%, #1a1a1f 70%, #101013 100%);
+  box-shadow: inset 0 -6px 0 rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 4px 7px rgba(0, 0, 0, 0.65);
+  color: rgba(255, 255, 255, 0.35);
+  transition: transform 0.07s ease, background 0.12s ease, box-shadow 0.12s ease;
+}
+.pk-black:hover { background: linear-gradient(180deg, #3a3a43 0%, #202026 70%, #141418 100%); }
+.pk-black.is-down {
+  transform: translateY(2px);
+  background: linear-gradient(180deg, #6d5424 0%, #b5832c 100%);
+  box-shadow: 0 0 20px rgba(214, 162, 67, 0.6);
+  color: #fbe9c2;
+}
+.pk:focus-visible { outline: 2px solid rgba(231, 191, 108, 0.85); outline-offset: -4px; }
+.pk-label { font-size: 11px; line-height: 1; pointer-events: none; }
+.pk-label sub { font-size: 8px; vertical-align: baseline; margin-left: 1px; opacity: 0.7; }
+.pk-label-c { color: #b5832c; font-weight: 600; }
+.pk-white.is-down .pk-label-c { color: #3d2c0d; }
+.pk-black .pk-label { font-size: 8.5px; }
+@media (max-width: 420px) { .pk-black .pk-label { display: none; } }
+
+.piano-note-readout.is-fresh { animation: notePop 0.25s ease; }
+@keyframes notePop { from { opacity: 0.4; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+
+.piano-ctl {
+  height: 2rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cfd0d6; background: rgba(255, 255, 255, 0.02); transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.piano-ctl:hover { background: rgba(255, 255, 255, 0.06); }
+.piano-ctl.is-on { border-color: rgba(231, 191, 108, 0.5); color: #f3da9e; background: rgba(214, 162, 67, 0.12); }
+.piano-range { accent-color: #e7bf6c; }
+.kbd {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 1.5rem; height: 1.5rem; padding: 0 0.35rem;
+  border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.15); border-bottom-width: 2px;
+  font-size: 11px; color: #e7e7ea; background: rgba(255, 255, 255, 0.04);
+}
+@media (hover: none) { .piano-kbd-help { display: none; } }
+
+/* ============================================================
+   EXERCISES & LESSON (js/components/exercises.js, js/lessons/*)
+   ============================================================ */
+.ex-chip {
+  display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.9rem; border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12); color: #cfd0d6; font-size: 0.8125rem;
+  background: rgba(255, 255, 255, 0.02); transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.ex-chip:hover { background: rgba(255, 255, 255, 0.06); }
+.ex-chip.is-playing, .ex-chip.is-selected {
+  border-color: rgba(231, 191, 108, 0.55); color: #f3da9e; background: rgba(214, 162, 67, 0.12);
+  box-shadow: 0 0 18px rgba(214, 162, 67, 0.18);
+}
+
+.ex-choice {
+  min-width: 7.5rem; padding: 0.85rem 1.4rem; border-radius: 1rem; font-weight: 500; font-size: 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.14); color: #f4f4f5; background: rgba(255, 255, 255, 0.04);
+  transition: transform 0.1s, background 0.15s, border-color 0.15s, opacity 0.15s, box-shadow 0.15s;
+}
+.ex-choice:not(:disabled):hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(231, 191, 108, 0.4); transform: translateY(-1px); }
+.ex-choice:disabled { opacity: 0.45; cursor: not-allowed; }
+.ex-choice.is-right { opacity: 1; border-color: rgba(52, 211, 153, 0.6); background: rgba(16, 185, 129, 0.14); color: #a7f3d0; }
+.ex-choice.is-wrong { border-color: rgba(248, 113, 113, 0.4); background: rgba(239, 68, 68, 0.08); animation: shake 0.3s ease; }
+.ex-choice.is-hint { border-color: rgba(231, 191, 108, 0.6); box-shadow: 0 0 20px rgba(214, 162, 67, 0.3); opacity: 1; }
+@keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+.ex-note-slot { display: flex; flex-direction: column; align-items: center; min-width: 4.5rem; }
+.ex-note-dot {
+  width: 2.75rem; height: 2.75rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.12);
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01));
+  transition: transform 0.15s, box-shadow 0.2s, background 0.2s, border-color 0.2s;
+}
+.ex-note-slot.is-playing .ex-note-dot {
+  transform: scale(1.12); border-color: rgba(231, 191, 108, 0.7);
+  background: radial-gradient(circle at 35% 30%, #f3da9e, #b5832c);
+  box-shadow: 0 0 30px rgba(214, 162, 67, 0.55);
+}
+.ex-note-slot.is-revealed .ex-note-dot { border-color: rgba(231, 191, 108, 0.35); }
+
+.vr-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.1rem; border-radius: 999px; font-size: 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.14); color: #e7e7ea; background: rgba(255, 255, 255, 0.03);
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.vr-btn:not(:disabled):hover { background: rgba(255, 255, 255, 0.07); }
+.vr-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.vr-btn-primary { border-color: rgba(248, 113, 113, 0.35); }
+.vr-rec-dot { width: 0.6rem; height: 0.6rem; border-radius: 999px; background: #f87171; }
+.vr-btn.is-recording { opacity: 1; border-color: rgba(248, 113, 113, 0.7); background: rgba(239, 68, 68, 0.12); }
+.vr-btn.is-recording .vr-rec-dot { animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.3; } }
+
+.lesson-stepper > div { scrollbar-width: none; }
+.lesson-stepper > div::-webkit-scrollbar { display: none; }
+.stage-pill {
+  white-space: nowrap; padding: 0.35rem 0.8rem; border-radius: 999px; font-size: 0.75rem; color: #7c7d89;
+  transition: color 0.2s, background 0.2s;
+}
+.stage-pill:hover { color: #e7e7ea; }
+.stage-pill.is-active { color: #f3da9e; background: rgba(214, 162, 67, 0.12); }
+
+.stair { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); transition: background 0.15s, box-shadow 0.2s, color 0.15s; }
+.stair.is-lit { background: linear-gradient(180deg, rgba(231, 191, 108, 0.55), rgba(214, 162, 67, 0.15)); box-shadow: 0 0 24px rgba(214, 162, 67, 0.35); color: #fbe9c2; }
+
+.pv-grid { stroke: rgba(255, 255, 255, 0.06); stroke-width: 1; }
+.pv-label { fill: #5c5d68; font-size: 11px; font-family: Inter, sans-serif; }
+.pv-axis { fill: #43434c; font-size: 10px; font-family: Inter, sans-serif; letter-spacing: 0.08em; }
+.pv-path { fill: none; stroke: rgba(231, 191, 108, 0.55); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.pv-dot { fill: #f3da9e; }
+.pv-dot-glow { fill: rgba(214, 162, 67, 0.3); }
+.pv-dot-old { fill: rgba(231, 191, 108, 0.6); }
+.learn-arrow-pop { animation: notePop 0.3s ease; }
+
 /* Respect reduced-motion preference */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  #app > section { animation: none; }
+  #app > section, .pitch-lesson > section:first-child { animation: none; }
+  .pk, .ex-choice, .ex-note-dot, .stair { transition: none; }
+  .ex-choice.is-wrong, .vr-btn.is-recording .vr-rec-dot, .piano-note-readout.is-fresh, .learn-arrow-pop { animation: none; }
 }

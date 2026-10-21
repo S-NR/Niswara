@@ -43,6 +43,8 @@ document.addEventListener("click", async (e) => {
   if (closeLink && menu) menu.classList.add("hidden");
   if (logoutBtn) {
     if (menu) menu.classList.add("hidden");
+    // Save anything still waiting to upload while we're still signed in
+    await Promise.all([CloudSync.flush(), ClassActivity.flush()]).catch(() => {});
     await Auth.signOut();
     location.hash = "#/";
   }
@@ -64,6 +66,8 @@ Auth.onChange((session, event) => {
   // current page is showing the wrong person's data, so re-render it.
   // rerender() also re-applies the requiresAuth guard.
   const userChanged = Store.switchUser(session ? session.user.id : null);
+  // Bring in this account's progress from other devices (re-renders via "remote-changed")
+  if (userChanged) CloudSync.userChanged(session ? session.user.id : null);
   if (userChanged || (!session && Router.currentRequiresAuth())) {
     Router.rerender();
   } else {
@@ -73,6 +77,28 @@ Auth.onChange((session, event) => {
   if (session && /^#\/(login|signup)/.test(hash)) {
     location.hash = Utils.safeNextRoute();
   }
+});
+
+// Progress arrived from another device: show it. Skipped while the learner is
+// typing so a background sync never wipes a half-written answer.
+let pendingRemoteRender = false;
+CloudSync.on((event) => {
+  if (event !== "remote-changed") return;
+  const el = document.activeElement;
+  if (el && el.closest && el.closest("#app") && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) {
+    pendingRemoteRender = true;
+    return;
+  }
+  Router.rerender();
+});
+document.addEventListener("focusout", () => {
+  if (!pendingRemoteRender) return;
+  setTimeout(() => {
+    const el = document.activeElement;
+    if (el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return;
+    pendingRemoteRender = false;
+    Router.rerender();
+  }, 0);
 });
 
 // Store couldn't save (usually storage quota) — tell the learner instead of failing silently

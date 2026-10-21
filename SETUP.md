@@ -79,8 +79,18 @@ below, **in order**, → **Run**:
    readable by visitors (opted-in profiles only), and limits avatars to
    2 MB images. **Required** — without it any user can make themselves
    an admin.
+3. [`supabase/migrations/0003_class_progress.sql`](supabase/migrations/0003_class_progress.sql)
+   — `class_progress` (per-user checkpoints, exercise scores and answers
+   for a class) and `class_notes` (private per-class notes). Both are
+   owner-only via RLS. Used by the interactive Class 3; until it's run,
+   Class 3 saves progress and notes on the learner's device only.
+4. [`supabase/migrations/0004_learner_state.sql`](supabase/migrations/0004_learner_state.sql)
+   — `learner_state` (each learner's whole progress, so it's the same on
+   every device they log in on) and a private `recordings` storage bucket
+   (each learner can only read and write their own folder). **Required
+   for progress to follow you between devices.**
 
-Both are safe to re-run. (If you're using the Supabase CLI instead:
+All four are safe to re-run. (If you're using the Supabase CLI instead:
 `supabase db push`.) Supabase's database linter will flag
 `public_profiles` as a "security definer view" — that's intentional; the
 view itself only exposes opted-in rows and safe columns.
@@ -131,8 +141,8 @@ Visit the live site → Sign Up → check that a row appears in the
 | Auth / Database / Storage | Supabase (already deployed the moment you create the project) |
 
 There is no build step and nothing to deploy for the backend beyond running
-the SQL migrations once. Future migrations (`0003_...sql`, etc., as Phase 3+
-lands) are run the same way, in order.
+the SQL migrations once. Future migrations (`0005_...sql`, etc.) are run
+the same way, in order.
 
 ## Security notes
 
@@ -154,19 +164,20 @@ lands) are run the same way, in order.
 - **Phase 2 — Authentication**: sign up, log in, log out, forgot/reset
   password, profile (with privacy settings and avatar upload), a protected
   `/dashboard`. Backed by Supabase Auth + the `profiles` table + RLS.
+- **Phase 3 — Progress on every device**: a learner's whole progress
+  (classes, practice, journal, projects, answers, milestones) is stored in
+  their `learner_state` row and merged across devices by `js/cloudSync.js`;
+  interactive-class scores and private notes use `class_progress` /
+  `class_notes`.
+- **Phase 5 (core) — Recordings in the account**: recordings upload to the
+  private `recordings` bucket and download on other devices.
 
 **Not yet** (each becomes its own migration + feature pass):
-- **Phase 3 — Database progress**: classes/lessons/practice/journal move
-  from this browser's `localStorage` into real per-user Postgres rows
-  (`lesson_progress`, `practice_sessions`, `journal_entries`, etc., per the
-  entity list in the original spec). `js/store.js` is already the single
-  seam everything else reads through, so this phase mostly rewrites that
-  one file's internals — page code shouldn't need to change.
-- **Phase 4 — Practice tracking** (weekly/monthly charts, once sessions are
-  in the database).
-- **Phase 5 — Recording uploads** (Supabase Storage, `recordings` table,
-  privacy levels).
-- **Phase 6 — Projects & journal** move to the database.
+- **Phase 4 — Practice tracking** (weekly/monthly charts — practice is
+  already stored as individual sessions, so this is mostly UI).
+- **Phase 5 (rest)** — recording privacy levels / sharing.
+- **Phase 6** — optional: split journal/projects out of `learner_state`
+  into their own tables if they need querying (e.g. for public profiles).
 - **Phase 7 — Public profiles & following** (`public_profiles` view already
   exists and is ready for this).
 - **Phase 8 — Admin dashboard** (the `role` column and `is_admin()` helper
@@ -174,17 +185,25 @@ lands) are run the same way, in order.
 - **Phase 9 — Analytics.**
 - **Phase 10 — AI coach integration** (placeholder API layer only).
 
-Until Phase 3 ships, logging in gives you a real account and profile, but
-the dashboard's class/practice numbers still read from this browser's local
-`Store` — the same data source the public pages already used. That's
-intentional, matches the phase order above, and means nothing here needs to
-be redone once Phase 3 lands.
+## How progress is saved
 
-In the meantime, `Store` keeps a separate local slot per account
-(`ffntp.v1:<user id>`), so two people sharing a browser never see each
-other's progress. The first time an account logs in on a browser, any
-progress made there while logged out moves into that account. Progress
-does **not** follow an account to another device until Phase 3.
-
-Recordings are stored in the browser's IndexedDB (`js/media.js`), not in
-localStorage, and also stay on the device until Phase 5.
+- **Logged out:** progress is saved in this browser only (`Store`,
+  localStorage slot `ffntp.v1`).
+- **Logged in:** `Store` keeps a local slot per account
+  (`ffntp.v1:<user id>`) so the site works offline and two people sharing a
+  browser never see each other's progress. `js/cloudSync.js` mirrors it to
+  the account's `learner_state` row:
+  - on login and whenever the tab comes back into view, it **pulls** the
+    account's copy and **merges** it with this device's (completed classes,
+    practice sessions, journal entries and recordings are unions; deleted
+    journal entries stay deleted; for single values the newer change wins),
+  - every change is **uploaded** a moment later, and before logging out,
+  - saves are versioned, so an older device can't overwrite newer progress —
+    it merges and retries.
+- The first time an account logs in on a browser, any progress made there
+  while logged out moves into that account (and is then synced).
+- **Recordings** live in IndexedDB on the device where they were made
+  (`js/media.js`) and are uploaded to the private `recordings` bucket; other
+  devices download them the first time they're played.
+- The dashboard shows where progress is saved ("Progress synced to your
+  account · 12:31", or a note if it's only on this device for now).

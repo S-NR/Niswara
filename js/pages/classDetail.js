@@ -18,6 +18,10 @@ const ClassDetailPage = {
       </section>`;
     }
 
+    // Interactive lessons (e.g. Class 3) own their whole layout
+    const lesson = cls.interactive && InteractiveLessons[cls.interactive];
+    if (lesson) return lesson.render(cls, status);
+
     const progress = Store.getClassProgress(cls.id);
     const c = cls.content;
     const all = APP_DATA.CLASSES.slice().sort((a, b) => (a.levelId - b.levelId) || (a.number - b.number));
@@ -114,6 +118,9 @@ const ClassDetailPage = {
   mount(container, params) {
     const cls = Store.getClassById(params.id);
     if (!cls || Store.classStatus(cls) === "locked") return () => {};
+
+    const lesson = cls.interactive && InteractiveLessons[cls.interactive];
+    if (lesson) return lesson.mount(container, cls, params);
 
     const timerCtrl = Timer.wire(container, "class-timer", {
       onLog: (minutes) => Store.logMinutes(taskKeyForSkill(cls.skillTag), minutes),

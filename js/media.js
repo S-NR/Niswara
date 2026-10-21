@@ -5,7 +5,10 @@
    file can exceed localStorage's ~5 MB quota, which used to make
    every later Store save fail. Store only keeps { mediaId, name,
    type, date }; this module holds the actual Blob.
-   Phase 5 replaces this with Supabase Storage.
+
+   When logged in, CloudSync also uploads each recording to the
+   account's private Supabase Storage folder; on a device that
+   doesn't have a file yet, getUrl() downloads it and caches it here.
    ============================================================ */
 
 const Media = (() => {
@@ -44,10 +47,28 @@ const Media = (() => {
     return id;
   }
 
-  /** Resolves to a playable object URL, or null if the file isn't on this device. */
+  /** The stored Blob for a mediaId on this device, or undefined. */
+  function getBlob(id) {
+    return run("readonly", (s) => s.get(id));
+  }
+
+  /** Stores a Blob under an existing id (a recording downloaded from the account). */
+  function put(id, blob) {
+    return run("readwrite", (s) => s.put(blob, id));
+  }
+
+  /** Resolves to a playable object URL, or null if the file isn't on this device or in the account. */
   async function getUrl(id) {
     if (urlCache.has(id)) return urlCache.get(id);
-    const blob = await run("readonly", (s) => s.get(id));
+    let blob = await getBlob(id);
+    if (!blob && typeof Auth !== "undefined" && Auth.isLoggedIn()) {
+      const { data, error } = await Auth.downloadRecording(id);
+      if (!error && data) {
+        blob = data;
+        await put(id, blob).catch(() => {}); // cache for next time
+        if (typeof CloudSync !== "undefined") CloudSync.markMediaSynced(id); // already in the account — don't re-upload
+      }
+    }
     if (!blob) return null;
     const url = URL.createObjectURL(blob);
     urlCache.set(id, url);
@@ -60,7 +81,8 @@ const Media = (() => {
       urlCache.delete(id);
     }
     await run("readwrite", (s) => s.delete(id));
+    if (typeof Auth !== "undefined" && Auth.isLoggedIn()) Auth.deleteRecording(id).catch(() => {});
   }
 
-  return { save, getUrl, remove };
+  return { save, put, getBlob, getUrl, remove };
 })();

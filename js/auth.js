@@ -134,10 +134,107 @@ const Auth = (() => {
     return { data: { publicUrl: `${data.publicUrl}?v=${Date.now()}` }, error: null };
   }
 
+  /* ---- Per-user class progress & private notes (supabase/migrations/0003_class_progress.sql) ----
+     RLS limits every row to its owner; user_id is always the session's own id. */
+
+  function notLoggedIn() {
+    return { data: null, error: isConfigured ? { message: "Not logged in." } : NOT_CONFIGURED_ERROR };
+  }
+
+  async function fetchClassProgress(classId) {
+    if (!isConfigured || !currentSession) return notLoggedIn();
+    return client.from("class_progress")
+      .select("checkpoints, exercise_stats, answers, completed_at, updated_at")
+      .eq("user_id", currentSession.user.id).eq("class_id", classId)
+      .maybeSingle();
+  }
+
+  async function saveClassProgress(classId, { checkpoints, exerciseStats, answers, completedAt }) {
+    if (!isConfigured || !currentSession) return notLoggedIn();
+    return client.from("class_progress").upsert({
+      user_id: currentSession.user.id,
+      class_id: classId,
+      checkpoints,
+      exercise_stats: exerciseStats,
+      answers,
+      completed_at: completedAt,
+    }, { onConflict: "user_id,class_id" });
+  }
+
+  async function fetchClassNote(classId) {
+    if (!isConfigured || !currentSession) return notLoggedIn();
+    return client.from("class_notes")
+      .select("body, updated_at")
+      .eq("user_id", currentSession.user.id).eq("class_id", classId)
+      .maybeSingle();
+  }
+
+  async function saveClassNote(classId, body) {
+    if (!isConfigured || !currentSession) return notLoggedIn();
+    return client.from("class_notes")
+      .upsert({ user_id: currentSession.user.id, class_id: classId, body }, { onConflict: "user_id,class_id" })
+      .select("updated_at")
+      .single();
+  }
+
+  /* ---- Whole-account learner state (supabase/migrations/0004_learner_state.sql) ----
+     One row per user; `version` gives optimistic concurrency so a stale device
+     can't overwrite newer progress (CloudSync merges and retries instead). */
+
+  async function fetchLearnerState() {
+    if (!isConfigured || !currentSession) return notLoggedIn();
+    return client.from("learner_state")
+      .select("state, version, updated_at")
+      .eq("user_id", currentSession.user.id)
+      .maybeSingle();
+  }
+
+  /** First save for this account. Fails with code 23505 if another device created the row first. */
+  async function insertLearnerState(state) {
+    if (!isConfigured || !currentSession) return notLoggedIn();
+    return client.from("learner_state")
+      .insert({ user_id: currentSession.user.id, state, version: 1 })
+      .select("version")
+      .single();
+  }
+
+  /** Saves only if the row is still at expectedVersion. data is [] when someone else saved first. */
+  async function updateLearnerState(state, expectedVersion) {
+    if (!isConfigured || !currentSession) return notLoggedIn();
+    return client.from("learner_state")
+      .update({ state, version: expectedVersion + 1 })
+      .eq("user_id", currentSession.user.id)
+      .eq("version", expectedVersion)
+      .select("version");
+  }
+
+  /* ---- Recordings: private bucket, path "<user_id>/<mediaId>" (owner-only policies) ---- */
+
+  function recordingPath(mediaId) { return `${currentSession.user.id}/${mediaId}`; }
+
+  async function uploadRecording(mediaId, blob) {
+    if (!isConfigured || !currentSession) return notLoggedIn();
+    const contentType = (blob.type || "audio/webm").split(";")[0]; // bucket allows audio/* and video/*
+    return client.storage.from("recordings").upload(recordingPath(mediaId), blob, { upsert: true, contentType });
+  }
+
+  async function downloadRecording(mediaId) {
+    if (!isConfigured || !currentSession) return notLoggedIn();
+    return client.storage.from("recordings").download(recordingPath(mediaId));
+  }
+
+  async function deleteRecording(mediaId) {
+    if (!isConfigured || !currentSession) return notLoggedIn();
+    return client.storage.from("recordings").remove([recordingPath(mediaId)]);
+  }
+
   return {
     isConfigured, init, onChange,
     getSession, getUser, isLoggedIn,
     signUp, signIn, signOut, sendPasswordReset, updatePassword,
     getProfile, updateProfile, getPublicProfile, uploadAvatar, updateUserMetadata,
+    fetchClassProgress, saveClassProgress, fetchClassNote, saveClassNote,
+    fetchLearnerState, insertLearnerState, updateLearnerState,
+    uploadRecording, downloadRecording, deleteRecording,
   };
 })();

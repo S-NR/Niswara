@@ -1,12 +1,10 @@
 /* ============================================================
    DASHBOARD (protected) — "Welcome back" + where-am-I-now summary
 
-   Note on data sourcing: account + profile come from Supabase
-   (real, per-user). Class/practice/progress numbers still read
-   from this browser's local Store, same as the public pages — that
-   becomes real per-user database data in Phase 3. Keeping both
-   pages on the same Store today means nothing here breaks once
-   that swap happens; only Store's internals change.
+   Note on data sourcing: account + profile come from Supabase.
+   Class/practice/progress numbers read from Store, which CloudSync
+   keeps in step with the account's learner_state row — so they're
+   the same on every device the learner logs in on.
    ============================================================ */
 
 const DashboardPage = {
@@ -38,8 +36,12 @@ const DashboardPage = {
         <div>
           <p class="text-xs tracking-[0.2em] uppercase text-gold-400/80 mb-2">Dashboard</p>
           <h1 class="font-display text-3xl text-ink-50">Welcome back, ${Utils.escapeHtml(name)}</h1>
+          <p class="text-xs mt-2" data-sync-status>${syncStatusHtml()}</p>
         </div>
-        <a href="#/profile" class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/15 text-ink-100 text-sm hover:bg-white/5 transition-colors">${icon("user", "w-4 h-4")} Edit Profile</a>
+        <div class="flex items-center gap-2">
+          <a href="#/profile" class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/15 text-ink-100 text-sm hover:bg-white/5 transition-colors">${icon("user", "w-4 h-4")} Edit Profile</a>
+          <button type="button" data-action="navLogout" class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-ink-400 text-sm hover:text-ink-100 hover:bg-white/5 transition-colors">Log Out</button>
+        </div>
       </div>
 
       <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.04] to-transparent p-6 sm:p-8 mb-8">
@@ -80,8 +82,21 @@ const DashboardPage = {
         </a>
       </div>
     `;
+
+    // Keep the sync line live; the listener retires itself once this page is gone
+    const statusEl = root.querySelector("[data-sync-status]");
+    const off = CloudSync.on((event) => {
+      if (!statusEl.isConnected) { off(); return; }
+      if (event === "status") statusEl.innerHTML = syncStatusHtml();
+    });
   },
 };
+
+function syncStatusHtml() {
+  const s = CloudSync.describe();
+  const color = { good: "text-emerald-300", warn: "text-amber-300", muted: "text-ink-500" }[s.tone];
+  return `<span class="${color}">${s.tone === "good" ? "☁ " : ""}${Utils.escapeHtml(s.text)}</span>`;
+}
 
 function continueSentence(stats, current) {
   if (stats.classesCompleted === 0) {

@@ -1,6 +1,6 @@
 # Niswara — Project Summary
 
-_Last updated: 2026-10-21 · Based on `main` @ `c05dbdc` plus uncommitted fixes (see [Change log](#6-change-log))_
+_Last updated: 2026-10-21 · Based on `main` @ `b27c1f7` plus the uncommitted interactive Class 3 (see [Change log](#6-change-log))_
 
 **Niswara: From First Note → Professional** is a personal music-learning platform. It walks one learner through 8 levels: singing, theory, recording, production, mixing, mastering and release. Each level is split into classes, and the platform includes daily practice tracking, a journal, song projects, before/after recordings and achievements.
 
@@ -11,7 +11,7 @@ The repo contains **two separate applications**:
 | **Niswara (primary)** | repo root (`index.html`, `js/`, `css/`, `supabase/`) | Active. Phases 1–2 of 10 done | Static, buildless HTML/CSS/vanilla JS. Tailwind via CDN. Supabase (Auth, Postgres, Storage). Hosted on GitHub Pages |
 | **Learning Academy (prototype)** | `web/` | Early prototype, appears dormant | React 18, TypeScript, Vite, Tailwind, Zustand, PWA |
 
-> **Login status:** all the code-side login issues are fixed. Login stays switched off until `config.js` holds a real Supabase Project URL and anon key, and migrations `0001` + `0002` have been run. See `SETUP.md` §1–6.
+> **Login & sync status:** `config.js` points at the real Supabase project, so the login forms are live. Progress now follows the account to every device (see `js/cloudSync.js`). But **no migrations have been run yet**: checked 2026-10-21, none of `profiles`, `class_progress`, `class_notes` or `learner_state` exist. Until `0001`–`0004` are run, sign-up can't create profiles and all progress stays on the device it was made on. The dashboard says so. See `SETUP.md` §2.
 
 ---
 
@@ -20,22 +20,39 @@ The repo contains **two separate applications**:
 ### Architecture
 
 ```
-index.html ─┬─ config.js            public Supabase URL + anon key (currently placeholders)
+index.html ─┬─ config.js            public Supabase URL + publishable key (real project)
             ├─ js/data.js           APP_DATA: levels, classes, achievements, quotes (static content)
             ├─ js/media.js          Media: recording files in IndexedDB
             ├─ js/store.js          Store: learner state in localStorage, one slot per account
             ├─ js/auth.js           Auth: the only module that touches Supabase
+            ├─ js/classActivity.js  ClassActivity: per-user interactive-lesson progress + private notes (local + Supabase sync)
             ├─ js/router.js         hash router, requiresAuth guard, render/mount/unmount lifecycle
             ├─ js/components.js     pure HTML-string components
             ├─ js/timer.js          practice timer (wall-clock based)
+            ├─ js/audio/pianoSynth.js        NoteUtils + PianoSynth (Web Audio piano, no audio files)
+            ├─ js/components/piano.js        PianoKey, VirtualPiano (reusable)
+            ├─ js/components/exercises.js    ExerciseScore, PitchExercise engine, HigherLower / SameDifferent / NoteIdentification
+            ├─ js/components/vocalRecording.js  VocalRecording + PitchAnalysis (placeholder seam, isAvailable: false)
+            ├─ js/components/personalNotes.js   PersonalNotes
+            ├─ js/components/classProgress.js   ClassProgress
+            ├─ js/lessons/understandingPitch.js interactive Class 3 + InteractiveLessons registry
             └─ js/pages/*.js        17 pages, each { render(params), mount(container) → cleanup }
 supabase/migrations/0001_profiles.sql          profiles table, signup trigger, RLS, public_profiles view, avatars bucket
 supabase/migrations/0002_security_fixes.sql    role protection, public view fix, avatar limits
+supabase/migrations/0003_class_progress.sql    class_progress + class_notes (owner-only RLS)
+supabase/migrations/0004_learner_state.sql     learner_state (whole progress per user, versioned) + private recordings bucket
 ```
 
+**Progress on every device:**
+- `Store` keeps a per-account local copy, so the site works offline.
+- `js/cloudSync.js` pulls the account's `learner_state` on login and when the tab regains focus. It merges with `Store.mergeSyncStates`: unions for classes, practice sessions, journal and uploads; journal deletions are remembered; for single values the newer edit wins. It then uploads (debounced, versioned, retried on conflict) and flushes before logout.
+- Recordings upload to `recordings/<uid>/<mediaId>`, and `Media.getUrl` downloads them on other devices.
+
+Interactive lessons: a class with `interactive: "<key>"` in `data.js` is rendered by `InteractiveLessons[key]` instead of the standard class layout (see `js/pages/classDetail.js`). Only Class 3 uses this today. The components follow the same `render(id, opts)` + `wire(container, id, opts)` pattern as `Timer`, so later classes can reuse them. They're vanilla JS rather than React because the site is buildless and deploys straight to GitHub Pages.
+
 Design seams (all intentional):
-- `Store` is the only persistence layer. Phase 3 rewrites only its internals.
-- `Media` is the only place recording files are stored. Phase 5 swaps it for Supabase Storage.
+- `Store` is the only persistence layer. `CloudSync` mirrors it to the account; pages never talk to the backend for progress.
+- `Media` is the only place recording files are handled: IndexedDB on the device, plus the account's private bucket.
 - `Auth` is the only backend client.
 - `APP_DATA` is the only content source.
 
@@ -45,10 +62,11 @@ Design seams (all intentional):
 |---|---|
 | Curriculum: 8 levels, 60 classes | ✅ Structure done. **Only Level 1 (10 classes) has real content.** Levels 2–8 (50 classes) are marked "Coming Soon" and can't be completed. |
 | Class page: lesson, timer, self-evaluation, upload + playback, reflection, complete | ✅ Working (local only) |
+| **Class 3 — Understanding Pitch (interactive)** | ✅ Guided lesson (Understand → Listen → Play → Identify → Sing → Reflect → Complete). Includes a virtual piano (mouse, touch, keyboard), Learn With Piano, three ear-training exercises with scoring, Sing the Note (record and play back, labelled "Self Evaluation"), private notes, reflection, assignment, and an 8-item progress tracker. Completion requires all 8 items. Saves per user to Supabase once `0003` is run; until then, on the device. |
 | Practice: daily checklist + timer | ✅ Working (local only) |
 | Journal, Projects, Progress, Achievements, Before/After | ✅ Working (local only) |
 | Share-a-class post generator | ✅ Working |
-| Auth: sign up / log in / log out / forgot + reset password | ✅ Built and hardened. ⚠️ **Not live:** `config.js` still holds placeholder values |
+| Auth: sign up / log in / log out / forgot + reset password | ✅ Built and hardened. Connected to the real project. ⚠️ Migrations not run yet |
 | Profile: details, privacy toggles, avatar upload | ✅ Built (needs Supabase) |
 | Protected `/dashboard` | ✅ Built. Shows Supabase profile plus that account's local progress |
 
@@ -57,10 +75,10 @@ Design seams (all intentional):
 | Phase | Scope | Status |
 |---|---|---|
 | 1 | Curriculum structure | ✅ Done |
-| 2 | Authentication & profiles | ✅ Done. **Waiting on Supabase credentials to go live** |
-| 3 | Move progress, practice and journal into Postgres per user | ⏳ Not started (interim per-account local storage is in place) |
+| 2 | Authentication & profiles | ✅ Done. Credentials in place. **Waiting on migrations `0001`/`0002`** |
+| 3 | Progress per user in Postgres, on every device | ✅ Built: all progress (classes and unlocks, practice, journal, projects, answers, milestones) via `learner_state` (`0004`). Class 3 scores and notes via `class_progress` / `class_notes` (`0003`). **Live once the migrations are run.** |
 | 4 | Practice charts (weekly/monthly) | ⏳ |
-| 5 | Recording uploads (Storage + `recordings` table) | ⏳ (interim: IndexedDB via `js/media.js`) |
+| 5 | Recording uploads (Storage + `recordings` table) | 🟡 Core built: recordings upload to a private bucket and play on every device (`0004`). Privacy levels and sharing aren't built yet. |
 | 6 | Projects & journal in the database | ⏳ |
 | 7 | Public profiles & following | ⏳ (`public_profiles` view now works, after `0002`) |
 | 8 | Admin dashboard | ⏳ (`role` column, `is_admin()` and role protection exist) |
@@ -116,7 +134,8 @@ Status: ✅ fixed · 🔧 fixed, but needs your action · ⏳ open
 
 | # | Severity | Issue | Status |
 |---|---|---|---|
-| **L1** | 🔴 Blocker | Login is disabled because `config.js` has placeholder Supabase values. | 🔧 Needs your Supabase Project URL + anon key, then `SETUP.md` §1–6 |
+| **L1** | 🔴 Blocker | Login was disabled because `config.js` had placeholder Supabase values. | 🔧 Credentials now in `config.js` (commit `b27c1f7`). **Still to do:** run migrations `0001`–`0004` and set the redirect URLs (`SETUP.md` §2, §4). |
+| L8 | 🟡 Low | No Log Out button on desktop: the only one was inside the mobile menu, which is hidden on wide screens. | ✅ Log Out added to the dashboard. It saves pending progress before signing out. |
 | L2 | 🟠 Medium | Losing the session in another tab or by token expiry left protected pages visible. | ✅ Fixed (`app.js`, `router.js`) |
 | L3 | 🟡 Low | The `?next=` redirect target wasn't validated. | ✅ `Utils.safeNextRoute()` |
 | L4 | 🟡 Low | Recovery link could land on the wrong page. Expired or other-browser links gave an unclear message. | ✅ `PASSWORD_RECOVERY` routing, and a clearer message about using the same browser |
@@ -130,13 +149,30 @@ Status: ✅ fixed · 🔧 fixed, but needs your action · ⏳ open
 |---|---|---|---|
 | **B1** | 🔴 High | Recordings stored as base64 in localStorage went over the ~5 MB quota. Every later save then failed silently. | ✅ Files now go to IndexedDB (`js/media.js`). Old recordings are migrated automatically on load. Save failures show a banner. |
 | **B2** | 🟠 Medium | The practice day rolled over at UTC midnight (05:30 IST). | ✅ `todayKey()` uses the local date |
-| B3 | 🟠 Medium | Local progress wasn't tied to an account; a shared browser showed one user's data to another. | ✅ Interim fix: one localStorage slot per account. Guest progress moves into the first account that logs in. Cross-device sync still needs Phase 3. |
+| B3 | 🟠 Medium | Local progress wasn't tied to an account; a shared browser showed one user's data to another. | ✅ One localStorage slot per account, and now synced to the account on every device (`learner_state`). Guest progress moves into the first account that logs in. |
 | B4 | 🟡 Low | "100 Classes" achievement couldn't be earned (60 classes exist). | ✅ Replaced with "Curriculum Complete" (all classes) |
 | B5 | 🟡 Low | Placeholder classes could be "completed". | ✅ Marked `comingSoon`. They can't be completed and show a "Coming Soon" badge. |
 | B6 | 🟡 Low | Username silently dropped at signup. | ✅ See L6 |
 | B7 | 🟡 Low | Class uploads couldn't be played back. | ✅ Each upload has a play button |
 | B8 | 🟡 Low | `0001` migration wasn't re-runnable. | ✅ `drop policy if exists` before each policy. `0002` is re-runnable too. |
 | B9 | 🟡 Low | Practice timer under-counted in background tabs. | ✅ Wall-clock based |
+
+### Class 3 (interactive) — known limitations
+
+| # | Severity | Issue | Status |
+|---|---|---|---|
+| C1 | 🟠 Medium | Class unlocks (`completedClassIds`) were device-only, so on a new device Class 3 stayed locked. | ✅ Fixed: unlocks sync via `learner_state`. Tested: a fresh device opens Class 3 with its notes and scores. |
+| C2 | 🟡 Low | There's no automatic pitch judgement for Sing the Note. By design for now, it's labelled "Self Evaluation". `PitchAnalysis` in `vocalRecording.js` is where it plugs in. | ⏳ Future (AI/pitch analysis) |
+| C3 | 🟡 Low | Tested in Chrome desktop and Chrome with phone emulation (390 px, touch). Not yet tried on a real iPhone/Safari (Web Audio unlock, MediaRecorder `audio/mp4`) or a real Android device. | ⏳ Needs a device check |
+| C4 | 🟡 Low | Class 3 recordings stayed on the device (IndexedDB), like other recordings. | ✅ Fixed: uploaded to the private `recordings` bucket and downloaded on other devices |
+
+### Cross-device sync — known limitations
+
+| # | Severity | Issue | Status |
+|---|---|---|---|
+| X1 | 🟡 Low | Another device's changes appear when you log in, return to the tab, or come back online. They don't stream in live while both screens are open side by side. | ⏳ Could add Supabase Realtime later |
+| X2 | 🟡 Low | A recording only reaches the account once the device that made it is online and logged in. Until then, other devices show it but can't play it ("isn't stored on this device"). | By design |
+| X3 | 🟡 Low | Journal, practice and project history live in one JSON row per user (limit 2 MB). That's plenty for years of use, but not queryable per entry. | ⏳ Split into tables if public profiles need it |
 
 ---
 
@@ -159,31 +195,90 @@ A generic React/TypeScript "sequential course" engine: day lessons, quizzes, a f
 
 ## 5. Pending tasks (prioritised)
 
-### Now: make login live (needs you)
-1. Create a Supabase project, or use an existing one. Put its **Project URL** and **anon public key** in `config.js` (`SETUP.md` §1, §3). **Never** use the `service_role` key.
-2. Run `0001_profiles.sql`, **then `0002_security_fixes.sql`**, in the Supabase SQL Editor (§2).
+### Now: make login and cross-device progress live (needs you)
+1. ~~Put the Supabase Project URL and key in `config.js`~~ ✅ Done (`b27c1f7`).
+2. In the Supabase SQL Editor, run **`0001_profiles.sql`, `0002_security_fixes.sql`, `0003_class_progress.sql`, `0004_learner_state.sql`**, in that order (§2).
 3. Set the Site URL and redirect URLs (§4).
-4. Smoke-test on the live site: sign up, log in, log out, forgot/reset password, profile edit, avatar upload. Check that a second account on the same browser sees empty progress.
+4. Smoke-test on the live site:
+   - Sign up (confirm by email; it's switched on for this project), log in, log out, forgot/reset password, profile edit, avatar upload.
+   - Class 3 with two accounts: scores and notes must stay separate, and a row should appear in `class_progress` / `class_notes` in the Table Editor.
+5. Try Class 3 on a real phone: audio, touch, and recording (**C3**).
+6. Cross-device check:
+   - Log in on your laptop, complete something and record a milestone.
+   - Then log in on your phone. It should all be there, and the recording should play.
+   - The dashboard should say "Progress synced to your account". In the Table Editor, your user should have one row in `learner_state`.
 
-### Next: Phase 3
-5. Design migration `0003` (`lesson_progress`, `practice_sessions`, `journal_entries`, `projects`) and rewrite the internals of `js/store.js` to use it.
-6. Import each account's local slot (`ffntp.v1:<uid>`) into the database on first login after Phase 3.
-7. Phase 5: move recordings from IndexedDB (`js/media.js`) to Supabase Storage.
+### Next
+7. Phase 4: weekly and monthly practice charts. Practice is now stored as individual sessions, so this is mostly UI.
+8. Optional live updates between open devices (**X1**).
 
-### Content
-8. Write Levels 2–8: 50 classes. Remove `comingSoon` from each as it's published.
-9. Fill the "Demonstration" slot with audio or video examples (empty on every class).
+### Content & interactive classes
+9. Write Levels 2–8: 50 classes. Remove `comingSoon` from each as it's published.
+10. Fill the "Demonstration" slot with audio or video examples (empty on every class).
+11. Class 3 follow-ups:
+    - Widen Find the Note beyond C4–F4 as a "harder" level.
+    - Add real pitch detection behind `PitchAnalysis` (**C2**).
+    - Reuse `VirtualPiano` and `PitchExercise` for Class 4 "Matching a Note" and later scales and intervals.
 
 ### Housekeeping
-10. Replace the Tailwind play CDN with a compiled stylesheet (**S5**).
-11. Decide the future of `web/`: merge or archive (**W4–W6**).
-12. Add automated tests and CI. The checks run for this round (below) were one-off scripts and aren't committed.
+12. Replace the Tailwind play CDN with a compiled stylesheet (**S5**).
+13. Decide the future of `web/`: merge or archive (**W4–W6**).
+14. Add automated tests and CI. The checks run so far (below) were one-off scripts and aren't committed.
 
 ---
 
 ## 6. Change log
 
-### 2026-10-21: login & issue fixes (uncommitted)
+### 2026-10-21: progress on every device (uncommitted)
+
+Changed: `js/store.js` (sync-safe data shapes and merge/export/import, same public API), `js/media.js` (download from the account on other devices), `js/auth.js` (learner_state and recordings calls), `js/classActivity.js` (`flush` returns a promise), `js/app.js` (sync on login, flush before logout, re-render when another device's progress arrives, deferred while you're typing), `js/pages/dashboard.js` (sync status line and Log Out button), `index.html`, `SETUP.md`.
+New: `js/cloudSync.js`, `supabase/migrations/0004_learner_state.sql`.
+
+Verified:
+- **Merge rules, in Node** (two `vm` "devices" running the real `store.js`):
+  - Same-day practice from both devices adds up (10 + 15 = 25), and repeat merges never double-count.
+  - Journal deletions stick, a newer untick beats an older tick, and older saved data keeps its minutes.
+  - Class 3 unlocks on the other device, and interactive-class data stays out of `learner_state`.
+- **Two separate Chrome instances ("laptop" and "phone") sharing a mock account server** (same contract as the Supabase calls, including the version check):
+  - The phone got the laptop's completed classes, unlocked Class 3, practice, journal, Class 3 notes and scores. The milestone recording downloaded (4096 B) and played. The dashboard showed "Progress synced to your account".
+  - Practising on both at once ended with 30 min on both devices and in the account (one version conflict, merged and retried).
+  - A journal delete on the phone disappeared on the laptop.
+  - A change made just before Log Out still reached the account.
+  - A second user (Bob) on the same phone saw none of Alice's progress. Alice back on the laptop had everything (37 min).
+- **Tables missing (today's real project):** progress stays on the device, and the dashboard says "Saved on this device. Account sync isn't set up on the server yet."
+- **Regression:** all 19 routes render with no errors. The Class 3 journey still passes, and the earlier Store/Utils checks still pass.
+
+**Not verified:** against the real Supabase project (needs the migrations and a confirmed account), and Supabase-specific behaviour of the version-checked update and the `audio/*` bucket rule. The mock server follows the documented behaviour.
+
+### 2026-10-21: interactive Class 3 "Understanding Pitch" (uncommitted)
+
+Changed: `index.html`, `css/styles.css`, `js/auth.js` (4 class-progress/notes calls), `js/store.js` (`classActivity` and `classNotes` slots), `js/data.js` (Class 3 content plus `interactive` flag), `js/pages/classDetail.js` (hand-off to interactive lessons; other classes unchanged), `SETUP.md`.
+New: `js/classActivity.js`, `js/audio/pianoSynth.js`, `js/components/{piano,exercises,vocalRecording,personalNotes,classProgress}.js`, `js/lessons/understandingPitch.js`, `supabase/migrations/0003_class_progress.sql`.
+
+Verified in headless Chrome (real Web Audio, IndexedDB, and MediaRecorder with a fake microphone):
+- **Layout:** all 16 steps render in the specified order.
+- **Piano:**
+  - 15 white + 10 black keys, C3–C5, with octave labels.
+  - A mouse press shows "C4 · 261.63 Hz" and lights the key.
+  - Sliding the pointer plays C4 → D4 → E4. Keyboard A/W/S plays C4/C#4/D4 at the exact frequencies, and Z/X shifts octave.
+  - Typing in text boxes plays nothing.
+  - Sustain, volume, octave and reset work. Audio output peaks at 0.15–0.33, so there's sound and no clipping.
+- **Learn With Piano:** shows ↑ / ↓ / = and plots the pitch path.
+- **Exercises:**
+  - Answers are hidden until the learner responds. A wrong answer gives "Not quite. Listen again." and offers "Show me the answer".
+  - Every right answer's feedback matched the frequencies actually played.
+  - Scores came out exactly as expected: 11 attempts, 10 correct, 91%, 9/10 first try. The difficulty curve ran ≥5 → ≥3 → ≥1 semitones.
+  - **Bug found and fixed:** an interrupted playback used to unlock the answer buttons before the notes had finished.
+- **Sing the Note:** a webm recording is saved and played back. Self-evaluation is saved and restored.
+- **Gating:** "lesson viewed" is set only after scrolling through steps 1–5, and Complete stays disabled until all 8 progress items are done. Completion unlocks Class 4 and writes a journal entry.
+- **After reload:** notes, reflection, scores and recording are all restored.
+- **Mobile** (390 px, touch emulation): 1 octave (C4–C5), no sideways scroll, touch press/slide/black keys work without scrolling the page, tap-to-answer works, and the keyboard help is hidden.
+- **Per-user** (mocked Supabase calls, rows keyed by user ID like RLS): User A 80% and User B 45% stayed independent. Notes were never shared. A "new device" restored A's progress and notes from the server. With tables missing it falls back to "Saved on this device".
+- **Regression:** all 19 routes render with no errors. Standard classes keep their old layout, the protected pages still redirect, and the piano keyboard stops when you leave Class 3. The earlier Store/Utils checks still pass.
+
+**Not verified:** against the real Supabase project (no tables yet, no test account), real iPhone/Android hardware, and `0003` hasn't been run against Postgres.
+
+### 2026-10-21: login & issue fixes (committed in `79224dc`)
 
 Files changed: `js/app.js`, `js/auth.js`, `js/router.js`, `js/store.js`, `js/timer.js`, `js/utils.js`, `js/components.js`, `js/data.js`, `js/pages/{classDetail,dashboard,forgotPassword,login,profile,progress,resetPassword,share,signup}.js`, `index.html`, `SETUP.md`, `supabase/migrations/0001_profiles.sql`, `web/README.md`, `web/src/store/useProgressStore.ts`.
 New files: `js/media.js`, `supabase/migrations/0002_security_fixes.sql`, `web/public/icons/icon-{192,512}.png`.

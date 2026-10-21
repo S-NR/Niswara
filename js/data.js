@@ -83,26 +83,37 @@ const APP_DATA = (() => {
     },
     {
       number: 3, title: "Understanding Pitch", category: "Pitch", skillTag: "pitch",
-      difficulty: "Beginner", estMinutes: 25,
-      description: "Learn what pitch is, how high and low notes feel in your body, and start recognizing pitch direction.",
+      difficulty: "Beginner", estMinutes: 40,
+      // Rendered by the interactive lesson in js/lessons/understandingPitch.js instead of the standard class layout
+      interactive: "understanding-pitch",
+      subtitle: "Before we learn to sing a note, we need to learn to hear a note.",
+      description: "An interactive lesson: what pitch is, high vs low, your first notes on a piano, three ear-training games, and singing your first note.",
       content: {
-        whatYoullLearn: "What pitch physically is (frequency of vibration) and how to recognize when a note moves up, down, or stays the same.",
+        whatYoullLearn: "What sound and pitch are, how to hear whether a note goes up, down or stays the same, what note names like C4 mean, and how to match a note with your voice.",
         whyItMatters: "Pitch accuracy is the single most noticeable skill to untrained ears. Every melody, harmony and in-tune recording depends on this foundation.",
-        theory: "A higher pitch means your vocal folds vibrate faster; a lower pitch means they vibrate slower. You don't need to know the physics to sing in tune — but understanding it helps you stop guessing and start listening.",
+        theory: "A higher pitch means something vibrates faster; a lower pitch means it vibrates slower. Your vocal folds work the same way — and your ears are the tool that keeps them on the right note.",
         guidedPractice: [
-          "Play (or imagine) three notes going up — hum along, noticing the rising sensation.",
-          "Play three notes going down — hum along, noticing the falling sensation.",
-          "Close your eyes and identify 'up', 'down' or 'same' for 10 random note pairs.",
+          "Played my first notes on a piano and trained my ears with Higher/Lower, Same/Different and Find-the-Note exercises.",
         ],
         assignment: {
           instructions: [
-            "Using any piano app or keyboard, play 10 random two-note pairs.",
-            "Record yourself saying 'up', 'down' or 'same' for each pair before checking.",
+            "Play three comfortable notes on the piano.",
+            "Identify which is highest and which is lowest.",
+            "Complete the High/Low exercise.",
+            "Complete the Same/Different exercise.",
+            "Complete the Note Identification exercise.",
+            "Choose one comfortable note.",
+            "Play it.",
+            "Sing it.",
+            "Record yourself.",
+            "Write a short reflection.",
           ],
           questions: [
-            "How many did I identify correctly?",
-            "Was rising or falling pitch easier to hear?",
-            "Did my body naturally want to move with the pitch?",
+            "What did I find easy?",
+            "What did I find difficult?",
+            "Which notes felt comfortable?",
+            "Could I hear when my voice was higher or lower?",
+            "Did I notice myself going off pitch?",
           ]
         }
       }
