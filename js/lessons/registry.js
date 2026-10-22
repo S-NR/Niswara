@@ -10,5 +10,6 @@ const InteractiveLessons = {
   "listening-to-your-voice": ListeningToYourVoiceLesson,
   "rhythm-and-timing": RhythmAndTimingLesson,
   "basic-vocal-warmup": BasicVocalWarmupLesson,
+  "vocal-relaxation": VocalRelaxationLesson,
   "basic-vocal-control": BasicVocalControlLesson,
 };

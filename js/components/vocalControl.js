@@ -207,15 +207,15 @@ const ControlCheck = {
     { value: "developing", mark: "△", label: "Developing" },
     { value: "practice", mark: "○", label: "Needs more practice" },
   ],
-  /** rows: [{ key, area, question }] */
-  render(id, rows, selected = {}) {
+  /** rows: [{ key, area, question }]. levels: optional custom [{ value, mark, label }] (defaults to ControlCheck.LEVELS) — e.g. Class 8's tension scale reuses this same chip-row shape with its own wording. */
+  render(id, rows, selected = {}, levels = ControlCheck.LEVELS) {
     return `
       <div class="flex flex-col gap-3" data-cc="${id}">
         ${rows.map((r) => `
           <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-4 flex flex-col sm:flex-row sm:items-center gap-3">
             <div class="flex-1"><p class="text-[11px] uppercase tracking-wider text-gold-400/80">${r.area}</p><p class="text-sm text-ink-200">${r.question}</p></div>
             <div class="flex flex-wrap gap-1.5">
-              ${ControlCheck.LEVELS.map((l) => `<button type="button" data-cc-row="${r.key}" data-cc-value="${l.value}" aria-pressed="${selected[r.key] === l.value}" class="ex-chip !text-xs !py-1.5 ${selected[r.key] === l.value ? "is-selected" : ""}"><span class="font-display">${l.mark}</span> ${l.label}</button>`).join("")}
+              ${levels.map((l) => `<button type="button" data-cc-row="${r.key}" data-cc-value="${l.value}" aria-pressed="${selected[r.key] === l.value}" class="ex-chip !text-xs !py-1.5 ${selected[r.key] === l.value ? "is-selected" : ""}"><span class="font-display">${l.mark}</span> ${l.label}</button>`).join("")}
             </div>
           </div>`).join("")}
       </div>`;

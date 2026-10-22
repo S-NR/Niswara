@@ -257,26 +257,31 @@ const APP_DATA = (() => {
     },
     {
       number: 8, title: "Vocal Relaxation", category: "Vocal Health", skillTag: "vocal",
-      difficulty: "Beginner", estMinutes: 15,
-      description: "Learn to recognize and release tension in the jaw, neck, shoulders and tongue before and during singing.",
+      difficulty: "Beginner", estMinutes: 20,
+      // Rendered by the interactive lesson in js/lessons/vocalRelaxation.js
+      interactive: "vocal-relaxation",
+      subtitle: "Less tension. More freedom.",
+      description: "An interactive lesson: notice unnecessary tension in the jaw, tongue, neck, shoulders and throat, learn to release it, and feel the difference in a simple before/after comparison.",
       content: {
-        whatYoullLearn: "How to spot physical tension that interferes with singing, and simple techniques to release it.",
-        whyItMatters: "Tension is the enemy of tone, range and endurance. Professionals actively manage it in every session — it's a skill, not a personality trait.",
-        theory: "The jaw, tongue root, neck and shoulders are the most common tension spots for beginners. Releasing them frees your voice instead of fighting through tightness.",
+        whatYoullLearn: "How to notice unnecessary tension in the face, jaw, tongue, neck, shoulders and throat, release it without force, and feel the difference it makes before and after you sing.",
+        whyItMatters: "Singing doesn't need the whole body to work hard. Unnecessary tension is the most common thing standing between a beginner and a comfortable, free voice — and it's a skill to notice and release, not a flaw to fix once.",
+        theory: "Relaxation is awareness, not force: you can't make a muscle relax by trying harder. The pattern is simple — notice, release, sing, notice again — and relaxed does not mean weak or collapsed; it means comfortable alignment with nothing unnecessary switched on.",
         guidedPractice: [
-          "Gently massage your jaw hinge in small circles for 30 seconds.",
-          "Roll your shoulders backward slowly 10 times.",
-          "Stick your tongue out and let it hang loose for 10 seconds, repeat 3 times.",
-          "Yawn-sigh: a big relaxed yawn followed by a loose sighed 'ahh'."
+          "Worked through a short body check, gentle shoulder, jaw and tongue awareness, humming and relaxed vowels, then compared a before and after recording.",
         ],
         assignment: {
+          // The assignment's two recordings live in the lesson (built on Exercise 6); these are the reflection prompts
           instructions: [
-            "Do the full relaxation sequence, then sing a familiar line and notice any difference.",
+            "Recording 1 — sing a comfortable exercise naturally, without consciously relaxing anything",
+            "Complete the Class 8 relaxation routine",
+            "Recording 2 — sing the same exercise again",
           ],
           questions: [
-            "Where did I notice the most tension before starting?",
-            "Did my voice feel freer afterward?",
-            "What tension spot should I keep an eye on in future sessions?",
+            "What does a relaxed singing voice feel like to me?",
+            "Where do I tend to create unnecessary tension?",
+            "Do I try too hard when singing?",
+            "Does singing softer help me stay relaxed?",
+            "Did I notice anything new about my body?",
           ]
         }
       }
