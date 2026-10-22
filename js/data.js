@@ -359,10 +359,45 @@ const APP_DATA = (() => {
     },
   ];
 
+  /* ---------- Level 2, Class 1: fully authored (interactive) ---------- */
+  const level2class1 = {
+    number: 1, title: "Breath & Phrase Control", category: "Breath Support", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 35,
+    // Rendered by the interactive lesson in js/lessons/breathPhraseControl.js
+    interactive: "breath-phrase-control",
+    subtitle: "Learn to breathe for the phrase, not just for the note.",
+    description: "An interactive lesson: connect breathing to real singing — when to breathe, how much breath you actually need, and how to release it naturally through a musical phrase.",
+    content: {
+      whatYoullLearn: "How to plan and use breath for a musical phrase — choosing a natural breathing point, taking a comfortable (not maximal) breath, completing a phrase without rushing, and releasing it naturally at the end.",
+      whyItMatters: "Breathing for singing isn't an isolated exercise — it's a decision made in service of the phrase. Learning to breathe comfortably at the right moment prevents running out of air mid-word, and prevents the strain that comes from over-preparing.",
+      theory: "A musical phrase is a group of words or notes that belong together, usually ending at a natural pause. Good phrase breathing means a comfortable breath just before the phrase, using it efficiently through to a natural end, and releasing without forcing — never maximum inhalation, never breath-holding, never racing a timer.",
+      guidedPractice: [
+        "Explored natural breath awareness, a gentle controlled exhale, breath-marking in spoken and sung phrases, phrases of increasing length, breath with rhythm and with pitch, and compared two recordings made with different breathing choices.",
+      ],
+      assignment: {
+        // The two recordings live in the lesson (built on the Breath Marking exercise); these are the reflection prompts
+        instructions: [
+          "Record a short, comfortable song phrase (first attempt)",
+          "Plan your breath — where, how much, and how you'll end",
+          "Record the same phrase again (second attempt)",
+          "Compare Attempt 1 and Attempt 2",
+        ],
+        questions: [
+          "Did planning the breath help?",
+          "Did I take too much breath?",
+          "Did I run out of breath?",
+          "Did I rush any words?",
+          "Where is my most comfortable breathing point?",
+          "What is one thing I want to improve?",
+        ]
+      }
+    }
+  };
+
   /* ---------- Placeholder classes for Levels 2–8 ---------- */
-  function placeholderLevel(levelId, category, skillTag, titles, difficulty) {
+  function placeholderLevel(levelId, category, skillTag, titles, difficulty, startNumber = 1) {
     return titles.map((title, i) => ({
-      number: i + 1,
+      number: startNumber + i,
       title,
       category,
       skillTag,
@@ -381,8 +416,8 @@ const APP_DATA = (() => {
   }
 
   const levelClassDefs = {
-    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate",
-      titles: ["Vocal Placement", "Resonance", "Chest Voice", "Head Voice", "Mixed Voice", "Vocal Range", "Dynamics", "Expression", "Phrasing", "First Performance Assessment"] },
+    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 2,
+      titles: ["Resonance", "Chest Voice", "Head Voice", "Mixed Voice", "Vocal Range", "Dynamics", "Expression", "Phrasing", "First Performance Assessment"] },
     3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
       titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
@@ -399,8 +434,9 @@ const APP_DATA = (() => {
 
   const CLASSES = [
     ...level1.map(c => ({ ...c, levelId: 1 })),
+    { ...level2class1, levelId: 2 },
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
-      placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty)
+      placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
     ),
   ].map(c => ({ ...c, id: `L${c.levelId}C${String(c.number).padStart(2, "0")}` }));
