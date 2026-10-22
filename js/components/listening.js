@@ -359,6 +359,7 @@ const RecordingCard = (() => {
   /**
    * opts: classId, take ({ mediaId, seconds } | null), minSeconds, maxSeconds, meta ({ name, exercise }),
    *       onSaved(take), onPlayer(player, take) — called whenever a player is (re)created.
+   *       onBeforeRecord() — optional; return false to stop a RE-record before it starts (first recording is never gated).
    */
   function wire(container, id, opts) {
     const root = container.querySelector(`[data-rc="${id}"]`);
@@ -383,6 +384,7 @@ const RecordingCard = (() => {
     }
 
     async function record() {
+      if (take && opts.onBeforeRecord && opts.onBeforeRecord() === false) return; // e.g. "replace your baseline?" (Class 10)
       try {
         session = await VoiceRecorder.start({
           maxSeconds,

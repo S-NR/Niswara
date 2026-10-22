@@ -12,4 +12,5 @@ const InteractiveLessons = {
   "basic-vocal-warmup": BasicVocalWarmupLesson,
   "vocal-relaxation": VocalRelaxationLesson,
   "basic-vocal-control": BasicVocalControlLesson,
+  "first-progress-recording": FirstProgressRecordingLesson,
 };

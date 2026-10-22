@@ -174,6 +174,7 @@ const PitchMatchExercise = (() => {
    *   state, onState(state)       saved per user by the lesson
    *   isComplete(state) -> bool
    *   onRecorded(upload), onAssessed(value)
+   *   onBeforeRecord(key) — optional; return false to stop a RE-record before it starts (first recording is never gated)
    */
   function wire(container, id, cfg, opts) {
     const root = container.querySelector(`[data-pm="${id}"]`);
@@ -246,6 +247,7 @@ const PitchMatchExercise = (() => {
     function setSlotStatus(key, text) { const el = slotEl(key); if (el) el.querySelector("[data-slot-status]").textContent = text; }
 
     async function record(key) {
+      if (state.takes[key] && opts.onBeforeRecord && opts.onBeforeRecord(key) === false) return; // e.g. "replace your baseline?" (Class 10)
       if (seq) seq.cancel();
       recordingKey = key;
       renderSlots();

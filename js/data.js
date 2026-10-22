@@ -323,28 +323,36 @@ const APP_DATA = (() => {
     },
     {
       number: 10, title: "First Progress Recording", category: "Recording", skillTag: "recording",
-      difficulty: "Beginner", estMinutes: 30,
-      description: "Record your first structured check-in and compare it honestly against your Day-1 baseline.",
+      difficulty: "Beginner", estMinutes: 35,
+      // Rendered by the interactive lesson in js/lessons/firstProgressRecording.js
+      interactive: "first-progress-recording",
+      subtitle: "Don't try to sound perfect. Record where you are today.",
+      description: "An interactive milestone: bring together everything from Classes 3–9 into one structured baseline recording — speaking, a reference note, a simple pattern, a rhythm exercise and a short song excerpt — your first point of comparison for future growth.",
       content: {
-        whatYoullLearn: "How to record a consistent, structured progress check-in — the same format you'll repeat throughout this journey.",
-        whyItMatters: "This is the first entry in your Before/After story — a real, honest record of where Foundation level took you.",
-        theory: "Consistent progress recordings (same format, same conditions) are the only reliable way to actually hear improvement rather than imagine it.",
+        whatYoullLearn: "How to create a structured, honest baseline recording — speaking voice, a comfortable reference note, a simple pitch pattern, a short rhythm exercise and a song excerpt — that becomes your first point of comparison for future progress.",
+        whyItMatters: "You can't measure improvement without an honest starting point. This isn't an audition or a professional recording — it's a snapshot of where you are today, recorded naturally, without heavy editing or effects.",
+        theory: "A useful baseline is consistent and honest: a similarly quiet environment and distance from the microphone each time, a comfortable volume, no pitch correction or effects, and no cherry-picking only the best take. The goal is a true record of today, not a performance.",
         guidedPractice: [
-          "Warm up using your Class 7 routine.",
-          "Sing the same song line you used in Class 1.",
-          "Sustain a comfortable note for 5 seconds.",
-          "Speak the same sentence you used in Class 1."
+          "Brought together speaking, a reference note, a simple pattern, a rhythm exercise and a short song excerpt into one structured baseline recording, then reflected on it.",
         ],
         assignment: {
+          // The five recordings live in the lesson (built on Parts 1-5); these are the reflection prompts ("What I Notice")
           instructions: [
-            "Record: the same song line, a sustained note, and the same spoken sentence from Class 1.",
-            "Upload this as your Day 30 (or current day) milestone on the Before/After timeline.",
+            "Speaking sample",
+            "Comfortable reference note",
+            "Simple pitch pattern",
+            "Rhythm exercise",
+            "30–60 second song excerpt",
+            "Self-evaluation",
+            "Personal reflection",
+            "One primary improvement focus",
           ],
           questions: [
-            "What's clearly improved since Class 1?",
-            "What still needs work?",
-            "How did breathing, pitch and control each feel compared to Day 1?",
-            "What am I most proud of from Foundation level?",
+            "One thing I like about my voice",
+            "One thing I noticed that I need to improve",
+            "One thing that surprised me",
+            "One thing that felt easier than expected",
+            "One thing I want to work on next",
           ]
         }
       }
