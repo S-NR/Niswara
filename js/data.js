@@ -223,26 +223,34 @@ const APP_DATA = (() => {
     },
     {
       number: 7, title: "Basic Vocal Warm-Up", category: "Vocal Technique", skillTag: "vocal",
-      difficulty: "Beginner", estMinutes: 15,
-      description: "Learn a simple, repeatable warm-up routine to prepare your voice before every practice session.",
+      difficulty: "Beginner", estMinutes: 20,
+      // Rendered by the interactive lesson in js/lessons/basicVocalWarmup.js
+      interactive: "basic-vocal-warmup",
+      subtitle: "Prepare your voice gently before you sing.",
+      description: "An interactive lesson: a short, comfortable warm-up routine — breathing awareness, humming, a gentle pitch glide, easy vowels, a five-note pattern and simple articulation — to prepare your voice, not push it.",
       content: {
-        whatYoullLearn: "A short, repeatable vocal warm-up sequence you can use before every future practice session.",
-        whyItMatters: "Professional singers never skip the warm-up — it reduces strain, improves range access and makes every practice session more productive.",
-        theory: "Warming up gradually increases blood flow to the vocal folds and loosens surrounding muscles, the same way a runner stretches before sprinting.",
+        whatYoullLearn: "A short, repeatable warm-up routine — breathing awareness, gentle humming or lip trills, an easy pitch glide, simple vowels, a five-note pattern and basic articulation — that gently prepares your voice before you sing.",
+        whyItMatters: "A warm-up prepares the coordination between breath, voice, pitch, resonance and articulation. It's preparation, not a workout — a voice that's gently prepared works more easily in everything that follows.",
+        theory: "Just as the body benefits from easing into activity, the voice benefits from a short, comfortable routine before it's asked to do more. A good warm-up feels easy, comfortable, controlled and gradual — never painful, strained, forced or exhausting.",
         guidedPractice: [
-          "Gentle humming, sliding up and down comfortably, 1 minute.",
-          "Lip trills ('brrr') sliding through your range, 1 minute.",
-          "Soft 'ng' sound (like 'sing') sliding gently, 1 minute.",
-          "Easy sirens from low to high and back, 1 minute."
+          "Worked through a short, comfortable routine: breathing awareness, humming or lip trills, a gentle pitch glide, easy vowels, a five-note pattern and simple articulation.",
         ],
         assignment: {
+          // The assignment steps live in the lesson; these are the reflection prompts
           instructions: [
-            "Run through the full 4-step warm-up and record the final siren exercise.",
+            "Gentle humming or lip trill",
+            "An easy pitch glide",
+            "AH, EE and OO on one comfortable note",
+            "A simple five-note pattern",
+            "A short articulation exercise (Ma-Me-Mi-Mo or La-Le-Li-Lo)",
           ],
           questions: [
-            "Did my voice feel looser after warming up?",
-            "Which exercise felt most comfortable?",
-            "Which exercise felt most challenging?",
+            "How does my voice feel before the warm-up?",
+            "How does it feel after?",
+            "Which exercise feels most natural?",
+            "Did I notice tension anywhere?",
+            "Did I try to push?",
+            "What should I remember before my next singing session?",
           ]
         }
       }

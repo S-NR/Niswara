@@ -362,10 +362,20 @@ body {
 .pv-dot-old { fill: rgba(231, 191, 108, 0.6); }
 .learn-arrow-pop { animation: notePop 0.3s ease; }
 
+/* Breathing circle (Class 7 warm-up) — smooth, slow, no hold phase */
+.breathe-circle {
+  width: 9rem; height: 9rem; border-radius: 999px; margin: 0 auto;
+  background: radial-gradient(circle at 35% 30%, rgba(143, 216, 203, 0.22), rgba(52, 156, 140, 0.06));
+  border: 1px solid rgba(143, 216, 203, 0.35); box-shadow: 0 0 40px -10px rgba(52, 156, 140, 0.45);
+}
+.breathe-circle.is-running { animation: breatheCycle 8s ease-in-out infinite; }
+@keyframes breatheCycle { 0%, 100% { transform: scale(0.82); opacity: 0.7; } 50% { transform: scale(1.08); opacity: 1; } }
+
 /* Respect reduced-motion preference */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   #app > section, .pitch-lesson > section:first-child { animation: none; }
   .pk, .ex-choice, .ex-note-dot, .stair { transition: none; }
   .ex-choice.is-wrong, .vr-btn.is-recording .vr-rec-dot, .piano-note-readout.is-fresh, .learn-arrow-pop { animation: none; }
+  .breathe-circle.is-running { animation: none; }
 }
