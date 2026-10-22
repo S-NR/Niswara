@@ -9,4 +9,5 @@ const InteractiveLessons = {
   "matching-a-note": MatchingANoteLesson,
   "listening-to-your-voice": ListeningToYourVoiceLesson,
   "rhythm-and-timing": RhythmAndTimingLesson,
+  "basic-vocal-control": BasicVocalControlLesson,
 };

@@ -257,6 +257,11 @@ body {
 .pg-key-ref, .pg-key-voice { display: inline-block; width: 16px; height: 0; border-top: 2px dashed rgba(231, 191, 108, 0.75); }
 .pg-key-voice { border-top: 2.5px solid #8fd8cb; }
 
+/* Volume envelope guide (js/components/vocalControl.js, Class 9) */
+.ve-target { fill: none; stroke: rgba(231, 191, 108, 0.75); stroke-width: 2; stroke-dasharray: 6 5; stroke-linejoin: round; }
+.ve-cursor { stroke: rgba(143, 216, 203, 0.8); stroke-width: 2; transition: opacity 0.2s; }
+.ve-key-target { display: inline-block; width: 16px; height: 0; border-top: 2px dashed rgba(231, 191, 108, 0.75); }
+
 /* ============================================================
    SELF-LISTENING (js/components/listening.js, Class 5)
    ============================================================ */

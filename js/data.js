@@ -275,25 +275,35 @@ const APP_DATA = (() => {
     },
     {
       number: 9, title: "Basic Vocal Control", category: "Vocal Technique", skillTag: "vocal",
-      difficulty: "Beginner", estMinutes: 25,
-      description: "Practice sustaining a note evenly and controlling volume without straining.",
+      difficulty: "Beginner", estMinutes: 45,
+      // Rendered by the interactive lesson in js/lessons/basicVocalControl.js
+      interactive: "basic-vocal-control",
+      subtitle: "Good singing is not about forcing the voice. It is about learning to control it.",
+      description: "An interactive lesson: start, stabilize, control, change, transition and combine — small, intentional changes while staying comfortable.",
       content: {
-        whatYoullLearn: "How to sustain a single note with a steady, even tone and controlled volume.",
-        whyItMatters: "Control is what separates a shaky first attempt from a confident, professional-sounding note — it underpins every style and genre.",
-        theory: "A controlled note stays level in pitch and volume for its full duration, supported by steady breath rather than throat tension.",
+        whatYoullLearn: "How to start and stop a note on purpose, keep a note reasonably stable, make small volume changes without forcing, and move smoothly between nearby notes — in time.",
+        whyItMatters: "Control is what separates a shaky first attempt from a confident note — and it comes from comfort and coordination, not force.",
+        theory: "A controlled note is started and ended intentionally, stays reasonably level in pitch, and changes volume only as much as you choose — supported by easy breath, never a squeezed throat.",
         guidedPractice: [
-          "Sustain a comfortable note for 5 seconds, aiming for an even volume.",
-          "Sustain the same note starting soft, growing louder, then softer again.",
-          "Repeat on 3 different comfortable notes."
+          "Practised steady notes, starting and stopping, soft and comfortable volume, a gentle swell, two- and three-note moves, and singing notes in time.",
         ],
         assignment: {
+          // The assignment steps live in the lesson; these are the reflection prompts
           instructions: [
-            "Record a 5-second sustained note, then a soft-loud-soft swell on another note.",
+            "One comfortable sustained note",
+            "Three short start/stop notes",
+            "One soft → comfortable volume change",
+            "A comfortable three-note pattern (e.g. C4 → D4 → E4)",
+            "A simple rhythm pattern with the metronome",
           ],
           questions: [
-            "Did my pitch stay steady for the full sustain?",
-            "Was the volume swell smooth or jumpy?",
-            "What felt different compared to Class 1?",
+            "What does vocal control mean to me now?",
+            "Could I control my voice without forcing it?",
+            "Was pitch easier when I stayed relaxed?",
+            "Did increasing volume affect my pitch?",
+            "Did I notice any tension?",
+            "Which exercise felt most natural?",
+            "What should I practice next?",
           ]
         }
       }
