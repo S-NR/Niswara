@@ -272,6 +272,82 @@ body {
 .lp-card { transition: border-color 0.2s, background 0.2s, opacity 0.2s; }
 .lp-card.is-done { border-color: rgba(52, 211, 153, 0.25); background: rgba(16, 185, 129, 0.04); }
 
+/* ============================================================
+   RHYTHM (js/components/rhythm.js, Class 6)
+   ============================================================ */
+.beat-dot {
+  display: block; width: 1.5rem; height: 1.5rem; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: background 0.12s, box-shadow 0.2s, transform 0.12s;
+}
+.beat-dot-big { width: 2.5rem; height: 2.5rem; }
+.beat-dot.is-first { border-color: rgba(231, 191, 108, 0.5); }
+.beat-dot.is-on { background: #8fd8cb; box-shadow: 0 0 22px rgba(143, 216, 203, 0.55); transform: scale(1.08); }
+.beat-dot.is-first.is-on { background: #e7bf6c; box-shadow: 0 0 28px rgba(214, 162, 67, 0.7); transform: scale(1.15); }
+.beat-ind.is-hidden .beat-dot { visibility: hidden; }
+
+.metro-start {
+  display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.95rem 2.4rem; border-radius: 999px;
+  font-size: 1rem; font-weight: 500; color: #09090b; background: #e7bf6c;
+  box-shadow: 0 0 30px rgba(214, 162, 67, 0.35); transition: background 0.15s, transform 0.1s;
+}
+.metro-start:hover { background: #f3da9e; }
+.metro-start.is-on { background: rgba(255, 255, 255, 0.08); color: #f3da9e; box-shadow: none; border: 1px solid rgba(231, 191, 108, 0.45); }
+
+.tap-pad {
+  position: relative; width: 9rem; height: 9rem; border-radius: 999px; color: #f3da9e;
+  background: radial-gradient(circle at 35% 30%, rgba(231, 191, 108, 0.22), rgba(214, 162, 67, 0.06));
+  border: 1px solid rgba(231, 191, 108, 0.45); box-shadow: 0 0 40px -10px rgba(214, 162, 67, 0.5);
+  touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
+  transition: transform 0.08s;
+}
+.tap-pad:active { transform: scale(0.97); }
+.tap-pad:focus-visible { outline: 2px solid rgba(231, 191, 108, 0.8); outline-offset: 4px; }
+.tap-ring { position: absolute; inset: -2px; border-radius: 999px; border: 2px solid rgba(231, 191, 108, 0.0); }
+.tap-pad.is-hit .tap-ring { animation: tapRing 0.35s ease-out; }
+@keyframes tapRing { from { border-color: rgba(243, 218, 158, 0.9); transform: scale(1); } to { border-color: rgba(243, 218, 158, 0); transform: scale(1.18); } }
+
+.rp-row { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.4rem; }
+.rp-slot {
+  display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: 0.55rem 0.2rem; border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); transition: background 0.1s, box-shadow 0.15s;
+}
+.rp-mark { font-size: 1.15rem; line-height: 1; color: #5c5d68; }
+.rp-slot.is-hit .rp-mark, .rp-slot.is-you .rp-mark { font-size: 1.7rem; }
+.rp-slot.is-hit .rp-mark { color: #e7bf6c; }
+.rp-slot.is-lit { background: rgba(214, 162, 67, 0.18); box-shadow: 0 0 18px rgba(214, 162, 67, 0.35); }
+.rp-slot.is-you .rp-mark { color: #8fd8cb; }
+.rp-slot.is-extra .rp-mark { color: #fbbf24; }
+.rp-label { font-size: 10px; color: #7c7d89; }
+.rp-row-you:empty { display: none; }
+
+.bg-tok {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 3.5rem; border-radius: 0.85rem; padding: 0.35rem;
+  background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); transition: background 0.1s, box-shadow 0.15s, transform 0.1s;
+}
+.bg-num { font-size: 10px; color: #5c5d68; }
+.bg-text { font-family: Fraunces, serif; font-size: 1.15rem; color: #e7e7ea; text-align: center; line-height: 1.2; }
+.bg-tok.is-sing .bg-text { color: #f3da9e; }
+.bg-tok.is-rest .bg-text { color: #43434c; }
+.bg-tok.is-on { background: rgba(143, 216, 203, 0.16); box-shadow: 0 0 20px rgba(143, 216, 203, 0.3); transform: translateY(-1px); }
+.bg-tok.is-sing.is-on { background: rgba(214, 162, 67, 0.2); box-shadow: 0 0 22px rgba(214, 162, 67, 0.4); }
+
+.walk-step { font-size: 1.6rem; opacity: 0.35; transition: opacity 0.1s, transform 0.12s; }
+.walk-step.is-on { opacity: 1; transform: translateY(-4px); }
+
+.tl-axis { stroke: rgba(255, 255, 255, 0.08); stroke-width: 1; }
+.tl-beat { stroke: rgba(231, 191, 108, 0.75); stroke-width: 2; }
+.tl-beat.is-first { stroke: #f3da9e; stroke-width: 3; }
+.tl-ghost { stroke: rgba(231, 191, 108, 0.18); stroke-width: 1; stroke-dasharray: 2 3; }
+.tl-tap-near { fill: #8fd8cb; }
+.tl-tap-far { fill: #fbbf24; }
+
+@media (prefers-reduced-motion: reduce) {
+  .beat-dot, .bg-tok, .walk-step, .tap-pad { transition: none; }
+  .beat-dot.is-on, .bg-tok.is-on, .walk-step.is-on { transform: none; }
+  .tap-pad.is-hit .tap-ring { animation: none; }
+}
+
 .pv-grid { stroke: rgba(255, 255, 255, 0.06); stroke-width: 1; }
 .pv-label { fill: #5c5d68; font-size: 11px; font-family: Inter, sans-serif; }
 .pv-axis { fill: #43434c; font-size: 10px; font-family: Inter, sans-serif; letter-spacing: 0.08em; }

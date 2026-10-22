@@ -43,6 +43,8 @@ index.html ─┬─ config.js            public Supabase URL + publishable key 
             ├─ js/lessons/matchingANote.js   interactive Class 4
             ├─ js/components/listening.js    Waveform, WaveformPlayer, RecordingMarkers, RecordingCard, ListeningPasses, ObservationChecklist
             ├─ js/lessons/listeningToYourVoice.js interactive Class 5
+            ├─ js/components/rhythm.js       RhythmSounds, MetronomeEngine, BeatIndicator, Metronome (+ tap tempo), TapPad, TimingAnalysis, TimingTimeline, TapExercise, RhythmPatternExercise, BeatGuide
+            ├─ js/lessons/rhythmAndTiming.js interactive Class 6
             ├─ js/lessons/registry.js        InteractiveLessons (class `interactive` key -> lesson)
             └─ js/pages/*.js        17 pages, each { render(params), mount(container) → cleanup }
 supabase/migrations/0001_profiles.sql          profiles table, signup trigger, RLS, public_profiles view, avatars bucket
@@ -73,6 +75,7 @@ Design seams (all intentional):
 | **Class 3 — Understanding Pitch (interactive)** | ✅ Guided lesson (Understand → Listen → Play → Identify → Sing → Reflect → Complete). Includes a virtual piano (mouse, touch, keyboard), Learn With Piano, three ear-training exercises with scoring, Sing the Note (record and play back, labelled "Self Evaluation"), private notes, reflection, assignment, and an 8-item progress tracker. Completion requires all 8 items. Saves per user to Supabase once `0003` is run; until then, on the device. |
 | **Class 4 — Matching a Note (interactive)** | ✅ Guided lesson (Understand → Hear → Sing → Adjust → Match → Practice → Reflect → Complete):<br>• The Listen → Remember → Sing → Compare → Adjust loop and a prominent "Choose comfort over range" rule.<br>• A reference note picked on the reused `VirtualPiano`, in a configurable range (Middle C4–C5 by default, or Lower C3–C4).<br>• Five exercises: Listen and Sing, Try Again and Adjust (3 attempts), Slide Into the Note, Blind Matching (3 hidden notes), and Note Chain (C–D–E; wider steps configurable but locked).<br>• Flat and sharp, with audio demos.<br>• An optional **pitch estimate**, offered only after you've judged a take yourself, and never a score.<br>• A practice timer logging "Pitch Training" with the class ID, an 8-question self-assessment, My Notes, a 10-item assignment with final reflection, a 10-item progress tracker with recording and self-evaluation counts, and a completion panel with the Class 5 bridge. |
 | **Class 5 — Listening to Your Own Voice (interactive)** | ✅ Guided lesson (Understand → Record → Listen → Observe → Mark → Compare → Practice → Reflect → Complete), built on "Observation before correction":<br>• A listening warm-up on six short examples (piano and a voice-like synth tone, clearly labelled not a real singer). Multi-select "What did you notice?" with "Good observation." and no score.<br>• A body-awareness check, then a 20–30 s baseline recording: honest, no effects.<br>• Three guided listens: just listen → only pitch → words, breath and smoothness. Each unlocks after the last; Listen 1 completes when playback reaches the end.<br>• A self-listening checklist: pitch, words, breath, volume, smoothness, tone, tension. These are observations, not diagnoses.<br>• A **waveform player** (loudness, explicitly *not* pitch) with play, pause, tap/drag/keyboard seek, replay and **replay a section**.<br>• **Timestamped markers** saved per recording, with private notes per recording.<br>• Reference vs your voice, on Class 4's engine and reference note, with no estimate and the learner deciding which was closer.<br>• Speaking vs singing, with notes.<br>• A practice timer logging "Listening / Vocal Awareness" (under the Ear Training task).<br>• An assignment: a 30–60 s song, three listens, three or more marked observations, five questions and **choose ONE thing**.<br>• A 4-question reflection, My Notes, an 11-item progress tracker, and a completion panel with your ONE thing and the Class 6 bridge. |
+| **Class 6 — Rhythm & Timing (interactive)** | ✅ Guided lesson (Understand → Hear → Feel → Count → Tap → Sing → Speak → Tempo → Practice → Reflect → Complete), built on "Don't rush. Don't chase the beat.":<br>• Beat, rhythm, tempo and timing explained with everyday examples and audio demos.<br>• A **metronome** as the centrepiece: Web Audio scheduled clicks, 60–120 BPM, presets, tap tempo, volume, accent on beat 1, and big beat lights so it never relies on sound alone.<br>• Exercises: Feel the beat (60 BPM) · Tap the pulse (hidden lights, timeline reveal) · Counting (with optional recording) · Clap the beat (1 2 3 4, 1 & 2 & …) · Rhythm patterns (A/B/C, then 8-beat D/E) · Sing with the beat (one comfortable note chosen on the Class 3 piano; 🎵 ○ 🎵 ○ / 🎵 🎵 ○ 🎵) · Speaking rhythm (tap → speak → sing "I am learning to sing") · an optional original song ("Step by Step").<br>• Tempo change (60 → 80) with a rushing check, and Rhythm vs pitch demos.<br>• A practice timer logging "Rhythm & Timing", a 5-part assignment with 7 questions, a 6-question self-reflection, My Notes, a **Rhythm Awareness** guide (Beginner / Developing / Comfortable, labelled not a professional rating), a 12-item progress tracker, and a completion panel with the Class 7 bridge.<br>• Every timing result is labelled a **basic timing estimate**. |
 | Practice: daily checklist + timer | ✅ Working (local only) |
 | Journal, Projects, Progress, Achievements, Before/After | ✅ Working (local only) |
 | Share-a-class post generator | ✅ Working |
@@ -176,6 +179,17 @@ Status: ✅ fixed · 🔧 fixed, but needs your action · ⏳ open
 | C3 | 🟡 Low | Tested in Chrome desktop and Chrome with phone emulation (390 px, touch). Not yet tried on a real iPhone/Safari (Web Audio unlock, MediaRecorder `audio/mp4`) or a real Android device. | ⏳ Needs a device check |
 | C4 | 🟡 Low | Class 3 recordings stayed on the device (IndexedDB), like other recordings. | ✅ Fixed: uploaded to the private `recordings` bucket and downloaded on other devices |
 
+### Class 6 (interactive) — known limitations and design choices
+
+| # | Severity | Issue | Status |
+|---|---|---|---|
+| G1 | — | Tap timing is measured against the **audio clock** of the device, with the scheduled click times corrected for the device's reported output latency. Tested at about ±2 ms in the browser, but **Bluetooth headphones** add delay that the browser doesn't always report, so taps can look "behind". Results are always labelled "basic timing estimate", never pass/fail. | By design; worth a note on real devices |
+| G2 | — | Singing and speaking in time are **self-assessed**: there's no automatic onset detection on the voice, so the app doesn't claim to judge sung or spoken timing. | Intended (future: onset detection on `RecordingCard` takes) |
+| G3 | — | Rhythm Awareness (Beginner / Developing / Comfortable) blends exercises completed (50%), the average basic timing estimate (30%) and the self-reflection answers (20%), and says plainly that it is not a professional rating. | Intended |
+| G4 | 🟡 Low | Practice minutes are logged under a `rhythm` task that isn't one of the daily-practice checkboxes. They count in practice totals and streaks, but there's no rhythm checkbox on the Practice page. | Accepted (add a checkbox if wanted) |
+| G5 | 🟡 Low | Real iPhone/Safari: Web Audio scheduling and touch-tap timing are untested (as **C3**/**D4**/**F5**). | ⏳ Device check |
+| G6 | 🟢 Fixed | **Found while testing:** for a returning learner, the 8-beat patterns D/E re-locked after a reload even though A–C were done. | ✅ Unlocked on load when A–C are saved |
+
 ### Class 5 (interactive) — known limitations and design choices
 
 | # | Severity | Issue | Status |
@@ -246,8 +260,10 @@ A generic React/TypeScript "sequential course" engine: day lessons, quizzes, a f
 ### Content & interactive classes
 9. Write Levels 2–8: 50 classes. Remove `comingSoon` from each as it's published.
 10. Fill the "Demonstration" slot with audio or video examples (empty on every class).
-11. Class 5/6 follow-ups:
-    - Build Class 6 "Rhythm & Timing" on `LessonKit` + `RecordingCard` + `WaveformPlayer`. The waveform's loudness view suits tapping and timing exercises.
+11. Class 5/6/7 follow-ups:
+    - ~~Build Class 6 "Rhythm & Timing"~~ ✅ Done.
+    - Build Class 7 "Basic Vocal Warm-Up" on `LessonKit`, `BeatGuide` (paced warm-up steps), `RecordingCard` and `VirtualPiano`.
+    - Optional: voice onset detection, so sung or spoken timing can get an estimate too (**G2**).
     - Optionally record real sung examples for the Class 5 warm-up (**F2**).
     - Decide how public recordings should work before adding sharing (**F3**).
 12. Class 4 follow-ups:
@@ -267,6 +283,45 @@ A generic React/TypeScript "sequential course" engine: day lessons, quizzes, a f
 ---
 
 ## 6. Change log
+
+### 2026-10-22: interactive Class 6 "Rhythm & Timing" (uncommitted)
+
+New: `js/components/rhythm.js` and `js/lessons/rhythmAndTiming.js`.
+Changed: `js/data.js` (Class 6 content and the `interactive` flag), `js/lessons/registry.js`, `index.html`, `css/styles.css`.
+No changes to Classes 3–5, the shared audio engines, `Store` or the sync code. **No new migration:** answers, checkpoints and tap results go in `class_progress`, notes in `class_notes`, practice in `learner_state`, and optional recordings use the private `recordings` bucket.
+
+Reuse:
+- **Recording:** Class 5's `RecordingCard`, so `VoiceRecorder` stays the only recording engine.
+- **Note choice:** Class 3's `VirtualPiano` (respecting the Class 4 range).
+- **Self-checks:** Class 4's `SelfAssessment`.
+- **Sound:** `PianoSynth`'s AudioContext and synth.
+- **Everything else:** `Timer`, `PersonalNotes`, `ClassProgress`, `ClassActivity`, `LessonKit`, and the page-wide "one sound at a time" signal. The metronome keeps playing while you record, so you can count along.
+
+Verified:
+- **TimingAnalysis in Node:** 11/11 cases passed — perfect, 15 ms lag, 90 ms early (rushing), 70 ms late, a gradual drag, ±200 ms jitter, too few taps, double taps, out-of-window taps, 80 BPM, and no taps.
+- **Part A, desktop headless Chrome, with taps sent as real pointer events aligned to the audio clock:**
+  - "Lesson viewed" is set only after scrolling.
+  - Metronome: 80 BPM by default, clicks exactly 0.75 s apart with the accent on every beat 1, and it counts as used after 8 beats. Changing to 120 BPM applies from the next beat. Tap tempo read 79 BPM from 750 ms taps.
+  - Exercise 1: taps landed −2 ms from the beat, rated Good and with the beat. Exercise 2 (lights hidden): 90 ms early came out as Developing, rushing.
+  - Counting completed 4 bars. Claps came back 4/4 and 8/8. Patterns A and C matched, and a deliberately incomplete B read "2 of 3". D/E unlocked, labelled 1 2 3 4 1 2 3 4.
+  - The tempo check flagged rushing at 80 BPM.
+- **Part B:**
+  - Exercise 6: choosing E4 on the piano made the guide play exactly 8 E4 notes, and none with the guide off.
+  - Exercise 7: "Done" stays disabled until a full guided run.
+  - The original melody played correctly.
+  - The timer logged `{task: "rhythm", category: "Rhythm & Timing", classId: "L1C06"}`.
+  - All 5 assignment parts completed. Rhythm Awareness read "Comfortable" from its three stated inputs.
+  - Progress reached 100%, with "Class 6 complete", the Class 7 bridge and Continue to Class 7. Class 7 became current.
+  - After reload everything was restored.
+- **Mobile (390 px, touch):** metronome presets and start/stop work, the TAP pad is 144×144 px, eight real touch taps registered 8/8, and there's no sideways scroll anywhere.
+- **Two users across two devices (mock account server):** Alice's Exercise 1 result, reflection answer, note and 3 practice minutes appeared on a fresh "phone". Bob saw Class 6 locked, then 0% with no results, answers, notes or minutes. The server kept separate per-user rows.
+- **Regression:**
+  - Classes 3–6 open as interactive lessons and Class 7 stays standard.
+  - All 19 routes render, and the Class 3 journey passes.
+  - The merge, Store, pitch and timing tests pass.
+- **Bug found and fixed:** **G6** (the 8-beat patterns re-locked after a reload).
+
+**Not verified:** real phones, Bluetooth audio latency (**G1**), and a real two-account run on the live Supabase (tested against a mock with the same contract).
 
 ### 2026-10-21: interactive Class 5 "Listening to Your Own Voice" (uncommitted)
 

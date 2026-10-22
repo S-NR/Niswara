@@ -189,26 +189,34 @@ const APP_DATA = (() => {
     },
     {
       number: 6, title: "Rhythm & Timing", category: "Rhythm", skillTag: "rhythm",
-      difficulty: "Beginner", estMinutes: 20,
-      description: "Develop a steady internal sense of tempo and learn to clap, tap and sing in time.",
+      difficulty: "Beginner", estMinutes: 45,
+      // Rendered by the interactive lesson in js/lessons/rhythmAndTiming.js
+      interactive: "rhythm-and-timing",
+      subtitle: "Learn to feel the pulse before you try to sing with it.",
+      description: "An interactive lesson: hear the beat, feel the pulse, count, tap, speak and sing in time — with a metronome at the centre.",
       content: {
-        whatYoullLearn: "How to feel a steady beat internally and keep time without rushing or dragging.",
-        whyItMatters: "Rhythm is invisible when it's right and obvious when it's wrong — it's the skeleton every melody, recording and mix sits on.",
-        theory: "A steady pulse ('tempo') is the grid everything else lines up against. Clapping along to a metronome trains your body to feel that grid, not just hear it.",
+        whatYoullLearn: "What beat, rhythm, tempo and timing mean, how to feel and count a steady pulse, tap and clap simple patterns, and place spoken words and sung notes in time.",
+        whyItMatters: "Rhythm is invisible when it's right and obvious when it's wrong — a singer can sing the correct note and still sound wrong if the timing is wrong.",
+        theory: "A steady pulse (the beat) is the grid everything lines up against; tempo is how fast it goes; rhythm is the pattern placed on it; timing is putting each sound in the right place.",
         guidedPractice: [
-          "Clap along to a slow metronome (60 BPM) for 1 minute.",
-          "Clap along to a moderate metronome (100 BPM) for 1 minute.",
-          "Try singing a simple phrase while tapping your foot on the beat.",
+          "Tapped, counted and clapped with a metronome, tapped back simple patterns, and spoke and sang in time at 60–80 BPM.",
         ],
         assignment: {
+          // The five assignment parts and seven questions live in the lesson; these are the reflection prompts
           instructions: [
-            "Practice clapping with a metronome at 60 and 100 BPM, 2 minutes each.",
-            "Record 20 seconds of yourself singing a line while tapping time.",
+            "Set the metronome to 60 BPM. Listen for 8 beats, then tap along for another 8.",
+            "Count 1 2 3 4 for 8 bars.",
+            "Speak a short phrase in time.",
+            "Sing a comfortable note in a simple rhythm.",
+            "Repeat at 80 BPM.",
           ],
           questions: [
-            "Did I rush, drag, or stay steady?",
-            "Was it harder to keep time while singing versus just clapping?",
-            "Which tempo felt more natural to me?",
+            "Can I feel the beat without looking at the screen?",
+            "Can I count while singing?",
+            "Do I tend to rush?",
+            "Do I tend to fall behind?",
+            "Can I recover if I lose the beat?",
+            "What is one thing I want to improve?",
           ]
         }
       }
