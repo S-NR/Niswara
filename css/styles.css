@@ -362,6 +362,12 @@ body {
 .pv-dot-old { fill: rgba(231, 191, 108, 0.6); }
 .learn-arrow-pop { animation: notePop 0.3s ease; }
 
+/* Pitch stability reference line (js/components/pitchStability.js, Class 12): a dot travels while the note sounds */
+.ps-ref-dot { fill: #f3da9e; opacity: 0.35; }
+[data-ref-line].is-playing .ps-ref-dot { opacity: 1; animation: psRefTravel 3s linear forwards; }
+[data-ref-line].is-playing .ps-ref-line { stroke: rgba(243, 218, 158, 0.95); }
+@keyframes psRefTravel { from { transform: translateX(0); } to { transform: translateX(500px); } }
+
 /* Breathing circle (Class 7 warm-up) — smooth, slow, no hold phase */
 .breathe-circle {
   width: 9rem; height: 9rem; border-radius: 999px; margin: 0 auto;
@@ -378,4 +384,5 @@ body {
   .pk, .ex-choice, .ex-note-dot, .stair { transition: none; }
   .ex-choice.is-wrong, .vr-btn.is-recording .vr-rec-dot, .piano-note-readout.is-fresh, .learn-arrow-pop { animation: none; }
   .breathe-circle.is-running { animation: none; }
+  [data-ref-line].is-playing .ps-ref-dot { animation: none; }
 }

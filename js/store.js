@@ -79,7 +79,62 @@ const Store = (() => {
     out.completedClassIds = [...new Set(out.completedClassIds || [])];
     out.deletedJournalIds = out.deletedJournalIds || [];
     out.practiceLog = Object.fromEntries(Object.entries(out.practiceLog || {}).map(([k, d]) => [k, normalizeDay(d)]));
-    return seedProjects(out);
+    return seedProjects(migrateClassIds(out));
+  }
+
+  /** Old id -> new id for classes that moved (APP_DATA.LEGACY_CLASS_IDS), while the old slot is still a placeholder. */
+  function movedClassIds() {
+    return Object.entries(APP_DATA.LEGACY_CLASS_IDS || {}).filter(([from]) => {
+      const c = APP_DATA.CLASSES.find((x) => x.id === from);
+      return !c || c.comingSoon;
+    });
+  }
+
+  /** Earlier ids of a class that moved (e.g. "L1C11" -> ["L2C01"]) — for reading rows saved under the old id. */
+  function legacyClassIds(id) {
+    return movedClassIds().filter(([, to]) => to === id).map(([from]) => from);
+  }
+
+  /** Re-keys everything a moved class saved (any device's copy, any age) so it follows the class to its new id. */
+  function migrateClassIds(s) {
+    movedClassIds().forEach(([from, to]) => {
+      const re = (id) => (id === from ? to : id);
+      s.completedClassIds = [...new Set(s.completedClassIds.map(re))];
+      s.currentClassId = re(s.currentClassId);
+      if (s.classProgress && s.classProgress[from]) {
+        const { [from]: old, ...rest } = s.classProgress;
+        s.classProgress = { ...rest, [to]: mergeClassProgress(rest[to], old) };
+      }
+      Object.values(s.practiceLog).forEach((d) => { d.sessions = d.sessions.map((x) => (x.classId === from ? { ...x, classId: to } : x)); });
+      s.journal = (s.journal || []).map((e) => (e.classId === from ? { ...e, classId: to } : e));
+      if (s.classActivity && s.classActivity[from]) {
+        const { [from]: old, ...rest } = s.classActivity;
+        s.classActivity = { ...rest, [to]: mergeActivity(rest[to], old) };
+      }
+      if (s.classNotes) {
+        const notes = {};
+        Object.entries(s.classNotes).forEach(([k, n]) => {
+          const key = k === from || k.startsWith(`${from}:`) ? to + k.slice(from.length) : k;
+          if (!notes[key] || (n.updatedAt || "") > (notes[key].updatedAt || "")) notes[key] = n;
+        });
+        s.classNotes = notes;
+      }
+    });
+    return s;
+  }
+
+  /** Two copies of one interactive-lesson record: checkpoints only move forward, newer answers win. */
+  function mergeActivity(a, b) {
+    if (!a) return b;
+    if (!b) return a;
+    const [older, newer] = (a.updatedAt || "") >= (b.updatedAt || "") ? [b, a] : [a, b];
+    return {
+      ...older, ...newer,
+      checkpoints: { ...older.checkpoints, ...newer.checkpoints, ...Object.fromEntries(Object.entries(older.checkpoints || {}).filter(([, v]) => v)) },
+      exerciseStats: { ...older.exerciseStats, ...newer.exerciseStats },
+      answers: { ...older.answers, ...newer.answers },
+      completedAt: [a.completedAt, b.completedAt].filter(Boolean).sort()[0] || null,
+    };
   }
 
   let state = load();
@@ -567,6 +622,7 @@ const Store = (() => {
     setMilestoneUpload, skillProgress, isAchievementUnlocked, overallStats,
     resetAll, todayKey, switchUser, migrateLegacyUploads,
     emptyClassActivity, getClassActivity, setClassActivity, getClassNote, setClassNote,
+    legacyClassIds,
     onPersist, exportSyncState, normalizeForSync, importSyncState, mergeSyncStates, referencedMediaIds,
   };
 })();

@@ -236,7 +236,7 @@ const BasicVocalControlLesson = (() => {
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
         <p class="text-sm text-ink-300 leading-relaxed mb-2">You've now started learning how to control your voice — with small, intentional changes, while staying comfortable.</p>
         <p class="text-sm text-ink-300 leading-relaxed mb-2">${next ? `Next, in <strong class="text-ink-100">Class ${next.number} — ${next.title}</strong>, you'll capture where your voice is today, so you can hear how far you've come.` : ""}</p>
-        <p class="text-sm text-ink-400 leading-relaxed">After that, Level 2 explores <strong class="text-ink-200">where your voice naturally resonates and how different parts of your voice feel</strong> — Vocal Placement & Resonance — starting with simple awareness, not technique.</p>
+        <p class="text-sm text-ink-400 leading-relaxed">Later, Level 2 explores <strong class="text-ink-200">where your voice naturally resonates and how different parts of your voice feel</strong> — Vocal Placement & Resonance — starting with simple awareness, not technique.</p>
       </div>`;
     if (status === "completed") {
       return `

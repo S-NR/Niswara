@@ -13,7 +13,9 @@ const ClassDetailPage = {
     if (status === "locked") {
       return `
       <section class="max-w-3xl mx-auto px-5 lg:px-8 py-20 text-center">
-        ${Components.EmptyState("lock", `Class ${cls.number} is locked`, `Finish everything earlier in Level ${level.id} — ${level.title} to unlock "${cls.title}".`)}
+        ${Components.EmptyState("lock", `Class ${cls.number} is locked`, Store.isLevelUnlocked(cls.levelId)
+          ? `Finish everything earlier in Level ${level.id} — ${level.title} to unlock "${cls.title}".`
+          : `Complete Level ${level.id - 1} — ${APP_DATA.LEVELS.find(l => l.id === level.id - 1).title} to unlock Level ${level.id} and "${cls.title}".`)}
         <a href="#/classes" class="inline-flex items-center gap-2 mt-6 text-sm text-gold-300">${icon("arrowRight", "w-3.5 h-3.5 rotate-180")} Back to Classes</a>
       </section>`;
     }

@@ -359,9 +359,12 @@ const APP_DATA = (() => {
     },
   ];
 
-  /* ---------- Level 2, Class 1: fully authored (interactive) ---------- */
-  const level2class1 = {
-    number: 1, title: "Breath & Phrase Control", category: "Breath Support", skillTag: "vocal",
+  /* ---------- Level 1, Class 11 (interactive) ----------
+     Built first as Level 2 Class 1 (L2C01) and moved into Level 1 on
+     2026-10-23; Store / ClassActivity carry old L2C01 progress across
+     (see LEGACY_CLASS_IDS below). */
+  const breathPhraseClass = {
+    number: 11, title: "Breath & Phrase Control", category: "Breath Support", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 35,
     // Rendered by the interactive lesson in js/lessons/breathPhraseControl.js
     interactive: "breath-phrase-control",
@@ -394,6 +397,74 @@ const APP_DATA = (() => {
     }
   };
 
+  /* ---------- Level 1, Class 12 (interactive) ---------- */
+  const pitchStabilityClass = {
+    number: 12, title: "Pitch Stability", category: "Pitch", skillTag: "pitch",
+    difficulty: "Beginner", estMinutes: 40,
+    // Rendered by the interactive lesson in js/lessons/pitchStability.js
+    interactive: "pitch-stability",
+    subtitle: "Find the note — then learn to stay with it.",
+    description: "An interactive lesson: the difference between matching a note and staying with it — listening first, then looking at an estimated pitch trace, with gentle, comfortable control.",
+    content: {
+      whatYoullLearn: "The difference between pitch matching and pitch stability: hearing a steady reference, matching it, holding it comfortably for a few seconds, noticing when your voice moves away, and trying again — on one note, on different vowels, with a comfortable breath and across three nearby notes.",
+      whyItMatters: "Reaching the right note is only the beginning. Melodies sound in tune when each note stays reasonably close to where it should be. Learning to notice unwanted movement — with your ears first — is the foundation for singing melodies accurately.",
+      theory: "A sung note naturally moves a little; stable does not mean perfectly flat. Unwanted movement can drift slightly sharp (higher), slightly flat (lower) or wobble. It often comes from an unfamiliar note, hard-to-hear reference, breath running low, tension, singing too loudly or holding too long — so the gentle fixes are shorter notes, comfortable volume and a natural breath, never squeezing or forcing.",
+      guidedPractice: [
+        "Listened to a steady reference, matched and stopped, held a note comfortably, judged stability by ear before seeing an estimated pitch trace, corrected a second attempt, compared vowels, connected breath and pitch, and stabilised three nearby notes and a short 1-2-3-2-1 pattern.",
+      ],
+      assignment: {
+        // The three recordings live in the lesson; these are the parts and the reflection questions
+        instructions: [
+          "Attempt 1 — play the reference, sing the note comfortably, record, listen back",
+          "Attempt 2 — play the reference again, sing the same note relaxed and stable, record",
+          "Three-note pattern — 1 → 2 → 3 → 2 → 1 from a comfortable starting pitch, record",
+        ],
+        questions: [
+          "Could I match the reference?",
+          "Did my pitch move?",
+          "Could I hear the movement?",
+          "Did my pitch become less stable near the end?",
+          "Did I become tense?",
+          "Was Attempt 2 easier?",
+          "Which note or part was hardest?",
+          "What will I focus on next?",
+        ]
+      }
+    }
+  };
+
+  /* ---------- Level 1, Classes 13–20 (not written yet) ---------- */
+  const level1Upcoming = [
+    { title: "Smooth Note Transitions", category: "Pitch", skillTag: "pitch", goal: "Move smoothly between notes",
+      learn: "Nearby note transitions, ascending and descending, listening for jumps, smooth movement, and simple two- and three-note patterns — no large intervals yet." },
+    { title: "Basic Dynamics", category: "Vocal Technique", skillTag: "vocal", goal: "Soft/loud control",
+      learn: "Comfortable soft and louder singing, and gentle changes between them, without forcing." },
+    { title: "Diction & Pronunciation", category: "Vocal Technique", skillTag: "vocal", goal: "Make words clearer",
+      learn: "Clear vowels and consonants while singing, so words are easy to understand." },
+    { title: "Basic Scale Patterns", category: "Pitch", skillTag: "pitch", goal: "Develop pitch coordination",
+      learn: "Simple scale patterns at a comfortable pitch, to coordinate the ear and the voice." },
+    { title: "Simple Melodic Phrases", category: "Pitch", skillTag: "pitch", goal: "Combine pitch + rhythm",
+      learn: "Short melodies that combine the right notes with the right timing." },
+    { title: "Singing a Simple Song", category: "Vocal Foundation", skillTag: "vocal", goal: "Apply the fundamentals",
+      learn: "Bringing pitch, rhythm, breath and control together in one simple song." },
+    { title: "Self-Evaluation", category: "Ear Training", skillTag: "ear", goal: "Learn to critically listen",
+      learn: "Listening back to your own singing honestly and choosing what to work on next." },
+    { title: "Level 1 Progress Recording", category: "Recording", skillTag: "recording", goal: "Measure foundation progress",
+      learn: "A second structured recording, compared with your Class 10 baseline, to hear how far your foundation has come." },
+  ].map((c, i) => ({
+    number: 13 + i, title: c.title, category: c.category, skillTag: c.skillTag,
+    difficulty: "Beginner", estMinutes: 35,
+    comingSoon: true, // no lesson content yet — can be viewed but not completed (see Store.completeClass)
+    description: `Coming soon: ${c.goal.charAt(0).toLowerCase()}${c.goal.slice(1)}.`,
+    content: {
+      whatYoullLearn: c.learn,
+      whyItMatters: "Content is released gradually so each skill builds on the foundations before it.",
+      theory: "Coming soon.",
+      guidedPractice: [],
+      assignment: { instructions: [], questions: [] }
+    }
+  }));
+
   /* ---------- Placeholder classes for Levels 2–8 ---------- */
   function placeholderLevel(levelId, category, skillTag, titles, difficulty, startNumber = 1) {
     return titles.map((title, i) => ({
@@ -416,8 +487,8 @@ const APP_DATA = (() => {
   }
 
   const levelClassDefs = {
-    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 2,
-      titles: ["Resonance", "Chest Voice", "Head Voice", "Mixed Voice", "Vocal Range", "Dynamics", "Expression", "Phrasing", "First Performance Assessment"] },
+    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate",
+      titles: ["Vocal Placement", "Resonance", "Chest Voice", "Head Voice", "Mixed Voice", "Vocal Range", "Dynamics", "Expression", "Phrasing", "First Performance Assessment"] },
     3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
       titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
@@ -433,8 +504,7 @@ const APP_DATA = (() => {
   };
 
   const CLASSES = [
-    ...level1.map(c => ({ ...c, levelId: 1 })),
-    { ...level2class1, levelId: 2 },
+    ...[...level1, breathPhraseClass, pitchStabilityClass, ...level1Upcoming].map(c => ({ ...c, levelId: 1 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
@@ -539,5 +609,10 @@ const APP_DATA = (() => {
     theory: "Music Theory", recording: "Recording", mixing: "Mixing", mastering: "Mastering",
   };
 
-  return { LEVELS, CLASSES, RESOURCE_TOPICS, MILESTONES, PROJECTS_SEED, ACHIEVEMENTS, QUOTES, PRACTICE_TASKS, SKILL_LABELS };
+  /* Classes that moved: old id -> new id. Store and ClassActivity carry a
+     learner's progress, notes and practice across, but only while the old
+     id is a comingSoon placeholder (so a future real class there is safe). */
+  const LEGACY_CLASS_IDS = { L2C01: "L1C11" }; // Breath & Phrase Control: Level 2 Class 1 -> Level 1 Class 11
+
+  return { LEVELS, CLASSES, LEGACY_CLASS_IDS, RESOURCE_TOPICS, MILESTONES, PROJECTS_SEED, ACHIEVEMENTS, QUOTES, PRACTICE_TASKS, SKILL_LABELS };
 })();

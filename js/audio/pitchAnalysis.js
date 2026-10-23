@@ -85,7 +85,7 @@ const PitchAnalysis = (() => {
     return { freq: sr / better, clarity: 1 - b };
   }
 
-  /** Raw samples -> { frames: [{ t, midi }], duration, voicedSeconds }. */
+  /** Raw samples -> { frames: [{ t, midi }], duration, voicedSeconds, loudSeconds, peak }. */
   function analyzeSamples(samples, sampleRate) {
     const { data, sr } = downsample(samples, sampleRate);
     const W = FRAME >> 1;
@@ -99,8 +99,10 @@ const PitchAnalysis = (() => {
     const maxRms = Math.max(0, ...rmsList);
     const gate = Math.max(0.008, maxRms * 0.15);
     const raw = [];
+    let loud = 0;
     rmsList.forEach((rms, idx) => {
       if (rms < gate) return;
+      loud++;
       const start = idx * HOP;
       const r = yin(data, start, sr, diff, cmnd);
       if (r && r.clarity > 0.8) raw.push({ t: (start + FRAME / 2) / sr, midi: toMidi(r.freq) });
@@ -110,7 +112,8 @@ const PitchAnalysis = (() => {
       t: f.t,
       midi: median(raw.slice(Math.max(0, i - 2), i + 3).map((x) => x.midi)),
     }));
-    return { frames, duration: data.length / sr, voicedSeconds: frames.length * HOP / sr };
+    // loudSeconds vs voicedSeconds tells noise (loud but no clear pitch) from a clear note; peak tells silence
+    return { frames, duration: data.length / sr, voicedSeconds: frames.length * HOP / sr, loudSeconds: loud * HOP / sr, peak: maxRms };
   }
 
   async function decode(blob) {

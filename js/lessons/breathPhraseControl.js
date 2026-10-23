@@ -1,5 +1,5 @@
 /* ============================================================
-   CLASS 11 (L2C01) — BREATH & PHRASE CONTROL (interactive lesson)
+   CLASS 11 (L1C11; first built as L2C01 — see APP_DATA.LEGACY_CLASS_IDS) — BREATH & PHRASE CONTROL (interactive lesson)
 
    Rendered by ClassDetailPage for interactive: "breath-phrase-control".
 
@@ -280,7 +280,7 @@ const BreathPhraseControlLesson = (() => {
               <a href="#/classes/${next.id}" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gold-500 text-ink-950 text-sm font-medium hover:bg-gold-400 transition-colors shadow-glow-sm">Continue to Class ${next.number} ${icon("arrowRight", "w-3.5 h-3.5")}</a>
               <a href="#/share/${cls.id}" class="inline-flex items-center gap-2 px-5 py-3 rounded-full border border-white/15 text-ink-100 text-sm hover:bg-white/5 transition-colors">${icon("share", "w-4 h-4")} Share</a>
             </div>
-          </div>` : `<p class="text-sm text-ink-500 mt-6">More of Level 2 is on its way.</p>`}
+          </div>` : `<p class="text-sm text-ink-500 mt-6">More classes are on their way.</p>`}
         </div>`;
     }
     return `

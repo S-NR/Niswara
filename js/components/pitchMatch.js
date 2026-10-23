@@ -119,7 +119,7 @@ const PitchMatchExercise = (() => {
   /**
    * cfg: { eyebrow, title, intro, tips, flow, slots: [{ key, label, hint, focus }],
    *        assessment: { question, options, feedback: { value: text } } | null,
-   *        hidden, chain, rounds, refLabel }
+   *        hidden, chain, rounds, refLabel, noteDuration (seconds per reference note) }
    */
   function render(id, cfg) {
     return `
@@ -173,7 +173,7 @@ const PitchMatchExercise = (() => {
    *   pickBlindNote(prevMidi)     blind mode: choose the next hidden note
    *   state, onState(state)       saved per user by the lesson
    *   isComplete(state) -> bool
-   *   onRecorded(upload), onAssessed(value)
+   *   onRecorded(upload), onAssessed(value), onPlayed(key) — a take was played to the end
    *   onBeforeRecord(key) — optional; return false to stop a RE-record before it starts (first recording is never gated)
    */
   function wire(container, id, cfg, opts) {
@@ -229,7 +229,7 @@ const PitchMatchExercise = (() => {
       const btn = refRoot.querySelector("[data-ref-play]");
       btn.classList.add("is-playing");
       seq = PianoSynth.playSequence(ns, {
-        duration: cfg.chain ? 0.9 : 1.6, gap: 0.25,
+        duration: cfg.noteDuration || (cfg.chain ? 0.9 : 1.6), gap: 0.25,
         onNote: (i) => refRoot.querySelectorAll("[data-chain-i]").forEach((d) => d.classList.toggle("is-lit", Number(d.dataset.chainI) === i)),
       });
       seq.then(() => btn.classList.remove("is-playing"));
@@ -287,7 +287,7 @@ const PitchMatchExercise = (() => {
       if (!take) return;
       if (seq) seq.cancel();
       setSlotStatus(key, "Playing your recording…");
-      const ok = await VoiceRecorder.play(take.mediaId, { onEnded: () => setSlotStatus(key, "") });
+      const ok = await VoiceRecorder.play(take.mediaId, { onEnded: () => { setSlotStatus(key, ""); if (opts.onPlayed) opts.onPlayed(key); } });
       if (!ok) setSlotStatus(key, "This recording isn't available on this device yet.");
     }
 

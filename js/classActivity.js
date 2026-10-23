@@ -94,7 +94,13 @@ const ClassActivity = (() => {
     const { data, error } = await Auth.fetchClassProgress(classId);
     if (error) { noteRemoteError(error); return false; }
     const local = get(classId);
-    const merged = merge(local, data);
+    let merged = merge(local, data);
+    if (!data) { // the class moved: progress saved under its old id comes across once (then lives under the new id)
+      for (const old of Store.legacyClassIds(classId)) {
+        const legacy = await Auth.fetchClassProgress(old);
+        if (legacy.data) merged = merge(merged, legacy.data);
+      }
+    }
     Store.setClassActivity(classId, merged);
     if (!data || !sameContent(merged, merge(Store.emptyClassActivity(), data))) {
       schedulePush(classId); // this device knows things the server doesn't yet
@@ -207,8 +213,15 @@ const ClassActivity = (() => {
   async function loadNote(classId) {
     const local = Store.getClassNote(classId);
     if (!canSync()) return { ...local, savedTo: "device" };
-    const { data, error } = await Auth.fetchClassNote(classId);
+    let { data, error } = await Auth.fetchClassNote(classId);
     if (error) { noteRemoteError(error); return { ...local, savedTo: "device" }; }
+    if (!data) { // the class moved: a note saved under its old id
+      for (const old of Store.legacyClassIds(classId)) {
+        const legacy = await Auth.fetchClassNote(old);
+        if (legacy.data) { data = legacy.data; break; }
+      }
+      if (data && (!local.updatedAt || data.updated_at >= local.updatedAt)) return saveNote(classId, data.body);
+    }
     if (data && (!local.updatedAt || data.updated_at >= local.updatedAt)) {
       Store.setClassNote(classId, data.body, data.updated_at);
       return { body: data.body, updatedAt: data.updated_at, savedTo: "account" };
