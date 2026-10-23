@@ -47,38 +47,64 @@ const LoudnessAnalysis = {
 
 const VolumeEnvelope = (() => {
   const W = 520, H = 150, L = 14, R = 14, T = 16, B = 22;
-  // Target: soft -> medium -> soft (a gentle hill, never a big jump)
-  const target = (x) => 0.2 + 0.6 * Math.sin(Math.PI * x);
+  // Target shapes: "hill" (soft -> medium -> soft, the original, a gentle hill, never a big
+  // jump), "up" (a gradual, steady rise) and "down" (a gradual, steady fall) — the latter two
+  // added for Class 14's gradual/crescendo/decrescendo exercises, which share this same guide.
+  const SHAPE_TARGET = {
+    hill: (x) => 0.2 + 0.6 * Math.sin(Math.PI * x),
+    up: (x) => 0.15 + 0.7 * x,
+    down: (x) => 0.85 - 0.7 * x,
+  };
+  const DEFAULT_LABELS = { hill: ["soft", "medium", "soft"], up: ["soft", "medium", "strong"], down: ["strong", "medium", "soft"] };
+  const DEFAULT_STATUS = {
+    hill: "Soft → a little louder → soft again. Small changes only.",
+    up: "Comfortably soft, gradually a little stronger. Small changes only.",
+    down: "Comfortably strong (but relaxed), gradually softer. Small changes only.",
+  };
+  const PHASES = {
+    hill: [[0.33, "Comfortably soft…"], [0.66, "A little louder — still easy"], [1, "Back to soft…"]],
+    up: [[0.33, "Comfortably soft…"], [0.66, "Gradually a little stronger…"], [1, "Comfortably strong — not shouting…"]],
+    down: [[0.33, "Comfortably strong, but relaxed…"], [0.66, "Gradually softer…"], [1, "Back to soft…"]],
+  };
   const xy = (x, v) => [L + x * (W - L - R), T + (1 - v) * (H - T - B)];
 
-  function svg(userCurve) {
+  function svg(userCurve, shape = "hill", labels) {
+    const target = SHAPE_TARGET[shape] || SHAPE_TARGET.hill;
+    const lbls = labels || DEFAULT_LABELS[shape] || DEFAULT_LABELS.hill;
     const tpts = Array.from({ length: 41 }, (_, i) => xy(i / 40, target(i / 40)).map((n) => n.toFixed(1)).join(",")).join(" ");
     const upts = userCurve && userCurve.length ? userCurve.map((v, i) => xy(i / (userCurve.length - 1), Math.min(1, v * 0.85)).map((n) => n.toFixed(1)).join(",")).join(" ") : "";
+    const labelHtml = shape === "hill"
+      ? `<text x="${L}" y="${H - 6}" class="pg-label">${lbls[0]}</text>
+         <text x="${W / 2}" y="${T - 2}" text-anchor="middle" class="pg-label">${lbls[1]}</text>
+         <text x="${W - R}" y="${H - 6}" text-anchor="end" class="pg-label">${lbls[2]}</text>`
+      : lbls.map((txt, i) => {
+          const x = L + (i / (lbls.length - 1)) * (W - L - R);
+          const anchor = i === 0 ? "start" : i === lbls.length - 1 ? "end" : "middle";
+          return `<text x="${x.toFixed(1)}" y="${H - 6}" text-anchor="${anchor}" class="pg-label">${txt}</text>`;
+        }).join("");
     return `
-      <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto" role="img" aria-label="Volume guide: soft, then medium, then soft">
-        <text x="${L}" y="${H - 6}" class="pg-label">soft</text>
-        <text x="${W / 2}" y="${T - 2}" text-anchor="middle" class="pg-label">medium</text>
-        <text x="${W - R}" y="${H - 6}" text-anchor="end" class="pg-label">soft</text>
+      <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto" role="img" aria-label="Volume guide: ${lbls.join(" to ")}">
+        ${labelHtml}
         <polyline points="${tpts}" class="ve-target"/>
         ${upts ? `<polyline points="${upts}" class="pg-voice"/>` : ""}
         <line x1="${L}" x2="${L}" y1="${T}" y2="${H - B}" class="ve-cursor" data-ve-cursor style="opacity:0"/>
       </svg>`;
   }
 
-  function render(id, { seconds = 6 } = {}) {
+  function render(id, { seconds = 6, shape = "hill", labels } = {}) {
     return `
       <div class="rounded-2xl border border-white/5 bg-ink-950/60 p-4" data-ve="${id}">
-        <div data-ve-svg>${svg(null)}</div>
+        <div data-ve-svg>${svg(null, shape, labels)}</div>
         <div class="flex flex-wrap items-center gap-3 mt-2">
           <button type="button" data-ve-start class="vr-btn">${icon("play", "w-3.5 h-3.5")} Follow the guide (${seconds}s)</button>
-          <span class="text-xs text-ink-500" data-ve-status>Soft → a little louder → soft again. Small changes only.</span>
+          <span class="text-xs text-ink-500" data-ve-status>${DEFAULT_STATUS[shape] || DEFAULT_STATUS.hill}</span>
           <span class="text-[11px] text-ink-500 ml-auto" data-ve-legend hidden><span class="inline-flex items-center gap-1.5"><span class="ve-key-target"></span>guide</span> <span class="inline-flex items-center gap-1.5 ml-3"><span class="pg-key-voice"></span>your loudness</span></span>
         </div>
       </div>`;
   }
 
-  /** opts: seconds, getNote(), onGuideDone(). Returns { setCurve(curve), destroy } */
-  function wire(container, id, { seconds = 6, getNote = () => 60, onGuideDone } = {}) {
+  /** opts: seconds, shape ("hill"|"up"|"down"), labels, getNote(), onGuideDone(). Returns { setCurve(curve), destroy } */
+  function wire(container, id, { seconds = 6, shape = "hill", labels, getNote = () => 60, onGuideDone } = {}) {
     const root = container.querySelector(`[data-ve="${id}"]`);
     if (!root) return { setCurve() {}, destroy() {} };
     let raf = null, running = false;
@@ -96,12 +122,13 @@ const VolumeEnvelope = (() => {
       const status = root.querySelector("[data-ve-status]");
       status.textContent = "Listen to the note… then sing it and follow the line.";
       const t0 = performance.now() + 1600;
+      const phases = PHASES[shape] || PHASES.hill;
       const step = () => {
         const x = (performance.now() - t0) / (seconds * 1000);
         if (x < 0) { raf = requestAnimationFrame(step); return; }
         if (x >= 1) { cursorAt(-1); running = false; status.textContent = "Done — rest a moment before the next try."; if (onGuideDone) onGuideDone(); return; }
         cursorAt(x);
-        status.textContent = x < 0.33 ? "Comfortably soft…" : x < 0.66 ? "A little louder — still easy" : "Back to soft…";
+        status.textContent = (phases.find((ph) => x < ph[0]) || phases[phases.length - 1])[1];
         raf = requestAnimationFrame(step);
       };
       raf = requestAnimationFrame(step);
@@ -109,7 +136,7 @@ const VolumeEnvelope = (() => {
     const onClick = (e) => { if (e.target.closest("[data-ve-start]")) start(); };
     root.addEventListener("click", onClick);
     return {
-      setCurve(curve) { root.querySelector("[data-ve-svg]").innerHTML = svg(curve); root.querySelector("[data-ve-legend]").hidden = !curve; },
+      setCurve(curve) { root.querySelector("[data-ve-svg]").innerHTML = svg(curve, shape, labels); root.querySelector("[data-ve-legend]").hidden = !curve; },
       destroy() { cancelAnimationFrame(raf); root.removeEventListener("click", onClick); },
     };
   }

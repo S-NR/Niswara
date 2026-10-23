@@ -609,9 +609,10 @@ const BeatGuide = (() => {
         const tok = bars[bi][beat];
         const guide = $("[data-bg-guide]");
         // tok.midi: a melody note of its own; tok.note: "sing here" on the learner's chosen note;
-        // tok.beats: hold the guide note for that many beats (following tokens can be "hold" markers)
+        // tok.beats: hold the guide note for that many beats (following tokens can be "hold" markers);
+        // tok.velocity: optional per-beat loudness for the guide note (defaults to a fixed soft cue)
         const midi = tok && (tok.midi || (tok.note ? getNote() : null));
-        if (midi && (!guide || guide.checked)) PianoSynth.play(midi, { duration: (60 / bpm) * ((tok.beats || 1) - 0.25), velocity: 0.55 });
+        if (midi && (!guide || guide.checked)) PianoSynth.play(midi, { duration: (60 / bpm) * ((tok.beats || 1) - 0.25), velocity: tok.velocity ?? 0.55 });
       },
       onStop: () => { setUi(false); clear(); },
     });

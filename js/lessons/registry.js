@@ -16,4 +16,5 @@ const InteractiveLessons = {
   "breath-phrase-control": BreathPhraseControlLesson,
   "pitch-stability": PitchStabilityLesson,
   "smooth-note-transitions": SmoothNoteTransitionsLesson,
+  "basic-vocal-dynamics": BasicVocalDynamicsLesson,
 };

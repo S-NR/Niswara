@@ -471,10 +471,43 @@ const APP_DATA = (() => {
     }
   };
 
-  /* ---------- Level 1, Classes 14–20 (not written yet) ---------- */
+  /* ---------- Level 1, Class 14 (interactive) ---------- */
+  const basicDynamicsClass = {
+    number: 14, title: "Basic Vocal Dynamics", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 40,
+    // Rendered by the interactive lesson in js/lessons/basicVocalDynamics.js
+    interactive: "basic-vocal-dynamics",
+    subtitle: "Control how softly and strongly you sing — without losing pitch or comfort.",
+    description: "An interactive lesson: singing the same note softly, at medium volume and a little stronger, moving gradually between them, and combining dynamics with pitch, transitions, rhythm, breath and a short melody — never by shouting or forcing.",
+    content: {
+      whatYoullLearn: "The difference between pitch (which note) and dynamics (how softly or strongly you sing it) — singing one note at a few comfortable volumes, moving gradually between them, a simple crescendo and decrescendo, and combining dynamics with everything learned so far: pitch stability, transitions, rhythm, breath and a short melody.",
+      whyItMatters: "A beginner's instinct is often to sing louder to sound 'stronger' or 'better' — but volume and quality aren't the same thing, and pushing for volume is how tension and strain begin. Dynamics is simply another dimension of control, built the same careful way as pitch (Class 4), stability (Class 12) and transitions (Class 13).",
+      theory: "'Stronger' does not mean louder at any cost — it means singing with a little more energy while staying comfortable and in tune. Dynamics sit on a spectrum (soft, medium, stronger), not a 0–100 score. If your pitch rises, your throat tightens, or your breath runs out when you sing stronger, you're pushing — not developing control.",
+      guidedPractice: [
+        "Listened to the same note at different volumes, sang it at three comfortable levels, moved gradually between soft and medium, practised a simple crescendo and decrescendo, then combined dynamics with pitch stability, note transitions, rhythm, breath and a short melody.",
+      ],
+      assignment: {
+        instructions: [
+          "Choose a comfortable note from the exercises above.",
+          "Attempt 1 — medium volume, Attempt 2 — soft, Attempt 3 — slightly stronger (never shout).",
+          "Crescendo (soft → medium → stronger → medium) and decrescendo (stronger → medium → soft), each on one comfortable breath.",
+          "A short melody (1 → 2 → 3 → 2 → 1) sung with changing dynamics (soft → medium → stronger → medium → soft).",
+        ],
+        questions: [
+          "Could I keep my pitch steady while my volume changed?",
+          "Did my voice disappear or become breathy when I sang softly?",
+          "Did I feel any tension when I sang stronger?",
+          "Was the crescendo or the decrescendo easier?",
+          "Did the melody with changing dynamics feel more expressive than a constant volume?",
+          "Did I push, shout or force my voice at any point today?",
+          "What do I want to focus on next?",
+        ]
+      }
+    }
+  };
+
+  /* ---------- Level 1, Classes 15–20 (not written yet) ---------- */
   const level1Upcoming = [
-    { title: "Basic Dynamics", category: "Vocal Technique", skillTag: "vocal", goal: "Soft/loud control",
-      learn: "Comfortable soft and louder singing, and gentle changes between them, without forcing." },
     { title: "Diction & Pronunciation", category: "Vocal Technique", skillTag: "vocal", goal: "Make words clearer",
       learn: "Clear vowels and consonants while singing, so words are easy to understand." },
     { title: "Basic Scale Patterns", category: "Pitch", skillTag: "pitch", goal: "Develop pitch coordination",
@@ -488,7 +521,7 @@ const APP_DATA = (() => {
     { title: "Level 1 Progress Recording", category: "Recording", skillTag: "recording", goal: "Measure foundation progress",
       learn: "A second structured recording, compared with your Class 10 baseline, to hear how far your foundation has come." },
   ].map((c, i) => ({
-    number: 14 + i, title: c.title, category: c.category, skillTag: c.skillTag,
+    number: 15 + i, title: c.title, category: c.category, skillTag: c.skillTag,
     difficulty: "Beginner", estMinutes: 35,
     comingSoon: true, // no lesson content yet — can be viewed but not completed (see Store.completeClass)
     description: `Coming soon: ${c.goal.charAt(0).toLowerCase()}${c.goal.slice(1)}.`,
@@ -540,7 +573,7 @@ const APP_DATA = (() => {
   };
 
   const CLASSES = [
-    ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, ...level1Upcoming].map(c => ({ ...c, levelId: 1 })),
+    ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, ...level1Upcoming].map(c => ({ ...c, levelId: 1 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
