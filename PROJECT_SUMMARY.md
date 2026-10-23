@@ -1,6 +1,6 @@
 # Niswara — Project Summary
 
-_Last updated: 2026-10-23 · Based on `main` @ `fc23409` plus the uncommitted interactive Class 12 "Pitch Stability" and the Level 1 restructure: Breath & Phrase Control moved from Level 2 into Level 1 as Class 11, and Level 1 now has 20 classes (see [Change log](#6-change-log))_
+_Last updated: 2026-10-23 · Based on `main` @ `f0bc60f` plus the uncommitted interactive Class 13 "Smooth Note Transitions" (see [Change log](#6-change-log))_
 
 **Niswara: From First Note → Professional** is a personal music-learning platform. It walks one learner through 8 levels: singing, theory, recording, production, mixing, mastering and release. Each level is split into classes, and the platform includes daily practice tracking, a journal, song projects, before/after recordings and achievements.
 
@@ -8,7 +8,7 @@ The repo contains **two separate applications**:
 
 | App | Location | Status | Stack |
 |---|---|---|---|
-| **Niswara (primary)** | repo root (`index.html`, `js/`, `css/`, `supabase/`) | Active. Phases 1–2 of 10 done | Static, buildless HTML/CSS/vanilla JS. Tailwind via CDN. Supabase (Auth, Postgres, Storage). Hosted on GitHub Pages |
+| **Niswara (primary)** | repo root (`index.html`, `js/`, `css/`, `supabase/`) | Active. Phases 1–3 of 10 built (Phase 3 live once migrations are run — see Roadmap) | Static, buildless HTML/CSS/vanilla JS. Tailwind via CDN. Supabase (Auth, Postgres, Storage). Hosted on GitHub Pages |
 | **Learning Academy (prototype)** | `web/` | Early prototype, appears dormant | React 18, TypeScript, Vite, Tailwind, Zustand, PWA |
 
 > **Login & sync status:** ✅ Live. `config.js` points at the real Supabase project, and migrations `0001`–`0004` have been run. Checked 2026-10-21: `profiles` answers, and `class_progress`, `class_notes` and `learner_state` correctly refuse logged-out visitors (`42501`). Progress follows the account to every device (`js/cloudSync.js`).
@@ -51,6 +51,7 @@ index.html ─┬─ config.js            public Supabase URL + publishable key 
             ├─ js/lessons/breathPhraseControl.js interactive Class 11 (L1C11; built as L2C01 and moved — see APP_DATA.LEGACY_CLASS_IDS)
             ├─ js/components/pitchStability.js PitchStability (held-note estimate in words), PitchVisualizer, StabilityPanel ("listen first, look second")
             ├─ js/lessons/pitchStability.js  interactive Class 12
+            ├─ js/lessons/smoothNoteTransitions.js interactive Class 13
             ├─ js/lessons/basicVocalControl.js interactive Class 9
             ├─ js/lessons/registry.js        InteractiveLessons (class `interactive` key -> lesson)
             └─ js/pages/*.js        17 pages, each { render(params), mount(container) → cleanup }
@@ -77,7 +78,7 @@ Design seams (all intentional):
 
 | Area | Status |
 |---|---|
-| Curriculum: 8 levels, 70 classes | ✅ Structure done (`js/data.js`). **Level 1 — Foundation now has 20 classes** (your Level 1 list, 2026-10-23): Classes 1–12 have real content and 3–12 are interactive; 13–20 are `comingSoon` placeholders with their titles and goals. Breath & Phrase Control moved from Level 2 into Level 1 as Class 11, and Level 2 starts with "Vocal Placement" again. Levels 2–8 (50 classes) remain `comingSoon` — viewable, but can't be completed. Level 2 unlocks only when all 20 Level 1 classes are done. |
+| Curriculum: 8 levels, 70 classes | ✅ Structure done (`js/data.js`). **Level 1 — Foundation has 20 classes**: 1–13 have real content and 3–13 are interactive; 14–20 are `comingSoon` placeholders with their titles and goals. Breath & Phrase Control moved from Level 2 into Level 1 as Class 11, and Level 2 starts with "Vocal Placement" again. Levels 2–8 (50 classes) remain `comingSoon` — viewable, but can't be completed. Level 2 unlocks only when all 20 Level 1 classes are done. |
 | Class page: lesson, timer, self-evaluation, upload + playback, reflection, complete | ✅ Working (local only) |
 | **Class 3 — Understanding Pitch (interactive)** | ✅ Guided lesson (Understand → Listen → Play → Identify → Sing → Reflect → Complete). Includes a virtual piano (mouse, touch, keyboard), Learn With Piano, three ear-training exercises with scoring, Sing the Note (record and play back, labelled "Self Evaluation"), private notes, reflection, assignment, and an 8-item progress tracker. Completion requires all 8 items. Saves per user to Supabase once `0003` is run; until then, on the device. |
 | **Class 4 — Matching a Note (interactive)** | ✅ Guided lesson (Understand → Hear → Sing → Adjust → Match → Practice → Reflect → Complete):<br>• The Listen → Remember → Sing → Compare → Adjust loop and a prominent "Choose comfort over range" rule.<br>• A reference note picked on the reused `VirtualPiano`, in a configurable range (Middle C4–C5 by default, or Lower C3–C4).<br>• Five exercises: Listen and Sing, Try Again and Adjust (3 attempts), Slide Into the Note, Blind Matching (3 hidden notes), and Note Chain (C–D–E; wider steps configurable but locked).<br>• Flat and sharp, with audio demos.<br>• An optional **pitch estimate**, offered only after you've judged a take yourself, and never a score.<br>• A practice timer logging "Pitch Training" with the class ID, an 8-question self-assessment, My Notes, a 10-item assignment with final reflection, a 10-item progress tracker with recording and self-evaluation counts, and a completion panel with the Class 5 bridge. |
@@ -89,6 +90,7 @@ Design seams (all intentional):
 | **Class 10 — First Progress Recording (interactive, MILESTONE)** | ✅ Guided lesson (Intro → Rules → Ready → Speaking → Note → Pattern → Rhythm → Song → Library → Evaluate → Reflect → Focus → Milestone), built on "Record where you are now":<br>• Explicitly not an audition — a prominent "not supposed to be perfect" callout, and a "please don't" list (retake endlessly, heavy editing, Auto-Tune, pitch correction, EQ/compression, reverb, noise removal that changes the voice, cherry-picking takes).<br>• Baseline recording rules (environment, equipment, distance, processing, voice, health) and a 6-item pre-recording checklist before anything is recorded.<br>• Five standardized parts, each reusing an existing engine: speaking (`RecordingCard`), a reference note chosen on the Class 3 `VirtualPiano` (`PitchMatchExercise`), a 1-2-3-2-1 pattern (`PitchMatchExercise` chain mode), a rhythm exercise on the **full Class 6 `Metronome` widget** (not just `BeatGuide` — the spec asked for the metronome itself) + `RecordingCard`, and a 30-60 s song excerpt with an optional song-title field.<br>• "My Singing Journey" — a simple chronological list of this session's five recordings (play, duration, date), explicitly not comparing against a nonexistent earlier baseline.<br>• Self-evaluation across six categories (Pitch/Rhythm/Voice/Words/Transitions/Overall) on independent `SelfAssessment` instances, each with its own option set from the spec — no synthesized score.<br>• "What I Notice" (5-question private reflection) and a single-select "My current focus" (pick ONE of 9 areas).<br>• **Baseline protection:** once every part, the self-evaluation, the reflection and the focus are all complete, the five recordings become the account's baseline (`ClassActivity` answers, synced via `class_progress` — no new table, per the spec's "don't duplicate an existing table" instruction). Re-recording any of the five parts after that shows a native confirm — "This is your progress baseline. Are you sure you want to replace it?" — via a new, backward-compatible `onBeforeRecord` hook added to both `RecordingCard` and `PitchMatchExercise` (undefined for every other call site, so Classes 4-9 are unaffected; regression-checked).<br>• A distinct **"🎤 Baseline Recording Created"** moment when the gate is first met, and on class completion a special **"FIRST MILESTONE COMPLETE"** screen (not the standard per-class completion card) listing all 8 Level-1 achievements, "Your next goal isn't perfection. It's consistency.", and the Class 11 bridge. No AI judgement anywhere — no fabricated accuracy percentages, no "excellent"/"professional" language. |
 | **Class 11 — Breath & Phrase Control (interactive, L1C11)** | ✅ Guided lesson (Intro → Breathe → Speaking → Phrase → Marking → Rhythm → Pitch → Compare → Evaluate → Practice → Reflect → Complete), built on "Comfortable breath → controlled phrase → natural release":<br>• A prominent "never train breath by forcing or holding it" rule, with an explicit "you do NOT need to" list and a dizziness/discomfort stop-notice — no timers, no countdowns, no breath-duration leaderboards anywhere in the lesson.<br>• Natural breath awareness (reuses Class 7's `.breathe-circle` CSS as-is) and a gentle controlled exhale, both unscored and un-recorded — awareness only, exactly as specified.<br>• A new **tap-to-place 💨 breath-marker phrase editor** (local to this file, not a new shared component — single- or multi-mark mode), reused three times: marking where you'd naturally breathe in a spoken phrase, a dedicated breath-marking exercise, and planning your own phrase in the assignment.<br>• Progressively longer phrases (short/medium/long, three `RecordingCard`s), breath + rhythm on the full Class 6 `Metronome`, and breath + pitch on a 1-2-3-2-1 pattern via the Class 4 `PitchMatchExercise` chain mode.<br>• "Same phrase, different breath" — natural vs. intentionally-larger-breath attempts, explicitly non-judgemental ("bigger breath is not automatically better"), and a baseline comparison against **Class 10's own song recording** (`ClassActivity.get("L1C10")`), with a graceful "complete Class 10 first" empty state if it's missing.<br>• Self-evaluation across six categories (Breath/Timing/Phrase/Ending/Control/Recovery) on the Class 8-generalized `ControlCheck`, with its own Comfortable/Developing/Needs attention/Not sure scale.<br>• A practice timer logging "Breath & Phrase Control", a plan-then-record assignment (type your own phrase, mark your planned breath points, record twice), a 6-question reflection, My Notes, a 12-item progress tracker, and a completion panel bridging to Class 12 "Pitch Stability".<br>• **Moved 2026-10-23:** built as Level 2 Class 1 (`L2C01`), now Level 1 Class 11 (`L1C11`). The lesson reads `cls.number`, so it now says "Class 11" everywhere. Existing learners' progress follows it automatically (see **M1–M3**). |
 | **Class 12 — Pitch Stability (interactive)** | ✅ Guided lesson (Understand → Listen → Match → Hold → Ear first → Correct → Vowels → Breath → Move → Evaluate → Practice → Reflect → Complete), built on "Find the note — then stay with it" and "Stable does not mean perfectly flat":<br>• Pitch matching (Class 4) vs pitch stability. ⬆️ slightly sharp / ⬇️ slightly flat / ↕️ unstable, with an illustrated "REFERENCE ──── / YOUR VOICE ──╲╱──" picture and "Listen first. Look second."<br>• A "please don't" list: freeze the voice, squeeze, force, get louder, make vibrato, hold long, hold the breath. Plus a stop-if-it-hurts notice.<br>• A comfortable note chosen on the Class 3 `VirtualPiano`; every exercise and the 1-2-3-2-1 pattern transpose from it. Its default comes from Classes 10 and 4.<br>• Nine exercises, mostly on the Class 4 `PitchMatchExercise` engine: listen to a steady reference (a dot travels along a flat line) · match then stop · match then hold ~3–4 s (length is never a score) · listen without looking · listen and correct (Attempt 1/2) · AH / EE / OO · pitch + breath (the Class 7 breathing circle as a cue; "shorter note, not bigger breath") · three-note stability 1-2-3-2-1 with held notes · a short 1-2-3-2-1 tune with "which note felt least stable?" (1–5 / Not sure) and a practice tip for that note.<br>• **Estimated pitch, ear first:** a new `StabilityPanel` stays closed until the learner has answered by ear, then shows the Class 4 `PitchGuide` trace labelled as an estimate ("not a professional vocal score"). It describes the take in words: near / slightly higher / slightly lower, steady / mostly steady / some movement, and "drifted lower toward the end". There are no percentages. The trace is hidden, with a reason, for silence, very soft or short takes, background noise and wildly moving takes.<br>• Before/after: Attempt 1 vs Attempt 2 with Play buttons and "Did I hear a difference?" (never assumes Attempt 2 is better). Common beginner problems as expandable sections, linking back to Class 8 for tension.<br>• A 5-row self-evaluation on `ControlCheck`, now with per-row answer sets (Yes/Mostly/Not yet, Yes/Sometimes/Not yet, Yes/Mostly/No). Also: a practice timer logging "Pitch Stability" under the Pitch task, with short sessions encouraged and no reward for length.<br>• An assignment (Attempt 1 with a full listen-back, Attempt 2, a 1-2-3-2-1 recording, and 8 questions), a 3-question reflection, My Notes, a 14-item progress tracker, the "PITCH AWARENESS → PITCH STABILITY" milestone, and a completion panel bridging to Class 13 "Smooth Note Transitions". |
+| **Class 13 — Smooth Note Transitions (interactive)** | ✅ Guided lesson (Understand → Setup → Hear → Transition → Clean Move → Ascend → Descend → Patterns → Rhythm → Breath → Listen → Evaluate → Practice → Reflect → Complete), built on "Smooth does not mean slow" and the MATCH → STABILIZE → MOVE → ARRIVE → STABILIZE progression from Class 12:<br>• 11 transition exercises, all on the Class 4 `PitchMatchExercise` chain engine (the Class 9 "transitionEx" shape): hear two notes and judge direction, match each note alone, a two-note transition up and down, a deliberately slow version, a visualised "start → move → arrive → stabilise" take, a 5-note ascending run, the same descending, a 3-note up/down movement, and a wider "skip a note" (1→3) up/down — small, nearby intervals throughout, no large jumps.<br>• Transition + rhythm on the Class 6 `BeatGuide` (one note per beat, then a rest) and transition + breath on the Class 7 breathing circle, reusing both exactly as earlier classes do.<br>• **"Listen and identify the problem" reuses the learner's own takes from this lesson** (a picker over this class's uploads) instead of fabricated example recordings — `PianoSynth` can't honestly simulate a real overshoot or sudden jump, and inventing misleading "example" audio would break the app's honesty rules, so classification (arrived too high/low, sudden jump, smooth, not sure) happens on real singing.<br>• The Class 12 `PitchVisualizer`/`StabilityPanel` reused as-is (not rebuilt) for the "clean movement" exercise's optional, ear-first estimated-pitch trace.<br>• A before/after pair (Exercise 3's take vs. a fresh attempt) with "did it feel different?", never assuming the second is better; five expandable common-problems sections (one linking back to Class 8 for tension).<br>• A 6-row self-evaluation on `ControlCheck`; a practice timer logging "Note Transitions"; a 3-attempt assignment (natural, focused, with metronome) on the same 1-2-3-2-1 shape Classes 10–12 use.<br>• **One deliberate simplification:** the spec's Assignment (§23) and a separate Reflection section would otherwise ask the identical 9 questions twice — Niswara keeps one textarea set, in Reflection, rather than duplicating the same questions back-to-back on the page. A 16-item progress tracker and a "FROM NOTE → TO NOTE" milestone (gold/teal card, same style as Class 12's) appear on completion. |
 | Practice: daily checklist + timer | ✅ Working (local only) |
 | Journal, Projects, Progress, Achievements, Before/After | ✅ Working (local only) |
 | Share-a-class post generator | ✅ Working |
@@ -102,7 +104,7 @@ The canonical source is `js/data.js`; this table exists so the class list can be
 
 | Level | Role | Classes | Status |
 |---|---|---|---|
-| **1 — Foundation** | Beginner | 1 Meet Your Voice · 2 Breathing & Breath Awareness · 3 Understanding Pitch 🟢 · 4 Matching a Note 🟢 · 5 Listening to Your Own Voice 🟢 · 6 Rhythm & Timing 🟢 · 7 Basic Vocal Warm-Up 🟢 · 8 Vocal Relaxation 🟢 · 9 Basic Vocal Control 🟢 · 10 First Progress Recording 🟢 · 11 Breath & Phrase Control 🟢 · 12 Pitch Stability 🟢 · 13 Smooth Note Transitions · 14 Basic Dynamics · 15 Diction & Pronunciation · 16 Basic Scale Patterns · 17 Simple Melodic Phrases · 18 Singing a Simple Song · 19 Self-Evaluation · 20 Level 1 Progress Recording | 12 of 20 real; 🟢 = interactive (10). 13–20 `comingSoon` |
+| **1 — Foundation** | Beginner | 1 Meet Your Voice · 2 Breathing & Breath Awareness · 3 Understanding Pitch 🟢 · 4 Matching a Note 🟢 · 5 Listening to Your Own Voice 🟢 · 6 Rhythm & Timing 🟢 · 7 Basic Vocal Warm-Up 🟢 · 8 Vocal Relaxation 🟢 · 9 Basic Vocal Control 🟢 · 10 First Progress Recording 🟢 · 11 Breath & Phrase Control 🟢 · 12 Pitch Stability 🟢 · 13 Smooth Note Transitions 🟢 · 14 Basic Dynamics · 15 Diction & Pronunciation · 16 Basic Scale Patterns · 17 Simple Melodic Phrases · 18 Singing a Simple Song · 19 Self-Evaluation · 20 Level 1 Progress Recording | 13 of 20 real; 🟢 = interactive (11). 14–20 `comingSoon` |
 | **2 — Singer** | Vocalist | 1 Vocal Placement · 2 Resonance · 3 Chest Voice · 4 Head Voice · 5 Mixed Voice · 6 Vocal Range · 7 Dynamics · 8 Expression · 9 Phrasing · 10 First Performance Assessment | All 10 `comingSoon` (Breath & Phrase Control moved to Level 1 on 2026-10-23) |
 | **3 — Musician** | Theory & Keys | Music Theory Basics · Keyboard Fundamentals · Scales · Intervals · Chords · Harmony · Rhythm for Musicians · Melody Writing | `comingSoon` (8) |
 | **4 — Recording Artist** | Studio Craft | Microphone Technique · Recording Fundamentals · Editing Basics · Comping Takes · Pitch Correction · Vocal Production | `comingSoon` (6) |
@@ -324,7 +326,30 @@ A generic React/TypeScript "sequential course" engine: day lessons, quizzes, a f
 
 ## 6. Change log
 
-### 2026-10-23: interactive Class 12 "Pitch Stability" + Level 1 grows to 20 classes (uncommitted)
+### 2026-10-23: interactive Class 13 "Smooth Note Transitions" (uncommitted)
+
+New: `js/lessons/smoothNoteTransitions.js`.
+Changed: `js/data.js` (new `smoothTransitionsClass` authored object spliced into `CLASSES` the same way `breathPhraseClass`/`pitchStabilityClass` are; the `level1Upcoming` map's `13 + i` numbering became `14 + i` now that Class 13 is real, so Classes 14–20 keep their numbers), `js/lessons/registry.js`, `index.html`.
+No changes to Classes 1–12, the shared audio engines, `Store`, `Auth`, or the sync code. **No new migration:** same `class_progress`/`learner_state`/`recordings` reuse as every interactive class so far. Level 1 is still 20 classes; nothing else renumbered.
+
+Reuse (no new shared components):
+- **Every transition exercise** (11 of them) is the Class 4 `PitchMatchExercise` in chain mode — the same shape Class 9 introduced for `ex5up`/`ex5down`-style directional pairs, extended here to 2-, 3-, and 5-note runs.
+- **Rhythm:** the Class 6 `BeatGuide`, one note per beat then a rest, exactly as Classes 9–11 use it.
+- **Breath:** the Class 7 `.breathe-circle` CSS, reused at the compact `!w-20 !h-20` size Class 12 already introduced.
+- **Visualization:** the Class 12 `PitchVisualizer`/`StabilityPanel` reused untouched — no new estimate logic, no new trace rendering.
+- **Self-evaluation:** `ControlCheck` (Class 9/12, per-row levels).
+- **Deliberate non-reuse:** Exercise 12 ("listen and identify the problem") does not fabricate example recordings the way the spec sketches (Example A–E of clean/overshoot/jump/etc.) — `PianoSynth` has no portamento or pitch-bend, so it cannot honestly produce a convincing "overshoot" or "sudden jump" sample without inventing misleading audio. Instead the learner picks and classifies one of their own takes from earlier in the lesson, which serves the same "develop listening ability" goal honestly.
+
+**Bug caught and fixed during self-review before testing:** the spec's Assignment (§23, 9 questions) and the established "Reflection" convention (`content.assignment.questions`, also these same 9 questions — Class 13 has no separate reflection set, unlike Classes 7–12) would have rendered as two identical 9-question textarea blocks back to back. Removed the duplicate from the Assignment chapter, pointed `assignmentDone()` at the Reflection answers instead, and left a one-line pointer in the Assignment chapter to where the questions actually are.
+
+Verified (headless Chrome, structural/visual only — same scope as every interactive class's entry above):
+- All 24 steps across 15 stages render with the expected content, including every exercise's chain badge ("2 notes" / "3 notes" / "5 notes"), the reference-note piano, the Exercise 12 own-takes picker (correctly showing its empty state with nothing recorded), the before/after section, all 5 expandable common-problems sections, and the progress/completion panels.
+- A full-page screenshot (the longest lesson page built so far) confirms the layout matches Classes 3–12's visual language throughout, with no broken sections.
+- **Regression:** with Classes 1–12 marked complete (a temporary local test script, reverted afterward), Class 13 renders as the current class; with nothing completed — the real default state — Class 13 correctly shows "locked", and Class 14 stays locked behind it. Classes 1, 4, 9, 11 and 12 (spot-checked) all still render correctly. Home, Classes, Journey, Practice, Progress, Journal, Login and Dashboard all still render with no errors. The git diff touched exactly the files listed above.
+
+**Not verified:** no actual microphone/recording interaction, no per-exercise click-through (the piano, every transition's record/play, the Exercise 12 picker, the metronome-guided assignment attempt, the self-assessment and classification chips), no Node-level logic tests, no real two-account or cross-device run, no mobile touch, no real Supabase. Same caveat as every interactive class above — built and structurally sound, **not yet interaction-tested**.
+
+### 2026-10-23: interactive Class 12 "Pitch Stability" + Level 1 grows to 20 classes (committed)
 
 **Curriculum (your choice: "Move into Level 1", plus your 20-class Level 1 list):**
 - **Moved:** Breath & Phrase Control `L2C01` → `L1C11`.
@@ -367,7 +392,7 @@ Checks run:
 - **Real Supabase (read-only):** anonymous reads of `class_progress`, `class_notes` and `learner_state` are still refused (42501), and the recordings bucket lists nothing.
 - **Regression:** all routes, including L1C11–L1C13, L1C20, L2C01 and L2C02. Class 4 and Class 9 full journeys passed, Classes 10 and 11 open as current, and Journey shows "11/20 classes". No page errors anywhere.
 
-### 2026-10-22: interactive Class 11 "Breath & Phrase Control" — Level 2's first real class (uncommitted)
+### 2026-10-22: interactive Class 11 "Breath & Phrase Control" — Level 2's first real class (committed)
 
 New: `js/lessons/breathPhraseControl.js`.
 Changed: `js/data.js` (new `level2class1` authored object, `placeholderLevel()`/`levelClassDefs` gained an optional `startNumber`, `CLASSES` construction splices the authored class in), `js/lessons/registry.js`, `index.html`.
@@ -393,7 +418,7 @@ Verified (headless Chrome, structural/visual only — same scope as Classes 7, 8
 
 **Not verified:** no actual microphone/recording interaction, no per-exercise click-through (the phrase editor's tap targets, the metronome, record/play on eight-plus takes, every self-assessment chip, the assignment's live phrase-typing-to-editor flow), no Node-level logic tests, no real two-account or cross-device run, no mobile touch, no real Supabase. Same caveat as Classes 7, 8 and 10 — built and structurally sound, **not yet interaction-tested**.
 
-### 2026-10-22: interactive Class 10 "First Progress Recording" — Level 1's milestone class (uncommitted)
+### 2026-10-22: interactive Class 10 "First Progress Recording" — Level 1's milestone class (committed)
 
 New: `js/lessons/firstProgressRecording.js`.
 Changed: `js/data.js` (Class 10 content and the `interactive` flag), `js/lessons/registry.js`, `index.html`, `js/components/listening.js` and `js/components/pitchMatch.js` (`onBeforeRecord` hook — see below).
@@ -416,7 +441,7 @@ Verified (headless Chrome, structural/visual only — same scope as Classes 7-8'
 
 **Not verified:** no actual microphone/recording interaction, no per-exercise click-through (piano note selection, the metronome's start/stop, record/play on all five parts, the pre-recording checklist, self-assessment chips, the focus chips, the baseline-replace confirm dialog itself), no Node-level logic tests, no real two-account or cross-device run, no mobile touch, no real Supabase (this session has no project credentials) — so the "User A can never reach User B's recordings" requirement is unverified beyond the fact that it relies on the same private-bucket + owner-only RLS policies already in place for Classes 3-9 (migration `0004`), not anything new this class introduces. Treat Class 10 as built and structurally sound, but **not yet interaction-tested** — same caveat as Classes 7 and 8.
 
-### 2026-10-22: interactive Class 8 "Vocal Relaxation" (uncommitted)
+### 2026-10-22: interactive Class 8 "Vocal Relaxation" (committed)
 
 New: `js/lessons/vocalRelaxation.js`.
 Changed: `js/data.js` (Class 8 content and the `interactive` flag), `js/lessons/registry.js`, `index.html`, `js/components/vocalControl.js` (`ControlCheck.render`/the levels it uses — see below).
@@ -440,7 +465,7 @@ Verified (headless Chrome, structural/visual only — same scope as the Class 7 
 
 **Not verified:** no actual microphone/recording interaction, no per-exercise click-through (body-check chips, awareness buttons, piano-free note playback, record/play, self-assessment chips, observation checklist, recording-comparison picker), no Node-level logic tests, no real two-account or cross-device run, no mobile touch, no real Supabase (this session has no project credentials). Treat Class 8 as built and structurally sound, but **not yet interaction-tested** — same caveat as Class 7.
 
-### 2026-10-22: interactive Class 7 "Basic Vocal Warm-Up" (uncommitted)
+### 2026-10-22: interactive Class 7 "Basic Vocal Warm-Up" (committed)
 
 New: `js/lessons/basicVocalWarmup.js`.
 Changed: `js/data.js` (Class 7 content and the `interactive` flag), `js/lessons/registry.js`, `index.html`, `css/styles.css` (one new rule: `.breathe-circle` + `@keyframes breatheCycle`).
@@ -460,7 +485,7 @@ Verified (headless Chrome, structural/visual only — see "Not verified" below):
 
 **Not verified:** no actual microphone/recording interaction (no fake-mic audio was fed in for this session), no per-exercise click-through (piano note selection, record/play, self-assessment chips, routine-length toggle, hum/articulation choice, breathing start/stop), no Node-level logic tests, no real two-account or cross-device run, no mobile touch, no real Supabase (this session has no project credentials). This is lighter verification than Classes 3–6/9 received above — treat Class 7 as built and structurally sound, but **not yet interaction-tested**.
 
-### 2026-10-22: Level 2–8 curriculum realignment (uncommitted)
+### 2026-10-22: Level 2–8 curriculum realignment (committed)
 
 Changed: `js/data.js` only (`LEVELS[].skills` and the `levelClassDefs` titles for Levels 2–8). No other file touched.
 
@@ -468,7 +493,7 @@ Level 2 "Singer" went from 6 generic placeholder titles (Vocal Technique Foundat
 
 Verified: headless Chrome confirmed the new titles (e.g. "Vocal Placement", "First Performance Assessment", "Melody Writing", "Comping Takes", "Bus Processing", "Stereo Imaging", "Release Preparation") render correctly on the Classes page; Classes 1 and 3 still render with no errors.
 
-### 2026-10-22: interactive Class 6 "Rhythm & Timing" (uncommitted)
+### 2026-10-22: interactive Class 6 "Rhythm & Timing" (committed)
 
 New: `js/components/rhythm.js` and `js/lessons/rhythmAndTiming.js`.
 Changed: `js/data.js` (Class 6 content and the `interactive` flag), `js/lessons/registry.js`, `index.html`, `css/styles.css`.
@@ -507,7 +532,7 @@ Verified:
 
 **Not verified:** real phones, Bluetooth audio latency (**G1**), and a real two-account run on the live Supabase (tested against a mock with the same contract).
 
-### 2026-10-21: interactive Class 5 "Listening to Your Own Voice" (uncommitted)
+### 2026-10-21: interactive Class 5 "Listening to Your Own Voice" (committed)
 
 New: `js/components/listening.js` (Waveform, WaveformPlayer, RecordingMarkers, RecordingCard, ListeningPasses, ObservationChecklist) and `js/lessons/listeningToYourVoice.js`.
 
@@ -553,7 +578,7 @@ Verified:
 
 **Not verified:** real singing voices, real iPhone/Android hardware (**F5**), and a real two-account run on the live Supabase (the logic was tested against a mock with the same contract).
 
-### 2026-10-21: interactive Class 4 "Matching a Note" (uncommitted)
+### 2026-10-21: interactive Class 4 "Matching a Note" (committed)
 
 New: `js/lessons/matchingANote.js`, `js/components/pitchMatch.js`, `js/audio/voiceRecorder.js`, `js/audio/pitchAnalysis.js`, `js/lessons/lessonKit.js`, `js/lessons/registry.js`.
 
@@ -595,7 +620,7 @@ Verified:
 
 **Not verified:** real singing voices (**D2**), real iPhone/Android hardware (**D4**), and a real two-account run against your live Supabase (the logic was tested against a mock with the same contract).
 
-### 2026-10-21: progress on every device (uncommitted)
+### 2026-10-21: progress on every device (committed)
 
 Changed: `js/store.js` (sync-safe data shapes and merge/export/import, same public API), `js/media.js` (download from the account on other devices), `js/auth.js` (learner_state and recordings calls), `js/classActivity.js` (`flush` returns a promise), `js/app.js` (sync on login, flush before logout, re-render when another device's progress arrives, deferred while you're typing), `js/pages/dashboard.js` (sync status line and Log Out button), `index.html`, `SETUP.md`.
 New: `js/cloudSync.js`, `supabase/migrations/0004_learner_state.sql`.
@@ -616,7 +641,7 @@ Verified:
 
 **Not verified:** against the real Supabase project (needs the migrations and a confirmed account), and Supabase-specific behaviour of the version-checked update and the `audio/*` bucket rule. The mock server follows the documented behaviour.
 
-### 2026-10-21: interactive Class 3 "Understanding Pitch" (uncommitted)
+### 2026-10-21: interactive Class 3 "Understanding Pitch" (committed)
 
 Changed: `index.html`, `css/styles.css`, `js/auth.js` (4 class-progress/notes calls), `js/store.js` (`classActivity` and `classNotes` slots), `js/data.js` (Class 3 content plus `interactive` flag), `js/pages/classDetail.js` (hand-off to interactive lessons; other classes unchanged), `SETUP.md`.
 New: `js/classActivity.js`, `js/audio/pianoSynth.js`, `js/components/{piano,exercises,vocalRecording,personalNotes,classProgress}.js`, `js/lessons/understandingPitch.js`, `supabase/migrations/0003_class_progress.sql`.

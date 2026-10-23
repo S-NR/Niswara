@@ -15,4 +15,5 @@ const InteractiveLessons = {
   "first-progress-recording": FirstProgressRecordingLesson,
   "breath-phrase-control": BreathPhraseControlLesson,
   "pitch-stability": PitchStabilityLesson,
+  "smooth-note-transitions": SmoothNoteTransitionsLesson,
 };

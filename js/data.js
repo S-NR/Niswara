@@ -433,10 +433,46 @@ const APP_DATA = (() => {
     }
   };
 
-  /* ---------- Level 1, Classes 13–20 (not written yet) ---------- */
+  /* ---------- Level 1, Class 13 (interactive) ---------- */
+  const smoothTransitionsClass = {
+    number: 13, title: "Smooth Note Transitions", category: "Pitch", skillTag: "pitch",
+    difficulty: "Beginner", estMinutes: 40,
+    // Rendered by the interactive lesson in js/lessons/smoothNoteTransitions.js
+    interactive: "smooth-note-transitions",
+    subtitle: "Move between notes without losing control.",
+    description: "An interactive lesson: controlled movement from one note to another — hearing, matching, then connecting nearby notes, ascending and descending, with rhythm and breath, and gently further apart.",
+    content: {
+      whatYoullLearn: "How to move smoothly between nearby notes instead of jumping or sliding too far — hearing which note is higher or lower, matching each note on its own, then connecting them ascending and descending, in time with a metronome, on a comfortable breath, and across a slightly larger step.",
+      whyItMatters: "A melody is made of individual notes, but good singing also requires controlled movement between those notes. Matching a note (Class 4) and staying with it (Class 12) are the foundation; this is the first step toward connecting them into a melody.",
+      theory: "Smooth does not mean slow — a transition can be quick and clean or slow and controlled. A clean transition moves from the first note toward the second, arrives, and briefly stabilises, without a sudden jump, an overshoot, or losing the pitch along the way. Small, nearby intervals come first; wider steps wait until the small ones feel comfortable.",
+      guidedPractice: [
+        "Listened to two notes and judged direction, matched each note on its own, connected them smoothly, then practised ascending and descending runs, a three-note movement, a slightly wider skip, a transition in time with the metronome, and a transition on a comfortable breath.",
+      ],
+      assignment: {
+        // The three attempts live in the lesson; these are the reflection prompts
+        instructions: [
+          "Choose three comfortable nearby notes (e.g. 1 → 2 → 3 → 2 → 1)",
+          "Attempt 1 — listen to the reference, record naturally",
+          "Attempt 2 — repeat, focusing on smooth movement, relaxation and accurate arrival",
+          "Attempt 3 — add the metronome and sing the same pattern in time",
+        ],
+        questions: [
+          "Which transition was easiest?",
+          "Which transition was hardest?",
+          "Was ascending easier?",
+          "Was descending easier?",
+          "Did I overshoot any note?",
+          "Did I arrive below the note?",
+          "Did I become tense?",
+          "Did the metronome make the exercise harder?",
+          "What do I want to improve?",
+        ]
+      }
+    }
+  };
+
+  /* ---------- Level 1, Classes 14–20 (not written yet) ---------- */
   const level1Upcoming = [
-    { title: "Smooth Note Transitions", category: "Pitch", skillTag: "pitch", goal: "Move smoothly between notes",
-      learn: "Nearby note transitions, ascending and descending, listening for jumps, smooth movement, and simple two- and three-note patterns — no large intervals yet." },
     { title: "Basic Dynamics", category: "Vocal Technique", skillTag: "vocal", goal: "Soft/loud control",
       learn: "Comfortable soft and louder singing, and gentle changes between them, without forcing." },
     { title: "Diction & Pronunciation", category: "Vocal Technique", skillTag: "vocal", goal: "Make words clearer",
@@ -452,7 +488,7 @@ const APP_DATA = (() => {
     { title: "Level 1 Progress Recording", category: "Recording", skillTag: "recording", goal: "Measure foundation progress",
       learn: "A second structured recording, compared with your Class 10 baseline, to hear how far your foundation has come." },
   ].map((c, i) => ({
-    number: 13 + i, title: c.title, category: c.category, skillTag: c.skillTag,
+    number: 14 + i, title: c.title, category: c.category, skillTag: c.skillTag,
     difficulty: "Beginner", estMinutes: 35,
     comingSoon: true, // no lesson content yet — can be viewed but not completed (see Store.completeClass)
     description: `Coming soon: ${c.goal.charAt(0).toLowerCase()}${c.goal.slice(1)}.`,
@@ -504,7 +540,7 @@ const APP_DATA = (() => {
   };
 
   const CLASSES = [
-    ...[...level1, breathPhraseClass, pitchStabilityClass, ...level1Upcoming].map(c => ({ ...c, levelId: 1 })),
+    ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, ...level1Upcoming].map(c => ({ ...c, levelId: 1 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
