@@ -20,4 +20,8 @@ const InteractiveLessons = {
   "smooth-note-transitions": SmoothNoteTransitionsLesson,
   "basic-vocal-dynamics": BasicVocalDynamicsLesson,
   "diction-pronunciation": DictionPronunciationLesson,
+  "singing-simple-phrases": SingingSimplePhrasesLesson,
+  "connecting-phrases": ConnectingPhrasesLesson,
+  "musical-phrasing": MusicalPhrasingLesson,
+  "melodic-patterns": MelodicPatternsLesson,
 };

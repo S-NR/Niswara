@@ -554,20 +554,174 @@ const APP_DATA = (() => {
     }
   };
 
-  /* ---------- Level 1, Classes 16–20 (not written yet) ---------- */
+  /* ---------- Level 1, Class 16 (interactive) ---------- */
+  const singingPhrasesClass = {
+    number: 16, title: "Singing Simple Phrases", category: "Vocal Foundation", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 45,
+    // Rendered by the interactive lesson in js/lessons/singingSimplePhrases.js
+    interactive: "singing-simple-phrases",
+    subtitle: "Now let's put the pieces together.",
+    description: "An interactive lesson: the first major integration point — combining pitch, rhythm, breath, note transitions, dynamics, diction and listening into one short musical phrase. The objective is not perfection — it's coordination.",
+    content: {
+      whatYoullLearn: "How to build a short phrase step by step — speaking it, finding its rhythm, learning its melody, humming it, singing it on one vowel, then adding the words — and how to combine pitch, rhythm, breath, transitions, dynamics and diction into one connected musical thought, one focus at a time.",
+      whyItMatters: "Until now, most exercises focused on one skill at a time. A real musical phrase asks for several of them at once. Trying to fix everything simultaneously overwhelms a beginner — choosing one main focus per attempt (pitch, then rhythm, then words, then expression) makes the combination manageable.",
+      theory: "A phrase has a beginning, a middle and an ending, each with its own common problems: starting too loudly, softly or tensely; losing pitch or rhythm partway through; dropping the final word or note. Reviewing a recording works best one lens at a time — pitch, rhythm, breath, diction, transitions, dynamics, comfort — rather than judging everything at once.",
+      guidedPractice: [
+        "Spoke the phrase, found its rhythm with the metronome, learned its melody, hummed it, sang it on one vowel, added the words, chose a breath point, practised its beginning/middle/ending separately, sang it complete, reviewed it one skill at a time, then added dynamics, diction focus and simple emotional meaning.",
+      ],
+      assignment: {
+        // The six attempts live in the lesson; these are the questions answered afterwards
+        instructions: [
+          "Attempt 1 — hum the melody",
+          "Attempt 2 — sing the melody on one vowel",
+          "Attempt 3 — sing with the lyrics",
+          "Attempt 4 — sing with the lyrics and rhythm",
+          "Attempt 5 — sing with the lyrics, rhythm and gentle dynamics",
+          "Attempt 6 — a final, natural performance",
+        ],
+        questions: [
+          "Which version felt easiest?",
+          "Did adding lyrics affect my pitch?",
+          "Did rhythm affect my pitch?",
+          "Did I lose breath near the end?",
+          "Which word was unclear?",
+          "Which note was difficult?",
+          "Did my transitions feel smooth?",
+          "Did dynamics improve the phrase?",
+          "Did thinking about emotion help or distract me?",
+          "What should I practice next?",
+        ]
+      }
+    }
+  };
+
+  /* ---------- Level 1, Class 17 (interactive) ---------- */
+  const connectingPhrasesClass = {
+    number: 17, title: "Connecting Phrases", category: "Vocal Foundation", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 45,
+    // Rendered by the interactive lesson in js/lessons/connectingPhrases.js
+    interactive: "connecting-phrases",
+    subtitle: "Turn separate phrases into one musical thought.",
+    description: "An interactive lesson: finishing one phrase, breathing comfortably, and beginning the next without losing pitch, rhythm or meaning — the second major integration point, building directly on Class 16's single phrase.",
+    content: {
+      whatYoullLearn: "How to connect two (and then three) short phrases into one continuous musical thought — identifying where a phrase ends, breathing without rushing, beginning the next phrase smoothly, and keeping pitch, rhythm, words and dynamics connected across the breath.",
+      whyItMatters: "A song is rarely one continuous line — it's made of phrase after phrase. The listener should still feel the phrases belong together. Class 16 built a single phrase; this is the first time two of them have to connect.",
+      theory: "A good phrase connection needs four moments: finish, recover, prepare, begin. Rushing, holding the breath, or taking an oversized breath all break the connection just as much as a long awkward silence does. Breathing is part of the musical sentence, not an interruption of it.",
+      guidedPractice: [
+        "Identified where a phrase ends, spoke then hummed two phrases with a breath between them, practised the ending and the beginning separately, then combined them — and connected pitch, rhythm, diction, dynamics and simple expression across the breath, before trying a third phrase.",
+      ],
+      assignment: {
+        // The six attempts live in the lesson; these are the questions answered afterwards
+        instructions: [
+          "Attempt 1 — hum both phrases",
+          "Attempt 2 — sing the melody using one vowel",
+          "Attempt 3 — add the lyrics",
+          "Attempt 4 — focus on comfortable breathing between phrases",
+          "Attempt 5 — focus on a smooth phrase connection",
+          "Attempt 6 — a natural final performance",
+        ],
+        questions: [
+          "Did I rush between phrases?",
+          "Was my breath comfortable?",
+          "Did the second phrase begin at the correct pitch?",
+          "Did I maintain the rhythm?",
+          "Were the words clear?",
+          "Did the phrase connection feel natural?",
+          "Did the second phrase lose energy?",
+          "Which transition needs the most practice?",
+        ]
+      }
+    }
+  };
+
+  /* ---------- Level 1, Classes 18–20 (not written yet) ---------- */
+  /* ---------- Level 1, Class 18 (interactive) ---------- */
+  const musicalPhrasingClass = {
+    number: 18, title: "Musical Phrasing & Line Shape", category: "Vocal Foundation", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 45,
+    // Rendered by the interactive lesson in js/lessons/musicalPhrasing.js
+    interactive: "musical-phrasing",
+    subtitle: "Make the listener feel where the phrase is going.",
+    description: "An interactive lesson: singing is not NOTE → NOTE → NOTE → NOTE, it's BEGINNING → DEVELOPMENT → DIRECTION → DESTINATION. Finding a phrase's peak, building gently toward it, and releasing afterward — without forcing volume.",
+    content: {
+      whatYoullLearn: "How to give a short phrase musical direction — tracing its melodic shape, finding its peak (the moment that feels most important), building gently toward it and releasing afterward, and connecting that shape with dynamics, breath and word emphasis, without forcing volume anywhere.",
+      whyItMatters: "Two singers can sing the same notes correctly, and still sound different — one flat and mechanical, the other musical. The difference is usually phrasing: where the phrase begins, grows, peaks, relaxes and finishes.",
+      theory: "“Musical shape does not mean singing louder all the time.” A phrase can have direction through pitch, rhythm, dynamics, vowel emphasis, timing, breath and articulation — not only volume. A gentle, subtle build toward a phrase's peak, followed by a release, is enough; this class does not require advanced interpretation.",
+      guidedPractice: [
+        "Listened for a melody's destination and traced its shape, hummed and sang it on one vowel, found its peak and sang toward it, compared a flat version with a shaped one, connected dynamics, breath and word emphasis to the shape, then built a complete beginning → peak → ending phrase and practised focusing on one element at a time.",
+      ],
+      assignment: {
+        // The six takes live in the lesson; these are the questions answered afterwards
+        instructions: [
+          "Take 1 — sing naturally",
+          "Take 2 — identify the phrase peak",
+          "Take 3 — sing toward the peak",
+          "Take 4 — add gentle dynamics",
+          "Take 5 — focus on the meaning of the words",
+          "Take 6 — a final natural performance",
+        ],
+        questions: [
+          "Where was the phrase peak?",
+          "Did I naturally build toward it?",
+          "Did I make it too loud?",
+          "Did I lose pitch while shaping the phrase?",
+          "Did my breathing support the phrase?",
+          "Were the important words clear?",
+          "Did the ending feel complete?",
+          "Did the phrase sound more musical after shaping it?",
+          "What single thing should I improve next?",
+        ]
+      }
+    }
+  };
+
+  /* ---------- Level 1, Classes 19–20 (not written yet) ---------- */
+  /* ---------- Level 1, Class 19 (interactive) ---------- */
+  const melodicPatternsClass = {
+    number: 19, title: "Melodic Patterns & Vocal Consistency", category: "Pitch", skillTag: "pitch",
+    difficulty: "Beginner", estMinutes: 45,
+    // Rendered by the interactive lesson in js/lessons/melodicPatterns.js
+    interactive: "melodic-patterns",
+    subtitle: "Can you sing it the same way twice?",
+    description: "An interactive lesson: short melodic patterns, sung and then repeated — pitch, rhythm, vowel and tone consistency, pattern memory, and comparing takes honestly. Being able to sing something once is useful; repeating it consistently is a skill.",
+    content: {
+      whatYoullLearn: "How to hear and repeat short melodic patterns consistently — matching pitch, rhythm, vowel and tone across repeated attempts, remembering a short pattern by ear, recognizing that a transposed pattern is the same shape on a different starting note, and comparing takes honestly without a fake score.",
+      whyItMatters: "Professional singing requires repeatability. If a phrase is correct once but changes every time, control is still developing — a simple pattern sung consistently is more valuable than a difficult one sung inconsistently.",
+      theory: "“Consistency comes before complexity.” Patterns here stay very short and comfortable — no difficult scales, no extreme notes, no added difficulty for its own sake. Perform → listen → identify → adjust → repeat, always listening before correcting rather than blindly repeating.",
+      guidedPractice: [
+        "Listened to and hummed two- and three-note patterns, repeated them and compared pitch, rhythm, vowel and tone consistency across attempts, tried a pattern from memory and transposed to a new starting note, connected pattern consistency to phrase shape and dynamics, then ran a three-take challenge and expanded a pattern into a short phrase.",
+      ],
+      assignment: {
+        // The six takes live in the lesson; these are the questions answered afterwards
+        instructions: [
+          "Take 1 — listen and sing",
+          "Take 2 — repeat without changing the pattern",
+          "Take 3 — listen to both recordings",
+          "Take 4 — identify ONE difference",
+          "Take 5 — correct only that difference",
+          "Take 6 — record the pattern naturally",
+        ],
+        questions: [
+          "Was I able to remember the pattern?",
+          "Did I start on the correct pitch?",
+          "Did my pitch remain stable?",
+          "Did my rhythm remain consistent?",
+          "Did my tone change noticeably?",
+          "Did my vowels affect the sound?",
+          "Was my second attempt better than my first?",
+          "What was the biggest difference between my attempts?",
+          "What should I practice next?",
+        ]
+      }
+    }
+  };
+
+  /* ---------- Level 1, Class 20 (not written yet) ---------- */
   const level1Upcoming = [
-    { title: "Basic Scale Patterns", category: "Pitch", skillTag: "pitch", goal: "Develop pitch coordination",
-      learn: "Simple scale patterns at a comfortable pitch, to coordinate the ear and the voice." },
-    { title: "Simple Melodic Phrases", category: "Pitch", skillTag: "pitch", goal: "Combine pitch + rhythm",
-      learn: "Short melodies that combine the right notes with the right timing." },
-    { title: "Singing a Simple Song", category: "Vocal Foundation", skillTag: "vocal", goal: "Apply the fundamentals",
-      learn: "Bringing pitch, rhythm, breath and control together in one simple song." },
-    { title: "Self-Evaluation", category: "Ear Training", skillTag: "ear", goal: "Learn to critically listen",
-      learn: "Listening back to your own singing honestly and choosing what to work on next." },
-    { title: "Level 1 Progress Recording", category: "Recording", skillTag: "recording", goal: "Measure foundation progress",
-      learn: "A second structured recording, compared with your Class 10 baseline, to hear how far your foundation has come." },
+    { title: "Melodic Movement & Controlled Range", category: "Pitch", skillTag: "pitch", goal: "Move smoothly across a comfortable range",
+      learn: "Ascending and descending patterns, small interval movement, and connecting notes smoothly while maintaining pitch and avoiding throat tension." },
   ].map((c, i) => ({
-    number: 16 + i, title: c.title, category: c.category, skillTag: c.skillTag,
+    number: 20 + i, title: c.title, category: c.category, skillTag: c.skillTag,
     difficulty: "Beginner", estMinutes: 35,
     comingSoon: true, // no lesson content yet — can be viewed but not completed (see Store.completeClass)
     description: `Coming soon: ${c.goal.charAt(0).toLowerCase()}${c.goal.slice(1)}.`,
@@ -619,7 +773,7 @@ const APP_DATA = (() => {
   };
 
   const CLASSES = [
-    ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, ...level1Upcoming].map(c => ({ ...c, levelId: 1 })),
+    ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, ...level1Upcoming].map(c => ({ ...c, levelId: 1 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))

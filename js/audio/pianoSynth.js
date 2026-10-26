@@ -148,9 +148,10 @@ const PianoSynth = (() => {
         const n = notes[i];
         const midi = typeof n === "number" ? n : n.midi;
         const vel = typeof n === "number" ? velocity : (n.velocity ?? velocity);
+        const dur = typeof n === "number" ? duration : (n.duration ?? duration);
         if (onNote) onNote(i, midi);
         current = noteOn(midi, { velocity: vel });
-        await new Promise((r) => setTimeout(r, duration * 1000));
+        await new Promise((r) => setTimeout(r, dur * 1000));
         current.release();
         if (i < notes.length - 1) await new Promise((r) => setTimeout(r, gap * 1000));
       }
