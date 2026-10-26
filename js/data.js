@@ -23,60 +23,71 @@ const APP_DATA = (() => {
   const level1 = [
     {
       number: 1, title: "Meet Your Voice", category: "Vocal Foundation", skillTag: "vocal",
-      difficulty: "Beginner", estMinutes: 25,
-      description: "Understand your natural voice and establish your Day-1 baseline.",
+      difficulty: "Beginner", estMinutes: 35,
+      // Rendered by the interactive lesson in js/lessons/meetYourVoice.js
+      interactive: "meet-your-voice",
+      subtitle: "Before we try to improve your voice, let's learn to hear it.",
+      description: "An interactive first lesson: listening, voice awareness and comfort — hear your environment, your speaking voice, a gentle hum, higher and lower notes, and your first recordings. No judgement, no scores.",
       content: {
-        whatYoullLearn: "How your natural speaking and singing voice actually sounds, without judgement — and how to capture an honest Day-1 baseline you'll compare against for the rest of this journey.",
-        whyItMatters: "Every professional vocalist, producer and mixing engineer starts from the same place: knowing exactly what they're working with. You can't track progress without a true starting point, and you can't improve a sound you've never really listened to.",
-        theory: "Your voice has two closely related instruments: your speaking voice (relaxed, habitual, usually in your most comfortable range) and your singing voice (which asks for more breath support, pitch accuracy and sustained tone). Today isn't about sounding good — it's about sounding like you, so Day 180 has something honest to compare against.",
+        whatYoullLearn: "How to listen — to your surroundings, to your own speaking voice and humming, to higher and lower sounds — and how to record yourself and notice what you hear, without judging it.",
+        whyItMatters: "The first skill of a singer isn't singing loudly or reaching high notes. It's listening. Everything you learn later — pitch, breath, control, recording — starts with being able to hear what your voice is doing.",
+        theory: "Everyone's voice is different, and there is no requirement to sound like another singer. A recording often sounds different from the voice you hear inside your head — that's normal. Singing uses many of the same systems as speaking, and adds controlled pitch, rhythm and longer sounds.",
         guidedPractice: [
-          "Sit or stand tall, relaxed shoulders, feet flat on the floor.",
-          "Speak one sentence about your day exactly as you normally would.",
-          "Hum a comfortable note for 5 seconds and notice where you feel the vibration.",
-          "Sing the first line of any song you know well, at a comfortable volume.",
-          "Notice — don't judge — any tension in your jaw, neck or shoulders."
+          "Checked in with how my voice feels, listened to the room, recorded my speaking voice, hummed gently, heard higher and lower notes, let my voice glide, tried a first pitch-matching preview, and compared speaking with singing.",
         ],
         assignment: {
+          // Every part is evidence from the lesson (auto-ticked); the reflection questions follow
           instructions: [
-            "Record 20 seconds of natural speech (just talk about your day).",
-            "Record 20–30 seconds of natural singing (any song, comfortable key).",
+            "Natural speaking recording",
+            "Gentle humming",
+            "Higher/lower listening exercise",
+            "One pitch-matching attempt",
+            "Listening-back exercise",
+            "Personal reflection",
           ],
           questions: [
-            "What did I notice about my voice?",
-            "Where did I feel comfortable?",
-            "Where did I struggle?",
-            "Did I run out of breath?",
-            "Did I notice pitch problems?",
-            "What do I currently consider my biggest weakness?",
-            "What do I think is my strongest point?",
+            "What surprised me about my voice?",
+            "Was listening to myself comfortable or uncomfortable?",
+            "Could I hear which note was higher?",
+            "Could I hear whether my singing matched the reference?",
+            "What do I want to learn first?",
           ]
         }
       }
     },
     {
-      number: 2, title: "Breathing & Breath Awareness", category: "Breath Support", skillTag: "vocal",
-      difficulty: "Beginner", estMinutes: 20,
-      description: "Learn how breath actually powers singing, and feel the difference between chest and diaphragmatic breathing.",
+      number: 2, title: "Comfortable Breathing for Singing", category: "Breath Support", skillTag: "vocal",
+      difficulty: "Beginner", estMinutes: 30,
+      // Rendered by the interactive lesson in js/lessons/comfortableBreathing.js
+      interactive: "comfortable-breathing",
+      subtitle: "Breathing for singing starts with comfort, not force.",
+      description: "An interactive lesson: notice your natural breathing, breathe comfortably, and begin connecting breath with sound — hum, speech, a short phrase and one note. Never a lung-capacity workout.",
       content: {
-        whatYoullLearn: "The difference between shallow chest breathing and deep diaphragmatic breathing, and how to feel your breath support engage.",
-        whyItMatters: "Breath is the engine of every note you'll ever sing. Weak or tense breathing is the root cause of most pitch, tone and endurance problems later on.",
-        theory: "Diaphragmatic breathing lets your lower ribs and belly expand on the inhale, giving your vocal folds a steady, supported stream of air instead of a tense push from the throat.",
+        whatYoullLearn: "How to notice your natural breathing without changing it, take a comfortable (not big) breath, let the air out gently, and connect a comfortable breath to a hum, a spoken phrase, a short sung phrase and a single note — then rest.",
+        whyItMatters: "We breathe automatically all day. Singing asks us to become more aware of when we breathe and how we use the breath while making sound. A comfortable breath leads to a comfortable voice; forcing the breath leads to tension.",
+        theory: "Breathing for singing isn't about the biggest breath, the longest hold or the longest exhale. At this stage it's awareness, comfort and coordination: breath → voice → rest → normal breathing. Breath support is not holding the breath, pushing the stomach, forcing air or squeezing the throat; more advanced ideas come later, on top of this foundation.",
         guidedPractice: [
-          "Lie down and place a hand on your belly — breathe so only your hand rises.",
-          "Repeat standing up, noticing the same expansion.",
-          "Inhale for 4 counts, exhale on a slow hiss for 8 counts.",
-          "Repeat 5 times, extending the exhale by 1 count each round if comfortable."
+          "Observed natural breathing, let a few breaths come and go naturally, made a gentle “sss”, connected a comfortable breath to a hum, to speech, to a short sung phrase and to one note, noticed tension and shoulder movement without judging, and recorded breath + voice.",
         ],
         assignment: {
+          // Every part is evidence from the lesson (auto-ticked); these questions are the reflection
           instructions: [
-            "Practice the 4-in / 8-out breathing cycle for 5 minutes.",
-            "Record a 15 second voice memo describing how your breath felt today.",
+            "Natural breathing awareness",
+            "Gentle exhale",
+            "Breath + hum",
+            "Breath + speech",
+            "Short singing phrase",
+            "Breath + pitch",
+            "Recording playback",
+            "Reflection",
           ],
           questions: [
-            "Did I feel my belly expand on the inhale?",
-            "Was my exhale steady or shaky?",
-            "Did I feel any tension in my shoulders or neck while breathing?",
-            "How long could I comfortably sustain the exhale?",
+            "Did I naturally hold my breath?",
+            "Did I take larger breaths than necessary?",
+            "Could I connect breath to sound comfortably?",
+            "Did I notice tension anywhere?",
+            "Did breathing feel easier when I stopped trying to control it?",
+            "What will I remember from this class?",
           ]
         }
       }
@@ -506,10 +517,45 @@ const APP_DATA = (() => {
     }
   };
 
-  /* ---------- Level 1, Classes 15–20 (not written yet) ---------- */
+  /* ---------- Level 1, Class 15 (interactive) ---------- */
+  const dictionClass = {
+    number: 15, title: "Diction & Pronunciation", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 40,
+    // Rendered by the interactive lesson in js/lessons/dictionPronunciation.js
+    interactive: "diction-pronunciation",
+    subtitle: "Let the listener hear the words you're singing.",
+    description: "An interactive lesson: sing the words clearly without losing the music — vowels, consonants, word endings and lyric clarity, combined with pitch, rhythm, breath and dynamics. Clear, natural, musical — never exaggerated.",
+    content: {
+      whatYoullLearn: "How to keep vowels and consonants clear, finish the ends of words, and keep lyrics understandable while you also manage pitch, rhythm, breath and dynamics — building from speaking, to rhythm, to singing.",
+      whyItMatters: "A singer isn't only producing notes — a singer is communicating words and meaning. A technically correct note can still be hard to understand if the words are unclear.",
+      theory: "Clear does not mean exaggerated. Common beginner problems are swallowed words, missing consonants, unclear vowels, dropped word endings, rushing through words, vowels changing with pitch — and over-pronouncing everything. The goal is clear, natural and musical. Your accent is not a mistake: the aim is understandability and consistency, not one 'correct' accent.",
+      guidedPractice: [
+        "Spoke and sang lyric phrases, explored AH/EH/EE/OH/OO on a comfortable note, clear consonants and syllables, word endings, speak → rhythm → sing, lyric clarity, and diction combined with pitch, breath and dynamics — then compared my own versions.",
+      ],
+      assignment: {
+        // The four attempts live in the lesson; these are the questions answered afterwards
+        instructions: [
+          "Attempt 1 — speak it naturally",
+          "Attempt 2 — speak it rhythmically",
+          "Attempt 3 — sing it slowly",
+          "Attempt 4 — sing it at normal speed",
+        ],
+        questions: [
+          "Which word was least clear?",
+          "Did I lose any consonants?",
+          "Did I lose any word endings?",
+          "Did my vowels remain clear?",
+          "Did focusing on diction affect my pitch?",
+          "Did focusing on pitch affect my pronunciation?",
+          "Did I over-pronounce anything?",
+          "What should I improve next?",
+        ]
+      }
+    }
+  };
+
+  /* ---------- Level 1, Classes 16–20 (not written yet) ---------- */
   const level1Upcoming = [
-    { title: "Diction & Pronunciation", category: "Vocal Technique", skillTag: "vocal", goal: "Make words clearer",
-      learn: "Clear vowels and consonants while singing, so words are easy to understand." },
     { title: "Basic Scale Patterns", category: "Pitch", skillTag: "pitch", goal: "Develop pitch coordination",
       learn: "Simple scale patterns at a comfortable pitch, to coordinate the ear and the voice." },
     { title: "Simple Melodic Phrases", category: "Pitch", skillTag: "pitch", goal: "Combine pitch + rhythm",
@@ -521,7 +567,7 @@ const APP_DATA = (() => {
     { title: "Level 1 Progress Recording", category: "Recording", skillTag: "recording", goal: "Measure foundation progress",
       learn: "A second structured recording, compared with your Class 10 baseline, to hear how far your foundation has come." },
   ].map((c, i) => ({
-    number: 15 + i, title: c.title, category: c.category, skillTag: c.skillTag,
+    number: 16 + i, title: c.title, category: c.category, skillTag: c.skillTag,
     difficulty: "Beginner", estMinutes: 35,
     comingSoon: true, // no lesson content yet — can be viewed but not completed (see Store.completeClass)
     description: `Coming soon: ${c.goal.charAt(0).toLowerCase()}${c.goal.slice(1)}.`,
@@ -573,7 +619,7 @@ const APP_DATA = (() => {
   };
 
   const CLASSES = [
-    ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, ...level1Upcoming].map(c => ({ ...c, levelId: 1 })),
+    ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, ...level1Upcoming].map(c => ({ ...c, levelId: 1 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))

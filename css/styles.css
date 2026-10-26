@@ -368,6 +368,28 @@ body {
 [data-ref-line].is-playing .ps-ref-line { stroke: rgba(243, 218, 158, 0.95); }
 @keyframes psRefTravel { from { transform: translateX(0); } to { transform: translateX(500px); } }
 
+/* Meet Your Voice (js/lessons/meetYourVoice.js, Class 1) */
+.obs-single [data-obs-root] { grid-template-columns: minmax(0, 1fr); }
+.mv-tile { transition: border-color 0.4s, background 0.4s, box-shadow 0.4s, transform 0.4s; }
+.mv-tile.is-lit { border-color: rgba(231, 191, 108, 0.55); background: rgba(214, 162, 67, 0.10); box-shadow: 0 0 40px -12px rgba(214, 162, 67, 0.6); transform: translateY(-2px); }
+.mv-glide-path { stroke-dasharray: 560; stroke-dashoffset: 0; }
+.mv-glide-path.is-up { animation: mvGlideUp 2.6s ease-in-out; }
+.mv-glide-path.is-down { animation: mvGlideDown 2.6s ease-in-out; }
+@keyframes mvGlideUp { from { stroke-dashoffset: 560; } to { stroke-dashoffset: 0; } }
+@keyframes mvGlideDown { from { stroke-dashoffset: -560; } to { stroke-dashoffset: 0; } }
+
+/* Comfortable Breathing (js/lessons/comfortableBreathing.js, Class 2): the orb follows the guide's phases — no numbers */
+.breath-orb { transform: scale(0.82); opacity: 0.75; transition-property: transform, opacity, box-shadow; transition-timing-function: ease-in-out; transition-duration: 2s; }
+.breath-orb.is-in { transform: scale(1.08); opacity: 1; }
+.breath-orb.is-out { transform: scale(0.8); opacity: 0.75; }
+.breath-orb.is-sound { transform: scale(0.84); opacity: 1; box-shadow: 0 0 0 10px rgba(143, 216, 203, 0.08), 0 0 50px -6px rgba(143, 216, 203, 0.7); }
+.breath-orb.is-stop { transform: scale(0.84); opacity: 0.85; }
+.breath-orb.is-rest { transform: scale(0.88); opacity: 0.7; }
+
+/* Diction & Pronunciation (js/lessons/dictionPronunciation.js, Class 15): readable lyric lines; words in the beat guide wrap on phones */
+.dc-lyric span { display: inline-block; margin-right: 0.35em; }
+.dc-words .bg-text { font-size: 1.05rem; overflow-wrap: anywhere; hyphens: auto; }
+
 /* Breathing circle (Class 7 warm-up) — smooth, slow, no hold phase */
 .breathe-circle {
   width: 9rem; height: 9rem; border-radius: 999px; margin: 0 auto;
@@ -385,4 +407,6 @@ body {
   .ex-choice.is-wrong, .vr-btn.is-recording .vr-rec-dot, .piano-note-readout.is-fresh, .learn-arrow-pop { animation: none; }
   .breathe-circle.is-running { animation: none; }
   [data-ref-line].is-playing .ps-ref-dot { animation: none; }
+  .mv-tile, .mv-glide-path.is-up, .mv-glide-path.is-down { transition: none; animation: none; }
+  .breath-orb { transition: none; }
 }

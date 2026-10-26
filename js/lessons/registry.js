@@ -5,6 +5,8 @@
    ============================================================ */
 
 const InteractiveLessons = {
+  "meet-your-voice": MeetYourVoiceLesson,
+  "comfortable-breathing": ComfortableBreathingLesson,
   "understanding-pitch": UnderstandingPitchLesson,
   "matching-a-note": MatchingANoteLesson,
   "listening-to-your-voice": ListeningToYourVoiceLesson,
@@ -17,4 +19,5 @@ const InteractiveLessons = {
   "pitch-stability": PitchStabilityLesson,
   "smooth-note-transitions": SmoothNoteTransitionsLesson,
   "basic-vocal-dynamics": BasicVocalDynamicsLesson,
+  "diction-pronunciation": DictionPronunciationLesson,
 };
