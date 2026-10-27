@@ -2,7 +2,6 @@
    CLASS 20 — MELODIC MOVEMENT & CONTROLLED RANGE (interactive lesson)
 
    Rendered by ClassDetailPage for interactive: "melodic-movement".
-   The final class of Level 1 — Foundation (20 of 20).
 
    Core idea: "Learn to move between notes while keeping the voice
    comfortable, stable and controlled." This is NOT a vocal-range
@@ -39,13 +38,10 @@
    ControlCheck (Class 9+). No shared component needed changes —
    this class is built entirely from existing engines.
 
-   Since Level 1 ends at exactly 20 classes, `LessonKit.nextClass()`
-   naturally resolves to Level 2's first real class (Vocal
-   Placement) once this one completes — the honest, already-correct
-   outcome, rather than a hard-coded "Class 21" link that doesn't
-   exist in the data yet (the spec's own bridge names a Class 21,
-   but only describes it as a future class; building it isn't part
-   of "Upgrade ONLY Class 20" — see the changelog).
+   `LessonKit.nextClass()` resolves to whatever is next in the data
+   at the time this class is completed — Class 21 "Vocal
+   Coordination & Longer Melodic Patterns" once it exists, or
+   Level 2's first real class before that. No hard-coded link here.
    ============================================================ */
 
 const MelodicMovementLesson = (() => {
@@ -282,15 +278,12 @@ const MelodicMovementLesson = (() => {
     const bridge = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
         <p class="text-sm text-ink-300 leading-relaxed mb-2">You don't need a huge range to become a good singer — you need to control the notes you can comfortably sing. You can move upward and downward without forcing, and identify a difficult movement to practise separately.</p>
-        <p class="text-sm text-ink-300 leading-relaxed">${next ? `Next, in <strong class="text-ink-100">${next.levelId > cls.levelId ? `Level ${next.levelId} — ` : `Class ${next.number} — `}${next.title}</strong>, we'll keep building on the coordination, pitch movement and comfort you've developed throughout Level 1.` : "More is on its way."}</p>
+        <p class="text-sm text-ink-300 leading-relaxed">${next ? `Next, in <strong class="text-ink-100">${next.levelId > cls.levelId ? `Level ${next.levelId} — ` : `Class ${next.number} — `}${next.title}</strong>, we'll keep building on the coordination, pitch movement and comfort you've developed so far.` : "More is on its way."}</p>
       </div>`;
     if (status === "completed") {
       return `
         <div class="flex flex-col gap-6">
           ${milestone()}
-          <div class="rounded-3xl border border-gold-400/30 bg-gold-500/[0.06] p-6 text-center">
-            <p class="font-display text-xl text-gold-200">🎉 Level 1 — Foundation complete: all 20 classes.</p>
-          </div>
           <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.05] p-6 sm:p-8 text-center">
             <p class="text-[11px] tracking-[0.25em] uppercase text-emerald-300 mb-2">Class ${cls.number} complete</p>
             <h3 class="font-display text-2xl text-ink-50 mb-5">Move between notes without forcing your voice.</h3>

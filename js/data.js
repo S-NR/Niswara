@@ -716,8 +716,7 @@ const APP_DATA = (() => {
     }
   };
 
-  /* ---------- Level 1, Class 20 (not written yet) ---------- */
-  /* ---------- Level 1, Class 20 (interactive — the final Level 1 class) ---------- */
+  /* ---------- Level 1, Class 20 (interactive) ---------- */
   const melodicMovementClass = {
     number: 20, title: "Melodic Movement & Controlled Range", category: "Pitch", skillTag: "pitch",
     difficulty: "Beginner", estMinutes: 45,
@@ -796,8 +795,192 @@ const APP_DATA = (() => {
       titles: ["Completing Full Songs", "Building a Portfolio", "Release Preparation", "Live Performance", "Artist Identity"] },
   };
 
+  /* ---------- Level 1, Class 21 (interactive) ---------- */
+  const vocalCoordinationClass = {
+    number: 21, title: "Vocal Coordination & Longer Melodic Patterns", category: "Pitch", skillTag: "pitch",
+    difficulty: "Beginner", estMinutes: 50,
+    // Rendered by the interactive lesson in js/lessons/vocalCoordination.js
+    interactive: "vocal-coordination",
+    subtitle: "Keep everything connected as the melody gets longer.",
+    description: "An interactive lesson: keeping pitch, rhythm, breath, movement, diction and relaxation working together as a melodic pattern grows longer. The challenge is not speed — it's coordination. \"Longer does not mean harder.\"",
+    content: {
+      whatYoullLearn: "How to keep several singing skills working together as a melody gets longer — breaking a longer pattern into smaller groups, maintaining pitch and rhythm together, adding vowels, syllables and words without losing stability, managing breath at sensible points, keeping one musical phrase shape, and practising only the one section that needs it instead of repeating the whole pattern.",
+      whyItMatters: "Good singing is not one skill — it's many small skills (pitch, rhythm, breath, movement, words, relaxation, phrase shape) working together without fighting each other. A longer melody is where that coordination is first really tested.",
+      theory: "\"Longer does not mean harder.\" The number of notes increases gradually — never by pushing the voice, raising volume, reaching for extreme notes, singing faster, or practising until tired. When a pattern feels difficult: slow it down, shorten it, or return to a comfortable range. \"Accuracy first. Speed later.\"",
+      guidedPractice: [
+        "Learned and grouped a longer 5–7 note pattern, combined it with rhythm, vowels, syllables and simple words, managed breath at sensible points, kept one phrase shape and gentle dynamics across it, reviewed pitch consistency and tone across repeated takes, practised slow to normal speed, tried it from memory, turned the pattern into a short musical phrase, then identified and practised the one weakest section.",
+      ],
+      assignment: {
+        // The seven takes live in the lesson; these are the questions answered afterwards
+        instructions: [
+          "Take 1 — hum the pattern",
+          "Take 2 — sing it on \"AH\"",
+          "Take 3 — sing it using simple syllables",
+          "Take 4 — add lyrics",
+          "Take 5 — focus on pitch consistency",
+          "Take 6 — focus on smooth movement",
+          "Take 7 — a final natural performance",
+        ],
+        questions: [
+          "Did I remember the pattern?",
+          "Where did I lose accuracy?",
+          "Did my pitch change when I added words?",
+          "Did my rhythm remain stable?",
+          "Did I breathe comfortably?",
+          "Did I become tense anywhere?",
+          "Did my phrase maintain direction?",
+          "Which section needs isolated practice?",
+          "Was the final attempt better than the first?",
+          "What should I focus on next?",
+        ]
+      }
+    }
+  };
+
+  /* ---------- Level 1, Class 22 (interactive) ---------- */
+  const vocalAgilityClass = {
+    number: 22, title: "Vocal Agility Foundations", category: "Pitch", skillTag: "pitch",
+    difficulty: "Beginner", estMinutes: 50,
+    // Rendered by the interactive lesson in js/lessons/vocalAgility.js
+    interactive: "vocal-agility",
+    subtitle: "Move lightly. Stay accurate. Don't rush.",
+    description: "An interactive lesson: the first introduction to vocal agility — moving between notes lightly, clearly and accurately. Not speed. Accuracy → Coordination → Speed, never reversed.",
+    content: {
+      whatYoullLearn: "How to move between notes cleanly and lightly — two- and three-note movements, repeated-note patterns, syllable and vowel agility, clean note changes without sliding or pushing, a small repeatable \"melodic cell,\" and how to build speed only once coordination is reliable, never before.",
+      whyItMatters: "Vocal agility is not the same as singing fast. Before fast runs, a singer needs clean note changes, accurate pitch, light articulation, relaxed movement and stable rhythm — the coordination this class establishes for later.",
+      theory: "\"Agility does not mean singing fast.\" It means moving accurately, efficiently, cleanly, relaxed, and in rhythm. Slow and accurate is always better practice than fast and inaccurate. \"Accuracy → Coordination → Speed\" — never reversed. If accuracy decreases, return to the slower level; speed is never the goal in itself.",
+      guidedPractice: [
+        "Practised two- and three-note movements, repeated-note patterns, syllables and vowels on a short pattern, clean note changes and light movement, a slow-practice ladder with the metronome, a small melodic cell with rhythm, connected the cell into a short phrase with breath and dynamics, then recorded three takes at different speeds and identified one problem to return to slowly.",
+      ],
+      assignment: {
+        // The seven takes live in the lesson; these are the questions answered afterwards
+        instructions: [
+          "Take 1 — hum slowly",
+          "Take 2 — sing on \"LA\"",
+          "Take 3 — sing on \"DA\"",
+          "Take 4 — sing on \"AH\"",
+          "Take 5 — use a metronome",
+          "Take 6 — slightly faster, only if accurate and comfortable",
+          "Take 7 — sing it naturally",
+        ],
+        questions: [
+          "Which speed was most accurate?",
+          "Did my pitch remain stable?",
+          "Did my articulation remain clear?",
+          "Did my jaw remain relaxed?",
+          "Did my throat remain comfortable?",
+          "Did I maintain rhythm?",
+          "Did I lose accuracy when increasing speed?",
+          "Which syllable was easiest?",
+          "Which syllable was hardest?",
+          "What should I practice next?",
+        ]
+      }
+    }
+  };
+
+  /* ---------- Level 1, Class 23 (interactive) ---------- */
+  const registerAwarenessClass = {
+    number: 23, title: "Register Awareness & Voice Connection", category: "Pitch", skillTag: "pitch",
+    difficulty: "Beginner", estMinutes: 50,
+    // Rendered by the interactive lesson in js/lessons/registerAwareness.js
+    interactive: "register-awareness",
+    subtitle: "Notice the changes. Connect them gently.",
+    description: "An interactive lesson: how the voice can feel different across its range, and learning to move between comfortable areas smoothly. Awareness, not classification — not a search for a permanent voice type, and never forced.",
+    content: {
+      whatYoullLearn: "How to notice that your voice can feel different in different parts of your range — vibration, resonance, volume, tone, effort, breath sensation — and how to move through those areas, and any transition between them, gently and without forcing. Lower, middle and upper are used only as descriptive, non-permanent areas for this exploration.",
+      whyItMatters: "You cannot improve something you cannot notice. Before any register technique is appropriate, a beginner needs to notice how their voice actually feels across its comfortable range — and learn that a transition that feels unstable is fixed by reducing range and slowing down, never by pushing harder.",
+      theory: "\"Awareness before control.\" LISTEN → NOTICE → EXPLORE → CONNECT. This class never assigns a permanent voice classification, never calls an endpoint your \"highest note,\" and never labels every change a \"vocal break.\" If a transition feels unstable: reduce the range, lower the volume, slow down, return to humming — never push, tighten the throat, lift the chin, or force one area's sound onto another.",
+      guidedPractice: [
+        "Explored a comfortable range and noticed any change in sensation, glided gently between areas, connected two and three notes smoothly, tried ng→ah and hum→vowel transitions, moved slightly lower and slightly higher from a comfortable note, listened for any noticeable change without forcing a fix, connected notes without relying on sliding, added rhythm, dynamics and simple words to the pattern, then recorded a transition a few different ways and mapped today's comfort zone.",
+      ],
+      assignment: {
+        // The five takes live in the lesson; these are the questions answered afterwards
+        instructions: [
+          "Take 1 — hum",
+          "Take 2 — sing on \"OO\"",
+          "Take 3 — sing on \"AH\"",
+          "Take 4 — sing with simple words",
+          "Take 5 — repeat softly",
+        ],
+        questions: [
+          "Did my voice feel different as the pitch changed?",
+          "Where did I notice the biggest change?",
+          "Did I notice a break?",
+          "Was ascending comfortable?",
+          "Was descending comfortable?",
+          "Did I push anywhere?",
+          "Did humming feel easier?",
+          "Did adding words change the transition?",
+          "Which area feels most comfortable today?",
+          "What transition should I practice next?",
+        ]
+      }
+    }
+  };
+
+  /* ---------- Level 1, Class 24 (interactive) ---------- */
+  const singingCompleteSongClass = {
+    number: 24, title: "Singing a Complete Simple Song", category: "Performance", skillTag: "song",
+    difficulty: "Beginner", estMinutes: 60,
+    // Rendered by the interactive lesson in js/lessons/singingCompleteSong.js
+    interactive: "singing-complete-song",
+    subtitle: "Bring everything together. One song, one connected musical experience.",
+    description: "An interactive lesson: combining pitch, rhythm, breath, diction, transitions, phrasing and dynamics to sing a short, complete, original practice song. The goal is not perfection — it's a complete, manageable performance that notices what works and what needs more practice.",
+    content: {
+      whatYoullLearn: "How to prepare and sing a complete simple song by combining pitch accuracy, rhythm and timing, comfortable breathing, diction and pronunciation, smooth note transitions, phrase connection, basic dynamics, musical expression, and self-listening — all the skills practiced individually across Classes 1–23, now coordinated together.",
+      whyItMatters: "A song is not merely a sequence of correct notes. It has phrases, breathing points, rhythm, words, dynamics and emotional direction. You don't need to master every skill before singing a song — you learn to coordinate them by practicing music in manageable steps.",
+      theory: "LISTEN → LEARN → BREAK DOWN → PRACTICE → CONNECT → PERFORM → REVIEW. Learn a short song in small sections, master each one before connecting it to the next, and bring pitch, rhythm, breath, diction, transitions and dynamics together gradually rather than all at once.",
+      guidedPractice: [
+        "Chose a practice song, listened to the reference without singing, learned it in small sections, matched the starting note, practiced the rhythm before the lyrics, planned comfortable breathing points, worked on diction, practiced a smooth transition and connected the phrases, added simple dynamics, sang the complete song in a chosen mode, recorded three takes, listened back and compared them, chose one area for targeted correction, then recorded a final performance.",
+      ],
+      assignment: {
+        // The checklist and both recordings live in the lesson; these mirror the spec's 10-step list
+        instructions: [
+          "Listen to the reference.",
+          "Practice the melody in small sections.",
+          "Practice the rhythm.",
+          "Identify comfortable breathing points.",
+          "Sing the sections with words.",
+          "Connect the sections.",
+          "Record a natural first attempt.",
+          "Identify one area to improve.",
+          "Practice that area separately.",
+          "Record a final complete attempt.",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 1, Class 25 (interactive) ---------- */
+  const foundationFinalAssessmentClass = {
+    number: 25, title: "Foundation Final Assessment & Progress Recording", category: "Performance", skillTag: "song",
+    difficulty: "Beginner", estMinutes: 60,
+    // Rendered by the interactive lesson in js/lessons/foundationFinalAssessment.js
+    interactive: "foundation-final-assessment",
+    subtitle: "Review your journey, listen to your progress, and plan your next step.",
+    description: "An interactive lesson: the final class of the Foundation level. Not an audition — an opportunity to listen to yourself, recognize your progress, and understand what deserves more practice, then record a comfortable performance and plan a practical next step.",
+    content: {
+      whatYoullLearn: "How to review the essential skills from Classes 1–24, record a comfortable final performance, listen critically without judging yourself harshly, compare it with your Class 10 baseline if you have one, identify specific strengths and growth areas, and decide — honestly, not automatically — whether to keep strengthening the Foundation or begin Level 2.",
+      whyItMatters: "Your voice does not need to be perfect for your progress to matter. A real, honest look at where you are now — not a score, not a ranking — is what makes the next step of practice useful instead of guesswork.",
+      theory: "LISTEN → RECORD → COMPARE → REFLECT → PLAN. Self-observation, not professional diagnosis. Completing a class doesn't automatically mean a skill is mastered — this class asks the learner to notice for themselves.",
+      guidedPractice: [
+        "Reviewed the Foundation skills honestly, recorded a natural performance and a focused-improvement take, compared today's recording with the Class 10 baseline where available, completed a personal self-assessment, identified strengths and growth areas, reviewed an honest progress summary, and chose a recommended next step.",
+      ],
+      assignment: {
+        instructions: [
+          "Take 1 — natural performance",
+          "Take 2 — focused improvement",
+          "Take 3 — optional final take",
+        ],
+        questions: []
+      }
+    }
+  };
+
   const CLASSES = [
-    ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass].map(c => ({ ...c, levelId: 1 })),
+    ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))

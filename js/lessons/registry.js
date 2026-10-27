@@ -25,4 +25,9 @@ const InteractiveLessons = {
   "musical-phrasing": MusicalPhrasingLesson,
   "melodic-patterns": MelodicPatternsLesson,
   "melodic-movement": MelodicMovementLesson,
+  "vocal-coordination": VocalCoordinationLesson,
+  "vocal-agility": VocalAgilityLesson,
+  "register-awareness": RegisterAwarenessLesson,
+  "singing-complete-song": SingingCompleteSongLesson,
+  "foundation-final-assessment": FoundationFinalAssessmentLesson,
 };
