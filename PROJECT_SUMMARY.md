@@ -1,6 +1,6 @@
 # Niswara — Project Summary
 
-_Last updated: 2026-10-26 · Based on `main` @ `291bed8` plus the uncommitted interactive Classes 16 "Singing Simple Phrases", 17 "Connecting Phrases", 18 "Musical Phrasing & Line Shape" and 19 "Melodic Patterns & Vocal Consistency" (see [Change log](#6-change-log))_
+_Last updated: 2026-10-27 · Based on `main` @ `6402b1f` (Classes 1–19) plus the uncommitted common **🎤 Warm-up** section (see [Change log](#6-change-log))_
 
 **Niswara: From First Note → Professional** is a personal music-learning platform. It walks one learner through 8 levels: singing, theory, recording, production, mixing, mastering and release. Each level is split into classes, and the platform includes daily practice tracking, a journal, song projects, before/after recordings and achievements.
 
@@ -11,7 +11,7 @@ The repo contains **two separate applications**:
 | **Niswara (primary)** | repo root (`index.html`, `js/`, `css/`, `supabase/`) | Active. Phases 1–3 of 10 built (Phase 3 live once migrations are run — see Roadmap) | Static, buildless HTML/CSS/vanilla JS. Tailwind via CDN. Supabase (Auth, Postgres, Storage). Hosted on GitHub Pages |
 | **Learning Academy (prototype)** | `web/` | Early prototype, appears dormant | React 18, TypeScript, Vite, Tailwind, Zustand, PWA |
 
-> **Login & sync status:** ✅ Live. `config.js` points at the real Supabase project, and migrations `0001`–`0004` have been run. Checked 2026-10-21: `profiles` answers, and `class_progress`, `class_notes` and `learner_state` correctly refuse logged-out visitors (`42501`). Progress follows the account to every device (`js/cloudSync.js`).
+> **Login & sync status:** ✅ Live. `config.js` points at the real Supabase project, and migrations `0001`–`0004` have been run. Checked 2026-10-21: `profiles` answers, and `class_progress`, `class_notes` and `learner_state` correctly refuse logged-out visitors (`42501`). Progress follows the account to every device (`js/cloudSync.js`). **New: run `0005_warmup_sessions.sql`** so warm-up history reaches the account. Until then it stays on each device, and nothing breaks.
 
 ---
 
@@ -26,6 +26,7 @@ index.html ─┬─ config.js            public Supabase URL + publishable key 
             ├─ js/store.js          Store: learner state in localStorage, one slot per account
             ├─ js/auth.js           Auth: the only module that touches Supabase
             ├─ js/classActivity.js  ClassActivity: per-user interactive-lesson progress + private notes (local + Supabase sync)
+            ├─ js/warmup.js         Warmup: the common Warm-up's routines, unlock rule (Classes 1–9), emphasis, history (local + warmup_sessions)
             ├─ js/router.js         hash router, requiresAuth guard, render/mount/unmount lifecycle
             ├─ js/components.js     pure HTML-string components
             ├─ js/timer.js          practice timer (wall-clock based)
@@ -35,6 +36,7 @@ index.html ─┬─ config.js            public Supabase URL + publishable key 
             ├─ js/components/vocalRecording.js  VocalRecording + PitchAnalysis (placeholder seam, isAvailable: false)
             ├─ js/components/personalNotes.js   PersonalNotes
             ├─ js/components/classProgress.js   ClassProgress
+            ├─ js/components/warmupPrompt.js    WarmupPrompt: "Prepare your voice" card (Class 11+), "warm up first?" before recordings, Classes-page entry
             ├─ js/audio/voiceRecorder.js     VoiceRecorder: shared mic/recording/level meter/save/playback engine
             ├─ js/audio/pitchAnalysis.js     PitchAnalysis: client-side YIN pitch ESTIMATE (honest, octave-aware)
             ├─ js/components/pitchMatch.js   ReferenceNotePlayer, SelfAssessment, PitchGuide, PitchComparison, PitchMatchExercise
@@ -62,11 +64,12 @@ index.html ─┬─ config.js            public Supabase URL + publishable key 
             ├─ js/lessons/melodicPatterns.js interactive Class 19
             ├─ js/lessons/basicVocalControl.js interactive Class 9
             ├─ js/lessons/registry.js        InteractiveLessons (class `interactive` key -> lesson)
-            └─ js/pages/*.js        17 pages, each { render(params), mount(container) → cleanup }
+            └─ js/pages/*.js        19 pages, each { render(params), mount(container) → cleanup } (incl. warmup.js: WarmupPage + WarmupSessionPage)
 supabase/migrations/0001_profiles.sql          profiles table, signup trigger, RLS, public_profiles view, avatars bucket
 supabase/migrations/0002_security_fixes.sql    role protection, public view fix, avatar limits
 supabase/migrations/0003_class_progress.sql    class_progress + class_notes (owner-only RLS)
 supabase/migrations/0004_learner_state.sql     learner_state (whole progress per user, versioned) + private recordings bucket
+supabase/migrations/0005_warmup_sessions.sql   warmup_sessions (finished warm-ups; owner-only RLS)
 ```
 
 **Progress on every device:**
@@ -107,6 +110,7 @@ Design seams (all intentional):
 | **Class 17 — Connecting Phrases (interactive)** | ✅ Guided lesson (Understand → Identify → Speak → Rhythm → Hum → Breath → Structure → Combine → Connect → Extend → Listen → Evaluate → Practice → Complete), the second integration point — PHRASE 1 → BREATH/TRANSITION → PHRASE 2, built directly on Class 16 (one phrase) and on **"Don't rush from one phrase into the next"** (finish → recover → prepare → begin):<br>• Two working phrases, one word per note like Class 16: "I want to sing today" (5 notes, degrees 1-2-3-4-3) and "and enjoy the sound" (4 notes, degrees 3-2-1-2) — **deliberately designed so Phrase 2 starts on the exact same note Phrase 1 ends on**, giving Exercise 9 ("connecting pitch") an objectively correct, demonstrable answer rather than an arbitrary one.<br>• A tap-to-identify phrase-boundary exercise over the combined 9-word line; speaking, then humming, both phrases with a breath between them; the **full Class 6 `Metronome` widget** for "rhythm before melody" (matching Classes 10/11/16's precedent); phrase ending and phrase beginning practised separately before combining; then five "connecting" exercises — pitch (`PitchMatchExercise` chain across both phrases + `StabilityPanel`), rhythm, diction (Class 15, the last word of Phrase 1 and first word of Phrase 2), dynamics (Class 14, explicitly "not a loudness exercise"), and a two-phrase expression exercise using the spec's own separate example pair ("I remember" / "something beautiful", sung freely with no reference melody).<br>• An optional three-phrase extension (`PitchMatchExercise` chain across all three phrases, Phrase 3 continuing from Phrase 2's ending toward the tonic — "the third phrase can feel like a destination").<br>• A **Version A / Version B listening-analysis exercise, honestly synthesized**: Version B plays the two phrases with a short natural gap and the designed same-note relationship; Version A plays the same two phrases with a long gap and the second phrase shifted to an unrelated note — gap length and starting note are exactly what the spec asks the learner to notice, and both are something `PianoSynth` can demonstrate truthfully (unlike a vocal flaw), with an explanatory reveal afterward.<br>• A recording-review exercise that deliberately asks for **one** area to improve (a single-select over the 7 areas), not a multi-row grid — matching the spec's explicit "don't judge everything at once; choose ONE main issue."<br>• Six expandable common-problems sections, a 7-row self-evaluation on `ControlCheck`, a practice timer logging "Phrase Connection", a 6-attempt assignment (hum both → one vowel → lyrics → breathing focus → smooth connection → final performance) with 8 questions, a 19-item progress tracker, and the "CONNECTING MUSICAL THOUGHTS" milestone (PHRASE 1 → BREATH → PHRASE 2 → CONTINUITY, then PHRASE 1 + PHRASE 2 + PHRASE 3 = MUSICAL FLOW) bridging to Class 18 "Musical Phrasing & Line Shape". No shared components were changed for this class — everything reuses Classes 3/4/5/6/9/12/14/15's existing engines as-is. |
 | **Class 18 — Musical Phrasing & Line Shape (interactive)** | ✅ Guided lesson (Understand → Shape → Hum → Vowel → Peak → Compare → Dynamics → Release → Breath → Words → Timing → Full Shape → Review → Evaluate → Practice → Complete), built on **"Don't just sing the notes. Give the phrase a direction"** and **"Musical shape does not mean singing louder all the time"** — singing as BEGINNING → DEVELOPMENT → DIRECTION → DESTINATION, not NOTE → NOTE → NOTE → NOTE:<br>• One 5-note working melody (degrees 0-1-3-2-0: begin low, rise, **peak** at the middle note, release, finish on the tonic) carries most of the class — deliberately shaped so the peak is objectively identifiable, reused for the one-vowel exercise, "find the peak," the main three-part shape exercise, and the visual phrase shaper. Exercise 1 gets its own short 4-note "destination" melody and Exercise 2 its own two illustrative contours (the spec's literal "LOW → HIGH → HIGHER → HIGH → LOW" / "HIGH → LOW → LOW → HIGH" examples, drawn as small bar-height contour views) — neither is the main phrase.<br>• Exercise 11's lyric ("I've been waiting for you," 5 words) maps one word to each of the main melody's 5 notes, so "waiting" naturally lands on the peak.<br>• **Two honestly-synthesized A/B comparisons** (`PianoSynth`): flat (uniform velocity) vs. shaped (velocity rising toward the peak) for "which feels more musical?", and strictly mechanical vs. a gentle velocity-only lean toward the peak (same underlying pulse — gap unchanged) for the timing exercise, consistent with how Class 17's listening-analysis A/B was built.<br>• Exercise 15 ("Visual Phrase Shaper") asks for a **draggable** visual; this buildless codebase instead gives each of the melody's 5 notes a **tap-to-cycle role button** (Start/Build/Peak/Release/Finish) — the same "select, don't drag" interaction language Classes 11/16/17 already use for their breath/boundary markers, flagged here as a deliberate interpretation rather than a new drag-and-drop system.<br>• Dynamics as shape (Class 14, "movement → destination → release," not "quiet → loud → louder"), phrase release, breath connected to shape (Class 17), word emphasis (Class 15) and a phrase-with-meaning exercise (neutral vs. intentional, like Class 17's expression exercise), a 4-take recording-practice comparison, and a **one-focus-improvement** exercise that's explicitly single-select (not a multi-row grid) — matching the spec's own "don't try to fix everything simultaneously; choose one."<br>• Six expandable common-problems sections, an 8-row self-evaluation on `ControlCheck`, a practice timer logging "Musical Phrasing," a 6-take assignment (natural → identify peak → toward the peak → dynamics → meaning → final performance) with 9 questions, a 20-item progress tracker, and the "GIVE THE PHRASE A DIRECTION" milestone (BEGIN → BUILD → PEAK → RELEASE → FINISH) bridging to Class 19 "Melodic Patterns & Vocal Consistency". No shared components were changed for this class. |
 | **Class 19 — Melodic Patterns & Vocal Consistency (interactive)** | ✅ Guided lesson (Understand → Recognize → Patterns → Pitch → Rhythm → Vowel → Words → Memory → Transpose → Connect → Habit → Compare → Expand → Evaluate → Practice → Complete), built on **"Being able to sing something once is useful. Being able to repeat it consistently is a skill"** and **"Consistency comes before complexity"** — very short, comfortable patterns throughout, never a harder scale just to raise difficulty:<br>• A two-note pair, three short 3-note patterns (1→2→3, 3→2→1, 1→3→2) and a 5-note pattern-into-phrase (1→2→3→2→1) — all one whole step apart, well within a comfortable range.<br>• **Exercise 5 ("Pitch consistency") is an honest, non-fake metric**: three single-note takes are each run through the existing Class 12 `PitchStability.assess()` against the same reference note, and the *spread* between their already-honest `cents` values is bucketed into More consistent / Some variation / Significant variation / Not enough data — reusing the proven engine's own thresholds rather than inventing a new scoring system. A full multi-note contour-similarity comparison across three takes was deliberately scoped out as a meaningfully larger, less honest feature (see Change log).<br>• **`PianoSynth.playSequence` gained an optional per-note `duration`** (additive, backward compatible — no existing caller sets it) so Exercise 7's "same notes, different rhythm" demo can honestly play equal-timing vs. long→short→short versions of the identical three notes.<br>• Pattern memory (play once, hidden, then reveal), transposition ("same shape, different starting pitch" — the concept taught without naming music theory), vowel consistency (AH/EE/OO on the Class 4 `PitchMatchExercise` chain engine, 3 slots on one shared reference, connecting Class 15), consistency connected to phrase shape (Class 18) and dynamics (Class 14, "consistency does not mean becoming robotic"), a listen-before-correcting practice habit (perform → listen → identify → adjust → repeat), a three-take challenge with 5 separate honest comparison questions and an explicit "do not automatically select the best take," and a tone-awareness `ObservationChecklist` (sudden changes, breathy beginnings, pressed sounds, etc. — never labelled good or bad).<br>• Six expandable common-problems sections, a 7-row self-evaluation on `ControlCheck`, a practice timer logging "Melodic Patterns," a 6-take assignment (listen & sing → repeat → listen to both → identify one difference → correct only that → natural) with 9 questions, a **19-item progress tracker** (one fewer than the usual 20 — Exercise 7's A/B demo has no checkpoint of its own, following the spec's own literal Class Progress list), and the "CONSISTENCY IS CONTROL" milestone (HEAR → SING → LISTEN → IDENTIFY → ADJUST → REPEAT) bridging to Class 20 "Melodic Movement & Controlled Range". |
+| **🎤 Warm-up (COMMON section, not a class)** | ✅ A `#/warmup` dashboard plus a guided `#/warmup/:mode` "vocal studio": a dark stage, a central microphone, a circular progress ring, a step timer, big Skip/Next controls and a pause overlay.<br>• **Not numbered and never in the class list.** It appears as a "Common" entry on the Classes page, a gold "🎤 Warm-up" link in the desktop nav, a "Common" group in the menu, and a bottom-bar tab on phones.<br>• **Locked until Classes 1–9 are all completed** (`Warmup.status()`). The dashboard and every session URL show "Warm-up Locked · X / 9 classes completed · Continue Classes / View Classes", so it can't be bypassed.<br>• **Three routines:**<br>  – **Quick**, ~5 min, 7 steps.<br>  – **Full**, ~10–12 min, 10 steps: Arrive & Listen → Relaxation → Breath → Gentle sound → Pitch connection → Self-listening → Rhythm → Vocal control → Mini phrase → Ready to Sing?<br>  – **Performance**, ~3–5 min: Relax → Breath → Hum → Reference pitch → Pattern → Phrase → Ready.<br>  Step times are suggestions. Nothing moves on by itself, and every step (and each sound exercise) can be skipped.<br>• **Every step shows its foundation** ("From Class 2", "From Classes 3–4", …) with a **Review Class** link. It opens in a new tab so the routine isn't lost.<br>• **Reused components:**<br>  – `VirtualPiano`: a 3-key range from the learner's own comfortable note (the Class 4/7 choice, as in Class 10).<br>  – `BeatGuide` on the Class 6 metronome engine: a count, then "mmm", plus the phrase guide.<br>  – `VoiceRecorder` for self-listening. The take is **played back, then discarded; it's never saved or uploaded**.<br>  – The Class 2 breathing orb (no digits, no holds, stoppable) and the Class 1 tile highlight.<br>• **Adaptive, but the learner decides.** An optional "Today's emphasis" (pitch / rhythm / note transitions / breath) gives that step 30 s more and its own version: 3 pitch notes, a third rhythm pass, a slow glide demo, or more breath cycles. It's suggested from the learner's own Class 10 focus and can be changed or turned off. There's no voice diagnosis and no score.<br>• **Readiness check:** Yes / Mostly / No on 6 questions (3 in Performance). Mostly yes → "You're ready to begin." Two or more No → "Take another moment. You don't need to force today's session."<br>• **"Your Warm-up Journey":** totals by type, the most practiced and most skipped step, and recent sessions. No streaks.<br>  – Saved locally first, then to `warmup_sessions`: type, times, duration, step keys and emphasis.<br>  – Finishing also logs the minutes under the practice log's "Warm-up" task.<br>• **Where it connects:**<br>  – **Class 10's intro** says "You've completed the first nine foundation classes", with [Start Warm-up] / [Continue to Recording].<br>  – **Class 10's pre-recording check and Progress → Before/After** ask "Would you like to warm up first?", then **return to the recording automatically**.<br>  – **Classes 11 and later** show a skippable "🎤 Prepare your voice" card. It's one component, added through `LessonKit.header`.<br>  – Recording never waits for a warm-up.<br>• **Comfort notice and class links.** A permanent comfort notice ("not medical advice") appears on both screens. "It does not replace your classes" links each difficulty to its class. |
 | Practice: daily checklist + timer | ✅ Working (local only) |
 | Journal, Projects, Progress, Achievements, Before/After | ✅ Working (local only) |
 | Share-a-class post generator | ✅ Working |
@@ -215,6 +219,7 @@ Status: ✅ fixed · 🔧 fixed, but needs your action · ⏳ open
 | B7 | 🟡 Low | Class uploads couldn't be played back. | ✅ Each upload has a play button |
 | B8 | 🟡 Low | `0001` migration wasn't re-runnable. | ✅ `drop policy if exists` before each policy. `0002` is re-runnable too. |
 | B9 | 🟡 Low | Practice timer under-counted in background tabs. | ✅ Wall-clock based |
+| B10 | 🟡 Low | The desktop nav didn't fit between 1024 and ~1150 px. Links ran 69 px past the screen edge at 1024, and "Continue Learning" / "Log In" wrapped. | ✅ The full link bar now starts at 1280 px, with the menu button below that. About shows inline from 1536 px (it's also in the footer). No overflow at 1024, 1100, 1280 or 1440 px. |
 
 ### Class 1 (interactive) — known limitations and design choices
 
@@ -308,6 +313,18 @@ Status: ✅ fixed · 🔧 fixed, but needs your action · ⏳ open
 | X2 | 🟡 Low | A recording only reaches the account once the device that made it is online and logged in. Until then, other devices show it but can't play it ("isn't stored on this device"). | By design |
 | X3 | 🟡 Low | Journal, practice and project history live in one JSON row per user (limit 2 MB). That's plenty for years of use, but not queryable per entry. | ⏳ Split into tables if public profiles need it |
 
+### Warm-up (common section) — known limitations and design choices
+
+| # | Severity | Issue | Status |
+|---|---|---|---|
+| WU1 | 🟡 Low | `warmup_sessions` only exists once **`0005_warmup_sessions.sql`** is run. Until then, history stays on each device and uploads the next time sync works. | 🔧 **Run `0005`** |
+| WU2 | — | A "Performance Recording" screen doesn't exist yet. The "warm up first?" prompt (`WarmupPrompt.beforeRecording(id, returnTo)`) currently appears at Class 10's pre-recording check and on Progress → Before/After. Add it to future recording screens the same way. | By design |
+| WU3 | — | Only **finished** warm-ups are saved. "End warm-up" records nothing and says stopping is fine, so the history can't pressure anyone to push through discomfort. | By design |
+| WU4 | — | The "how does my voice feel?" and readiness answers, and the self-listening take, are **not stored** anywhere. | By design (minimal data) |
+| WU5 | — | "Adaptive" means a suggestion from the learner's own Class 10 focus. The app never analyses recordings to decide what "needs attention". | By design |
+| WU6 | 🟡 Low | Skipping a class card or recording prompt hides it for the rest of the day, on that device only. | By design |
+| WU7 | 🟡 Low | The Rhythm step uses `BeatGuide` (Class 6's metronome engine, with clicks and beat lights). The full `Metronome` widget is too large for the studio screen. | By design |
+
 ---
 
 ## 4. Secondary app: `web/` (Learning Academy prototype)
@@ -331,7 +348,7 @@ A generic React/TypeScript "sequential course" engine: day lessons, quizzes, a f
 
 ### Now: make login and cross-device progress live (needs you)
 1. ~~Put the Supabase Project URL and key in `config.js`~~ ✅ Done (`b27c1f7`).
-2. In the Supabase SQL Editor, run **`0001_profiles.sql`, `0002_security_fixes.sql`, `0003_class_progress.sql`, `0004_learner_state.sql`**, in that order (§2).
+2. In the Supabase SQL Editor, run **`0001_profiles.sql`, `0002_security_fixes.sql`, `0003_class_progress.sql`, `0004_learner_state.sql`**, in that order (§2). Then run **`0005_warmup_sessions.sql`** (warm-up history, **WU1**) and check with two real accounts that each one sees only its own rows.
 3. Set the Site URL and redirect URLs (§4).
 4. Smoke-test on the live site:
    - Sign up (confirm by email; it's switched on for this project), log in, log out, forgot/reset password, profile edit, avatar upload.
@@ -372,6 +389,47 @@ A generic React/TypeScript "sequential course" engine: day lessons, quizzes, a f
 ---
 
 ## 6. Change log
+
+### 2026-10-27: common "🎤 Warm-up" section (uncommitted)
+
+A permanent, non-class preparation routine built from Classes 1–9 (see the feature row). It isn't Class 10, and no class was renumbered or renamed. Classes 1–9 weren't modified.
+
+New:
+- `js/warmup.js`
+- `js/components/warmupPrompt.js`
+- `js/pages/warmup.js`
+- `supabase/migrations/0005_warmup_sessions.sql`: one table, owner-only RLS (`auth.uid() = user_id`), no anon access.
+
+Changed:
+- `js/auth.js`: warm-up fetch and save.
+- `js/store.js`: a local-only `warmupSessions` slot, synced through its own table.
+- `js/app.js`: the routes. Background sync no longer redraws during a warm-up, which would restart it.
+- `js/router.js`
+- `js/components.js`: navigation (**B10**).
+- `js/pages/classes.js`
+- `js/lessons/lessonKit.js`
+- `js/pages/classDetail.js`
+- `js/lessons/firstProgressRecording.js`: the intro and prompt only. The baseline logic is untouched.
+- `js/pages/progress.js`
+- `css/styles.css`
+- `index.html`
+
+Checks run (headless Chrome, fake microphone; one-off scripts, not committed):
+- **Guest journey, 102 checks, all passed:**
+  - Locked at 0, 7 and 8 of 9, including direct session and `?return=` URLs. Unlocked at 9/9.
+  - Quick, Full and Performance run end to end, and every step's controls work. Breathing cues contain no digits. The self-listening take is never saved.
+  - Pause freezes the timer. "End warm-up" saves nothing.
+  - History, the "most skipped" stat and practice minutes survive a reload.
+  - After a warm-up started from Class 10, the learner is returned there automatically. An external `?return=` is ignored.
+  - The class card shows on Classes 11, 15, 19 and 20 but not on 1–9, and skipping it is remembered.
+  - The emphasis suggestion, the off switch and the 3-note pitch variant all work.
+  - Every route, including Classes 1–20 and `L2C01`, has no page errors.
+  - At 390 px, no page overflows, and the controls sit above the bottom nav.
+- **Two accounts, mock Supabase that enforces owner-only rows, 11 checks, all passed:**
+  - Alice's warm-up was saved with only the minimal fields and reached her second device.
+  - On the same browser, Bob saw the section locked and none of Alice's sessions.
+  - Querying Alice's `user_id` from Bob's session returned nothing.
+  - The real database policies still need a check once `0005` is run (**WU1**).
 
 ### 2026-10-26: interactive Class 19 "Melodic Patterns & Vocal Consistency" (uncommitted)
 

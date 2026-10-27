@@ -42,6 +42,7 @@ const ProgressPage = {
           </div>
           <p class="text-sm text-ink-500 max-w-sm">Upload a short recording at each milestone and let the timeline tell the real story.</p>
         </div>
+        ${WarmupPrompt.beforeRecording("progress", "#/progress")}
         <div class="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1">
           ${APP_DATA.MILESTONES.map(m => Components.MilestoneCard(m, Store.getState().milestoneUploads[m.id])).join("")}
         </div>

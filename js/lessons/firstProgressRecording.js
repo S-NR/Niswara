@@ -26,6 +26,10 @@
    bucket exactly as Classes 3-9 already do, and "baseline" is
    just a flag in this class's own ClassActivity answers (synced
    via class_progress, already owner-only RLS) — no new table.
+
+   The common Warm-up (js/warmup.js) unlocks right before this
+   class: the intro offers it, and the pre-recording check asks
+   "warm up first?" — both optional; recording never waits on it.
    ============================================================ */
 
 const FirstProgressRecordingLesson = (() => {
@@ -302,6 +306,18 @@ const FirstProgressRecordingLesson = (() => {
       <div class="max-w-5xl mx-auto px-5 lg:px-8 py-12 flex flex-col gap-20">
 
         ${chapter("intro", 1, "Record where you are now", `
+          ${Warmup.isUnlocked() ? `
+          <div class="wu-prompt rounded-3xl p-5 sm:p-6 mb-8 flex flex-col sm:flex-row sm:items-center gap-5">
+            <span class="wu-mic-md" aria-hidden="true">🎤</span>
+            <div class="flex-1">
+              <p class="text-ink-100">You've completed the first nine foundation classes.</p>
+              <p class="text-sm text-ink-400 mt-1">Before making your first progress recording, you can now use your Warm-up routine.</p>
+            </div>
+            <div class="flex flex-wrap gap-2 shrink-0">
+              <a href="${Warmup.href("quick", `#/classes/${cls.id}`)}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gold-500 text-ink-950 text-sm font-medium hover:bg-gold-400 transition-colors">Start Warm-up</a>
+              <a href="#" data-stage-link="check" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/15 text-ink-100 text-sm hover:bg-white/5 transition-colors">Continue to Recording ${icon("arrowRight", "w-3.5 h-3.5")}</a>
+            </div>
+          </div>` : ""}
           ${p("This recording is <strong class=\"text-ink-100\">not</strong> an audition. It is <strong class=\"text-ink-100\">not</strong> an examination. It is <strong class=\"text-ink-100\">not</strong> a professional studio recording.")}
           ${p("It's a snapshot of your current ability — honest, unpolished, and exactly what it needs to be.")}
           <div class="comfort-callout rounded-3xl border border-teal-300/25 bg-gradient-to-br from-teal-500/[0.10] to-transparent p-6 sm:p-8 mb-6">
@@ -331,6 +347,7 @@ const FirstProgressRecordingLesson = (() => {
 
         ${chapter("check", 3, "Pre-recording check", `
           ${narrow(`
+            ${WarmupPrompt.beforeRecording("class10", `#/classes/${cls.id}`)}
             <div class="flex flex-col gap-1 mb-5">
               ${PRE_CHECK_ITEMS.map((t, i) => `
                 <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">

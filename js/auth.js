@@ -208,6 +208,33 @@ const Auth = (() => {
       .select("version");
   }
 
+  /* ---- Warm-up history (supabase/migrations/0005_warmup_sessions.sql) ----
+     Append-only log of finished warm-ups; ids are made on the device, so saving twice is harmless. */
+
+  async function fetchWarmupSessions() {
+    if (!isConfigured || !currentSession) return notLoggedIn();
+    return client.from("warmup_sessions")
+      .select("id, warmup_type, started_at, completed_at, duration, completed_steps, skipped_steps, emphasis")
+      .eq("user_id", currentSession.user.id)
+      .order("completed_at", { ascending: false })
+      .limit(500);
+  }
+
+  async function saveWarmupSessions(sessions) {
+    if (!isConfigured || !currentSession) return notLoggedIn();
+    return client.from("warmup_sessions").upsert(sessions.map((s) => ({
+      id: s.id,
+      user_id: currentSession.user.id,
+      warmup_type: s.type,
+      started_at: s.startedAt,
+      completed_at: s.completedAt,
+      duration: s.duration,
+      completed_steps: s.completedSteps,
+      skipped_steps: s.skippedSteps,
+      emphasis: s.emphasis || null,
+    })), { onConflict: "id" });
+  }
+
   /* ---- Recordings: private bucket, path "<user_id>/<mediaId>" (owner-only policies) ---- */
 
   function recordingPath(mediaId) { return `${currentSession.user.id}/${mediaId}`; }
@@ -235,6 +262,7 @@ const Auth = (() => {
     getProfile, updateProfile, getPublicProfile, uploadAvatar, updateUserMetadata,
     fetchClassProgress, saveClassProgress, fetchClassNote, saveClassNote,
     fetchLearnerState, insertLearnerState, updateLearnerState,
+    fetchWarmupSessions, saveWarmupSessions,
     uploadRecording, downloadRecording, deleteRecording,
   };
 })();

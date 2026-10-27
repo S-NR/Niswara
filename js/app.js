@@ -6,6 +6,8 @@ Router.add("#/", HomePage);
 Router.add("#/journey", JourneyPage);
 Router.add("#/classes", ClassesPage);
 Router.add("#/classes/:id", ClassDetailPage);
+Router.add("#/warmup", WarmupPage);
+Router.add("#/warmup/:mode", WarmupSessionPage);
 Router.add("#/practice", PracticePage);
 Router.add("#/projects", ProjectsPage);
 Router.add("#/progress", ProgressPage);
@@ -81,13 +83,14 @@ Auth.onChange((session, event) => {
 
 // Progress arrived from another device: show it. Skipped while the learner is
 // typing so a background sync never wipes a half-written answer.
-// Also skipped while recording — a redraw would cancel the take in progress.
+// Also skipped while recording — a redraw would cancel the take in progress —
+// and during a warm-up, where a redraw would restart the routine.
 let pendingRemoteRender = false;
 let pendingTimer = null;
 function busyLearner() {
   const el = document.activeElement;
   const typing = el && el.closest && el.closest("#app") && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName);
-  return typing || VoiceRecorder.isRecording();
+  return typing || VoiceRecorder.isRecording() || WarmupSessionPage.inProgress();
 }
 function renderWhenFree() {
   clearTimeout(pendingTimer);

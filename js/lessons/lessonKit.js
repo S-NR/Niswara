@@ -45,6 +45,7 @@ const LessonKit = {
           <span>~${cls.estMinutes} min</span><span class="w-1 h-1 rounded-full bg-ink-600"></span>
           <span data-lesson-pct>${pct}% complete</span>
         </div>
+        ${WarmupPrompt.classCard(cls)}
       </section>`;
   },
 

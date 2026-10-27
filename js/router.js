@@ -65,7 +65,7 @@ const Router = (() => {
   function updateChrome(hash) {
     document.getElementById("navbar").innerHTML = Components.Navbar(hash);
     document.getElementById("mobile-nav").innerHTML = Components.MobileNav(hash);
-    document.getElementById("mobile-fab").innerHTML = hash.startsWith("#/classes") ? "" : Components.ContinueFab();
+    document.getElementById("mobile-fab").innerHTML = hash.startsWith("#/classes") || hash.startsWith("#/warmup") ? "" : Components.ContinueFab();
   }
 
   /** Re-run routing for the current hash (re-applies the requiresAuth guard). No-op until start(). */

@@ -13,14 +13,18 @@ Components.Navbar = (route) => {
     { href: "#/", label: "Home" },
     { href: "#/journey", label: "My Journey" },
     { href: "#/classes", label: "Classes" },
+    { href: "#/warmup", label: "🎤 Warm-up", common: true }, // the common section — not a class
     { href: "#/practice", label: "Practice" },
     { href: "#/projects", label: "Projects" },
     { href: "#/progress", label: "Progress" },
     { href: "#/resources", label: "Resources" },
     { href: "#/journal", label: "Journal" },
-    { href: "#/about", label: "About" },
+    { href: "#/about", label: "About", wideOnly: true }, // also in the footer; keeps the bar on one line at xl
   ];
   const isActive = (href) => href === "#/" ? route === "#/" : route.startsWith(href);
+  const desktopCls = (l) => isActive(l.href) ? "text-gold-300 bg-white/5"
+    : l.common ? "text-gold-300/90 hover:text-gold-200 hover:bg-gold-500/10"
+    : "text-ink-300 hover:text-ink-50 hover:bg-white/5";
   const session = typeof Auth !== "undefined" ? Auth.getSession() : null;
   const user = session ? session.user : null;
   const displayName = user ? (user.user_metadata && user.user_metadata.name ? user.user_metadata.name.split(" ")[0] : user.email.split("@")[0]) : "";
@@ -34,13 +38,13 @@ Components.Navbar = (route) => {
           <span class="font-display text-[16px] text-ink-50 tracking-[0.08em]">NISWARA</span>
         </span>
       </a>
-      <nav class="hidden lg:flex items-center gap-1 text-sm">
+      <nav class="hidden xl:flex items-center gap-1 text-sm">
         ${links.map(l => `
-          <a href="${l.href}" class="px-3 py-2 rounded-full transition-colors ${isActive(l.href) ? "text-gold-300 bg-white/5" : "text-ink-300 hover:text-ink-50 hover:bg-white/5"}">${l.label}</a>
+          <a href="${l.href}" class="${l.wideOnly ? "hidden 2xl:inline-flex" : ""} px-3 py-2 rounded-full whitespace-nowrap transition-colors ${desktopCls(l)}">${l.label}</a>
         `).join("")}
       </nav>
       <div class="flex items-center gap-2">
-        <a href="#/classes/${Store.getState().currentClassId}" id="continue-learning-btn" class="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold-500 text-ink-950 text-sm font-medium hover:bg-gold-400 transition-colors shadow-glow-sm">
+        <a href="#/classes/${Store.getState().currentClassId}" id="continue-learning-btn" class="hidden md:inline-flex items-center gap-2 whitespace-nowrap px-4 py-2 rounded-full bg-gold-500 text-ink-950 text-sm font-medium hover:bg-gold-400 transition-colors shadow-glow-sm">
           Continue Learning ${icon("arrowRight", "w-3.5 h-3.5")}
         </a>
         ${user ? `
@@ -49,13 +53,13 @@ Components.Navbar = (route) => {
             ${Utils.escapeHtml(displayName)}
           </a>
         ` : `
-          <a href="#/login" class="hidden sm:inline-flex items-center px-4 py-2 rounded-full border border-white/15 text-ink-100 text-sm hover:bg-white/5 transition-colors">Log In</a>
+          <a href="#/login" class="hidden sm:inline-flex items-center whitespace-nowrap px-4 py-2 rounded-full border border-white/15 text-ink-100 text-sm hover:bg-white/5 transition-colors">Log In</a>
         `}
-        <button data-action="toggleMobileMenu" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-full border border-white/10 text-ink-200">${icon("menu", "w-5 h-5")}</button>
+        <button data-action="toggleMobileMenu" class="xl:hidden w-10 h-10 flex items-center justify-center rounded-full border border-white/10 text-ink-200">${icon("menu", "w-5 h-5")}</button>
       </div>
     </div>
-    <nav id="mobile-menu" class="hidden lg:hidden border-t border-white/5 px-5 py-3 flex flex-col gap-1 bg-ink-950/95">
-      ${links.map(l => `<a href="${l.href}" data-action="closeMobileMenu" class="px-3 py-2.5 rounded-lg text-sm ${isActive(l.href) ? "text-gold-300 bg-white/5" : "text-ink-300"}">${l.label}</a>`).join("")}
+    <nav id="mobile-menu" class="hidden xl:hidden border-t border-white/5 px-5 py-3 flex flex-col gap-1 bg-ink-950/95">
+      ${links.map(l => `${l.common ? `<p class="px-3 pt-2 text-[10px] tracking-[0.2em] uppercase text-ink-600">Common</p>` : ""}<a href="${l.href}" data-action="closeMobileMenu" class="px-3 py-2.5 rounded-lg text-sm ${isActive(l.href) || l.common ? "text-gold-300" : "text-ink-300"} ${isActive(l.href) ? "bg-white/5" : ""}">${l.label}</a>`).join("")}
       <div class="border-t border-white/5 my-1"></div>
       ${user ? `
         <a href="#/dashboard" data-action="closeMobileMenu" class="px-3 py-2.5 rounded-lg text-sm text-ink-300">Dashboard</a>
@@ -74,9 +78,9 @@ Components.MobileNav = (route) => {
   const items = [
     { href: "#/", label: "Home", icon: "home" },
     { href: "#/classes", label: "Classes", icon: "grid" },
+    { href: "#/warmup", label: "Warm-up", icon: "mic" }, // My Journey stays in the top menu
     { href: "#/practice", label: "Practice", icon: "timer" },
     { href: "#/progress", label: "Progress", icon: "chart" },
-    { href: "#/journey", label: "Journey", icon: "map" },
   ];
   return `
   <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-ink-950/95 backdrop-blur-xl border-t border-white/5 pb-[env(safe-area-inset-bottom)]">

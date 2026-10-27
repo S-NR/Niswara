@@ -42,6 +42,7 @@ const Store = (() => {
       milestoneUploads: {},  // milestoneId -> { fileName, mediaId, date } (file itself lives in Media)
       classActivity: {},     // classId -> interactive-lesson record; synced separately (class_progress)
       classNotes: {},        // classId -> { body, updatedAt }; synced separately (class_notes)
+      warmupSessions: [],    // finished warm-ups (see Warmup); synced separately (warmup_sessions)
       createdAt: nowIso(),
       updatedAt: null,
     };
@@ -208,8 +209,8 @@ const Store = (() => {
 
   /* ---- Cloud sync support (see CloudSync) ---- */
 
-  // Interactive-lesson records and class notes have their own tables, so they're not part of learner_state.
-  const LOCAL_ONLY_FIELDS = ["classActivity", "classNotes"];
+  // Interactive-lesson records, class notes and warm-up history have their own tables, so they're not part of learner_state.
+  const LOCAL_ONLY_FIELDS = ["classActivity", "classNotes", "warmupSessions"];
 
   /** The part of the state that's stored in the account (learner_state.state). */
   function exportSyncState() {
@@ -452,6 +453,22 @@ const Store = (() => {
     writeLocal(); // ClassActivity syncs this itself (class_notes)
   }
 
+  /* ---- Warm-up history (synced to Supabase by Warmup) ---- */
+  function getWarmupSessions() {
+    return state.warmupSessions || [];
+  }
+
+  /** Adds sessions not already kept (by id), newest first. Returns true if anything was added. */
+  function mergeWarmupSessions(sessions) {
+    const byId = new Map(getWarmupSessions().map((s) => [s.id, s]));
+    let added = false;
+    sessions.forEach((s) => { if (!byId.has(s.id)) { byId.set(s.id, s); added = true; } });
+    if (!added) return false;
+    state.warmupSessions = [...byId.values()].sort((a, b) => (b.completedAt || "").localeCompare(a.completedAt || ""));
+    writeLocal(); // Warmup syncs this itself (warmup_sessions)
+    return true;
+  }
+
   /* ---- Practice log ---- */
   function getTodayLog() {
     const key = todayKey();
@@ -622,6 +639,7 @@ const Store = (() => {
     setMilestoneUpload, skillProgress, isAchievementUnlocked, overallStats,
     resetAll, todayKey, switchUser, migrateLegacyUploads,
     emptyClassActivity, getClassActivity, setClassActivity, getClassNote, setClassNote,
+    getWarmupSessions, mergeWarmupSessions,
     legacyClassIds,
     onPersist, exportSyncState, normalizeForSync, importSyncState, mergeSyncStates, referencedMediaIds,
   };

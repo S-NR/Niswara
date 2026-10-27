@@ -29,6 +29,7 @@ const ClassDetailPage = {
     const all = APP_DATA.CLASSES.slice().sort((a, b) => (a.levelId - b.levelId) || (a.number - b.number));
     const idx = all.findIndex(x => x.id === cls.id);
     const next = all[idx + 1];
+    const warmupCard = WarmupPrompt.classCard(cls);
 
     return `
     <section class="max-w-3xl mx-auto px-5 lg:px-8 py-10 sm:py-14">
@@ -44,6 +45,7 @@ const ClassDetailPage = {
         <span>${cls.difficulty}</span><span class="w-1 h-1 rounded-full bg-ink-600"></span>
         <span>${cls.estMinutes} min</span>
       </div>
+      ${warmupCard ? `<div class="-mt-6 mb-10">${warmupCard}</div>` : ""}
 
       <div class="flex flex-col gap-10">
 
