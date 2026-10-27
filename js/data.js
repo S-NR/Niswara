@@ -717,22 +717,46 @@ const APP_DATA = (() => {
   };
 
   /* ---------- Level 1, Class 20 (not written yet) ---------- */
-  const level1Upcoming = [
-    { title: "Melodic Movement & Controlled Range", category: "Pitch", skillTag: "pitch", goal: "Move smoothly across a comfortable range",
-      learn: "Ascending and descending patterns, small interval movement, and connecting notes smoothly while maintaining pitch and avoiding throat tension." },
-  ].map((c, i) => ({
-    number: 20 + i, title: c.title, category: c.category, skillTag: c.skillTag,
-    difficulty: "Beginner", estMinutes: 35,
-    comingSoon: true, // no lesson content yet — can be viewed but not completed (see Store.completeClass)
-    description: `Coming soon: ${c.goal.charAt(0).toLowerCase()}${c.goal.slice(1)}.`,
+  /* ---------- Level 1, Class 20 (interactive — the final Level 1 class) ---------- */
+  const melodicMovementClass = {
+    number: 20, title: "Melodic Movement & Controlled Range", category: "Pitch", skillTag: "pitch",
+    difficulty: "Beginner", estMinutes: 45,
+    // Rendered by the interactive lesson in js/lessons/melodicMovement.js
+    interactive: "melodic-movement",
+    subtitle: "Move between notes without forcing your voice.",
+    description: "An interactive lesson: controlled melodic movement — ascending, descending, small intervals, matching a destination note, and a comfortable-area exploration. Not a vocal-range competition. Comfort first — range comes later.",
     content: {
-      whatYoullLearn: c.learn,
-      whyItMatters: "Content is released gradually so each skill builds on the foundations before it.",
-      theory: "Coming soon.",
-      guidedPractice: [],
-      assignment: { instructions: [], questions: [] }
+      whatYoullLearn: "How to move between notes comfortably — ascending, descending, small intervals vs. larger skips, matching a destination note, connecting two notes smoothly, and exploring your comfortable singing area for today without chasing a highest or lowest note.",
+      whyItMatters: "Singing is movement — up, down, across, between notes. A smaller range with good control is more valuable at this stage than a large, forced one. Your range is not a number to chase; your control is more important than your highest note.",
+      theory: "“Comfort first. Range comes later.” Never push to reach a note, never increase volume to reach a higher one, never force the throat. If a note feels uncomfortable, stop and move the exercise into a comfortable range — today's comfortable area may change from day to day, and that's normal.",
+      guidedPractice: [
+        "Listened to and hummed upward and downward movement, explored small intervals and step vs. skip, matched a destination note, connected two notes smoothly, explored a comfortable range without labelling it permanent, connected movement to dynamics, rhythm and phrase shape, then recorded three takes and identified one difficult movement to practise slowly.",
+      ],
+      assignment: {
+        // The six takes live in the lesson; these are the questions answered afterwards
+        instructions: [
+          "Take 1 — hum the pattern",
+          "Take 2 — sing it on \"AH\"",
+          "Take 3 — sing it on \"OO\"",
+          "Take 4 — sing it with simple lyrics",
+          "Take 5 — focus on smooth movement",
+          "Take 6 — focus on comfort and relaxed singing",
+        ],
+        questions: [
+          "Was ascending comfortable?",
+          "Was descending comfortable?",
+          "Which note was hardest?",
+          "Did I push any note?",
+          "Did my volume change unintentionally?",
+          "Did I maintain pitch?",
+          "Did I maintain rhythm?",
+          "Did the movement feel connected?",
+          "What is my comfortable area today?",
+          "What single movement should I practice next?",
+        ]
+      }
     }
-  }));
+  };
 
   /* ---------- Placeholder classes for Levels 2–8 ---------- */
   function placeholderLevel(levelId, category, skillTag, titles, difficulty, startNumber = 1) {
@@ -773,7 +797,7 @@ const APP_DATA = (() => {
   };
 
   const CLASSES = [
-    ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, ...level1Upcoming].map(c => ({ ...c, levelId: 1 })),
+    ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass].map(c => ({ ...c, levelId: 1 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))

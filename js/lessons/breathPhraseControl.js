@@ -529,6 +529,10 @@ const BreathPhraseControlLesson = (() => {
     }));
     LessonKit.loadAndRefresh(container, classId, params);
 
+    /* ---- breathing circle (Exercise 1, visual pace guide only — matches Classes 13/14/16/17/18's pattern) ---- */
+    const breatheCircle = $("[data-breathe-circle]");
+    if (breatheCircle) breatheCircle.classList.add("is-running");
+
     /* ---- generic self-assess wiring (shared handler, filtered by group id) ---- */
     const assessMap = {
       "bp-breathe-assess": (v) => { set("breathe", "assess", v); },

@@ -24,4 +24,5 @@ const InteractiveLessons = {
   "connecting-phrases": ConnectingPhrasesLesson,
   "musical-phrasing": MusicalPhrasingLesson,
   "melodic-patterns": MelodicPatternsLesson,
+  "melodic-movement": MelodicMovementLesson,
 };
