@@ -701,6 +701,35 @@ const BasicVocalDynamicsLesson = (() => {
     wireEx("crescendo", EX.crescendo(), () => [base()]);
     wireEx("decrescendo", EX.decrescendo(), () => [base()]);
 
+    /* ---- Exercises 3-6: the moving volume guide (+ your loudness line over it) ---- */
+    const GUIDES = { softToMedium: ["ve-up", 4, "up", ["soft", "medium"]], mediumToSoft: ["ve-down", 4, "down", ["medium", "soft"]], crescendo: ["ve-cresc", 6, "up", ["p", "mp", "mf", "f"]], decrescendo: ["ve-decresc", 6, "down", ["f", "mf", "mp", "p"]] };
+    const guides = {};
+    Object.entries(GUIDES).forEach(([key, [id, seconds, shape, labels]]) => { guides[key] = own(VolumeEnvelope.wire(container, id, { seconds, shape, labels, getNote: base })); });
+    const loudCache = new Map();
+    async function loudnessOf(mediaId) {
+      if (loudCache.has(mediaId)) return loudCache.get(mediaId);
+      let blob = await Media.getBlob(mediaId).catch(() => null);
+      if (!blob) { // another device: getUrl downloads it from the account
+        const url = await Media.getUrl(mediaId).catch(() => null);
+        blob = url ? await fetch(url).then((r) => r.blob()).catch(() => null) : null;
+      }
+      if (!blob) return null;
+      const res = await LoudnessAnalysis.analyze(blob).catch(() => null);
+      loudCache.set(mediaId, res);
+      return res;
+    }
+    const painted = {};
+    async function paintGuides() {
+      for (const key of Object.keys(guides)) {
+        const t = exState(rec0(), key).takes.take;
+        if (!t || !t.mediaId || painted[key] === t.mediaId) continue;
+        const res = await loudnessOf(t.mediaId);
+        if (res) { guides[key].setCurve(res.curve); painted[key] = t.mediaId; }
+      }
+    }
+    paintGuides();
+    cleanups.push(ClassActivity.onChange((id) => { if (id === classId && container.isConnected) paintGuides(); }));
+
     /* ---- Exercise 7 visualization (StabilityPanel, reused as-is) ---- */
     const stabPanel = $("[data-bd-stability-viz]");
     if (stabPanel) {
