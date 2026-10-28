@@ -149,6 +149,7 @@ const SmoothNoteTransitionsLesson = (() => {
 
   const exState = (rec, key) => { const s = (rec.answers.exercises || {})[key] || {}; return { ...s, takes: s.takes || {} }; };
   const exDone = (rec, key) => !!(exState(rec, key).takes.take && exState(rec, key).takes.take.assessment);
+  const recorded = (rec, key) => !!(exState(rec, key).takes.take && exState(rec, key).takes.take.mediaId);
 
   function assignmentDone(rec, cls) {
     const a = A(rec, "assignment");
@@ -160,7 +161,7 @@ const SmoothNoteTransitionsLesson = (() => {
     const out = {};
     const hear = A(rec, "hear");
     if (hear.up && hear.down) out.twoNoteListening = true;
-    if (exDone(rec, "matchA") && exDone(rec, "matchB")) out.individualMatching = true;
+    if (recorded(rec, "matchA") && recorded(rec, "matchB")) out.individualMatching = true; // no self-assessment question on these two
     if (exDone(rec, "up") && exDone(rec, "down")) out.twoNoteTransition = true;
     if (exDone(rec, "slow")) out.slowTransition = true;
     if (exDone(rec, "ascend")) out.ascending = true;
