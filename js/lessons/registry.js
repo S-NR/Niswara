@@ -32,4 +32,6 @@ const InteractiveLessons = {
   "foundation-final-assessment": FoundationFinalAssessmentLesson,
   "voice-placement": VoicePlacementLesson,
   "resonance": ResonanceLesson,
+  "chest-voice-foundations": ChestVoiceFoundationsLesson,
+  "head-voice-foundations": HeadVoiceFoundationsLesson,
 };

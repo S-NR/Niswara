@@ -779,11 +779,12 @@ const APP_DATA = (() => {
   }
 
   const levelClassDefs = {
-    // Classes 1 "Voice Placement" and 2 "Resonance" are now real, authored classes
-    // (voicePlacementClass, resonanceClass below) — these remaining 8 stay comingSoon
-    // placeholders, numbered 3-10 via startNumber.
-    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 3,
-      titles: ["Chest Voice", "Head Voice", "Mixed Voice", "Vocal Range", "Dynamics", "Expression", "Phrasing", "First Performance Assessment"] },
+    // Classes 1 "Voice Placement", 2 "Resonance", 3 "Chest Voice Foundations" and 4 "Head Voice
+    // Foundations" are now real, authored classes (voicePlacementClass, resonanceClass,
+    // chestVoiceFoundationsClass, headVoiceFoundationsClass below) — these remaining 6 stay
+    // comingSoon placeholders, numbered 5-10 via startNumber.
+    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 5,
+      titles: ["Mixed Voice", "Vocal Range", "Dynamics", "Expression", "Phrasing", "First Performance Assessment"] },
     3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
       titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
@@ -1032,9 +1033,60 @@ const APP_DATA = (() => {
     }
   };
 
+  /* ---------- Level 2, Class 3 (interactive) ---------- */
+  const chestVoiceFoundationsClass = {
+    number: 3, title: "Chest Voice Foundations", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/chestVoiceFoundations.js
+    interactive: "chest-voice-foundations",
+    subtitle: "Explore a comfortable, speech-like vocal quality — no forcing, no searching for a sensation.",
+    description: "An interactive lesson: chest voice as a comfortable, speech-like vocal coordination — not a sensation to find, and not the same as shouting, speaking loudly, or forcing low notes. Gentle humming, a simple vowel, and optional pitch exploration.",
+    content: {
+      whatYoullLearn: "How to explain chest voice in beginner-friendly language, explore a comfortable speech-like sound at an easy pitch, notice the difference between speaking and gently sustaining a voiced sound, and understand that chest voice is not the same as shouting, speaking loudly, or forcing low notes.",
+      whyItMatters: "Comfort and consistency matter more than whether a voice sounds professional yet. Chest voice is a coordination you already use when you speak comfortably — not a sensation to search for or force.",
+      theory: "Chest voice is a commonly used term for a vocal coordination often associated with comfortable speaking and lower-to-middle singing pitches. Some singers notice vibration around the chest, but sensations differ between people, and the name doesn't mean sound is produced only in the chest.",
+      guidedPractice: [
+        "Listened to my speaking voice, explored a gentle voiced “mmm” sound, tried “mmm-ah,” explored one comfortable reference note, compared comfortable exploration with what to avoid, and reflected on comfort and tension rather than judging my voice.",
+      ],
+      assignment: {
+        instructions: [
+          "One short sentence, spoken naturally",
+          "Two comfortable “mmm-ah” repetitions",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 4 (interactive) ---------- */
+  const headVoiceFoundationsClass = {
+    number: 4, title: "Head Voice Foundations", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/headVoiceFoundations.js
+    interactive: "head-voice-foundations",
+    subtitle: "Explore a lighter vocal quality — gently, without forcing a sound or a sensation.",
+    description: "An interactive lesson: head voice as a lighter vocal coordination, not proof that sound is produced in the head. A gentle 'oo', a small pitch movement, an optional tiny glide, and a non-judging comparison with Class 3's chest-voice exploration.",
+    content: {
+      whatYoullLearn: "What singers generally mean by 'head voice', that it's a term for vocal coordination rather than a literal sound source, how to explore a gentle, lighter sound without forcing pitch or volume, and how to reflect on comfort and effort instead of judging vocal quality.",
+      whyItMatters: "Not everyone experiences an obvious difference immediately, and that's normal. Comparing sensations honestly — without needing a 'right' answer — matters more than identifying a register correctly on the first try.",
+      theory: "Chest voice and head voice are terms for vocal coordination, not two completely separate physical sound sources. Some singers notice sensations around the face or head; others don't. The goal is exploration, not achieving a particular sound.",
+      guidedPractice: [
+        "Relaxed and listened to my speaking voice, explored a gentle 'oo' sound, tried a small pitch movement, optionally explored a tiny glide, compared the 'oo' with Class 3's 'mmm-ah' without judging either, and reflected on comfort and effort.",
+      ],
+      assignment: {
+        instructions: [
+          "One short sentence, spoken naturally",
+          "Two comfortable “oo” sounds",
+          "One small pitch glide, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
   const CLASSES = [
     ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
-    ...[voicePlacementClass, resonanceClass].map(c => ({ ...c, levelId: 2 })),
+    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass].map(c => ({ ...c, levelId: 2 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
