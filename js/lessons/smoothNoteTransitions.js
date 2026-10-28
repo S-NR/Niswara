@@ -147,6 +147,8 @@ const SmoothNoteTransitionsLesson = (() => {
     breath: () => transitionEx("Exercise 11 · Breath", "A phrase on one comfortable breath", "Breathe comfortably, then sing the three notes as one phrase, finishing naturally.", "Your phrase", null),
   };
 
+  const matchEx = (which, midi) => ({ eyebrow: `Note ${which}`, title: NoteUtils.name(midi), intro: "Play it, then sing it back.", slots: [{ key: "take", label: `Note ${which}`, hint: "A comfortable, brief note" }], assessment: null });
+
   const exState = (rec, key) => { const s = (rec.answers.exercises || {})[key] || {}; return { ...s, takes: s.takes || {} }; };
   const exDone = (rec, key) => !!(exState(rec, key).takes.take && exState(rec, key).takes.take.assessment);
   const recorded = (rec, key) => !!(exState(rec, key).takes.take && exState(rec, key).takes.take.mediaId);
@@ -340,8 +342,8 @@ const SmoothNoteTransitionsLesson = (() => {
         ${chapter("hear", 5, "Exercise 2 — Match each note separately", `
           ${narrow(p("Before transitioning, make sure you can match both notes on their own: Note A, then Note B."))}
           <div class="grid sm:grid-cols-2 gap-4">
-            ${PitchMatchExercise.render("st-matchA", { eyebrow: "Note A", title: N(b), intro: "Play it, then sing it back.", slots: [{ key: "take", label: "Note A", hint: "A comfortable, brief note" }], assessment: null })}
-            ${PitchMatchExercise.render("st-matchB", { eyebrow: "Note B", title: N(b + STEP), intro: "Play it, then sing it back.", slots: [{ key: "take", label: "Note B", hint: "A comfortable, brief note" }], assessment: null })}
+            ${PitchMatchExercise.render("st-matchA", matchEx("A", b))}
+            ${PitchMatchExercise.render("st-matchB", matchEx("B", b + STEP))}
           </div>
           ${p("Note A ↓ Note B — before Note A → Note B.")}
         `)}
@@ -543,13 +545,13 @@ const SmoothNoteTransitionsLesson = (() => {
     cleanups.push(() => container.removeEventListener("click", onAssess));
 
     /* ---- Exercise 2: match A / B separately ---- */
-    controllers.matchA = own(PitchMatchExercise.wire(container, "st-matchA", { slots: [{ key: "take" }], assessment: null }, {
+    controllers.matchA = own(PitchMatchExercise.wire(container, "st-matchA", matchEx("A", base()), {
       classId, exerciseId: "matchA", state: (rec0().answers.exercises || {}).matchA || {},
       getNotes: () => [base()], isComplete: (s) => !!(s.takes.take && s.takes.take.mediaId),
       onState: (s) => { set("exercises", "matchA", s); syncCheckpoints(); refreshLive(); },
       onRecorded: () => ClassActivity.bump(classId, "recordings"),
     }));
-    controllers.matchB = own(PitchMatchExercise.wire(container, "st-matchB", { slots: [{ key: "take" }], assessment: null }, {
+    controllers.matchB = own(PitchMatchExercise.wire(container, "st-matchB", matchEx("B", base() + STEP), {
       classId, exerciseId: "matchB", state: (rec0().answers.exercises || {}).matchB || {},
       getNotes: () => [base() + STEP], isComplete: (s) => !!(s.takes.take && s.takes.take.mediaId),
       onState: (s) => { set("exercises", "matchB", s); syncCheckpoints(); refreshLive(); },
