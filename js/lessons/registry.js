@@ -30,4 +30,6 @@ const InteractiveLessons = {
   "register-awareness": RegisterAwarenessLesson,
   "singing-complete-song": SingingCompleteSongLesson,
   "foundation-final-assessment": FoundationFinalAssessmentLesson,
+  "voice-placement": VoicePlacementLesson,
+  "resonance": ResonanceLesson,
 };

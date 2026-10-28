@@ -197,6 +197,7 @@ const StabilityPanel = (() => {
       if (my !== token) return;
       const refs = take.notes;
       const res = opts.chain ? PitchStability.assessChain(analysis, refs) : PitchStability.assess(analysis, refs[0]);
+      console.info("[PitchStability]", id, { peak: analysis.peak, duration: analysis.duration, loudSeconds: analysis.loudSeconds, voicedSeconds: analysis.voicedSeconds, frames: analysis.frames.length, result: res });
       const heard = opts.heard ? opts.heard() : null;
       const lines = opts.chain
         ? (res.reliable ? ["Look for a short, fairly flat stretch on each line before the move — that's the note settling."] : PitchStability.describe(res))

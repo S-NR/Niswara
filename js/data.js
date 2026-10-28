@@ -779,8 +779,11 @@ const APP_DATA = (() => {
   }
 
   const levelClassDefs = {
-    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate",
-      titles: ["Vocal Placement", "Resonance", "Chest Voice", "Head Voice", "Mixed Voice", "Vocal Range", "Dynamics", "Expression", "Phrasing", "First Performance Assessment"] },
+    // Classes 1 "Voice Placement" and 2 "Resonance" are now real, authored classes
+    // (voicePlacementClass, resonanceClass below) — these remaining 8 stay comingSoon
+    // placeholders, numbered 3-10 via startNumber.
+    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 3,
+      titles: ["Chest Voice", "Head Voice", "Mixed Voice", "Vocal Range", "Dynamics", "Expression", "Phrasing", "First Performance Assessment"] },
     3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
       titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
@@ -979,8 +982,59 @@ const APP_DATA = (() => {
     }
   };
 
+  /* ---------- Level 2, Class 1 (interactive) ---------- */
+  const voicePlacementClass = {
+    number: 1, title: "Voice Placement", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner–Intermediate", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/voicePlacement.js
+    interactive: "voice-placement",
+    subtitle: "Discover a comfortable, clear, and easy way to begin shaping your singing tone.",
+    description: "An interactive lesson: voice placement as a teaching concept for exploring vocal sensation and sound — not a literal instruction to move the voice into a body part. Gentle humming, vowel and pitch exploration at an easy, comfortable volume.",
+    content: {
+      whatYoullLearn: "How to explain voice placement in beginner-friendly language, recognize comfortable versus forced sound production, explore a few gentle vocal exercises at an easy pitch and volume, listen to how small changes affect vocal tone, and record observations about what feels easy, clear or uncomfortable.",
+      whyItMatters: "Singers experience sensations differently, and the sound heard, ease of production, and absence of strain matter more than forcing a particular sensation. Noticing this honestly, without chasing a specific feeling, is what prepares a beginner for resonance work in the next class.",
+      theory: "Voice placement is a way of exploring the perceived focus and quality of vocal sound. The sound we hear is affected by vocal-fold vibration and the shape of the vocal tract — throat, mouth and tongue. Vibration sensations around the lips, face or chest may occur, but they are not reliable standalone proof of correct technique. A comfortable tone does not need to be loud.",
+      guidedPractice: [
+        "Checked in with how my speaking voice felt, explored an easy hum, spoke into a gentle hum, explored three vowels without pushing the sound, tried a nearby note and returned to a comfortable one, and listened back for comfort and clarity.",
+      ],
+      assignment: {
+        instructions: [
+          "A short, easy hum",
+          "One or two comfortable vowels",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 2 (interactive) ---------- */
+  const resonanceClass = {
+    number: 2, title: "Resonance", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner–Intermediate", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/resonance.js
+    interactive: "resonance",
+    subtitle: "Discover how small, comfortable changes shape your vocal tone.",
+    description: "An interactive lesson: resonance as the vocal tract shaping the sound vocal-fold vibration produces — not a sensation to chase, and not the same as volume. Gentle humming, vowel comparison, soft-vs-normal volume, and pitch exploration.",
+    content: {
+      whatYoullLearn: "How to explain resonance in beginner-friendly language, understand how the shape of the vocal tract affects vocal tone, explore comfortable changes in vowel sound, compare gentle humming, speaking and vowel sounds, recognize the difference between a tone change and simply singing louder, and record personal observations without judging the voice harshly.",
+      whyItMatters: "Resonance is not the same as volume, and not every singer feels the same sensation in the same place. Noticing tone by listening — rather than chasing a particular vibration or forcing more volume — is what keeps this exploration honest and comfortable.",
+      theory: "Vocal-fold vibration produces the initial sound; the vocal tract — throat, mouth, tongue — shapes and filters it. Vowel shapes influence the resulting tone. Nasal resonance and oral vowel shaping are related concepts, but neither means forcing air through the nose. Different voices naturally have different tone qualities.",
+      guidedPractice: [
+        "Listened for the difference between ordinary speech and a gentle sung sound, explored an easy hum, compared three vowel shapes, compared soft and normal volume on one vowel, explored a nearby pitch and returned to a comfortable note, and compared recordings for audible differences in tone.",
+      ],
+      assignment: {
+        instructions: [
+          "Gentle humming",
+          "Two comfortable vowels",
+        ],
+        questions: []
+      }
+    }
+  };
+
   const CLASSES = [
     ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
+    ...[voicePlacementClass, resonanceClass].map(c => ({ ...c, levelId: 2 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
