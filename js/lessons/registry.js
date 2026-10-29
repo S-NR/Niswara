@@ -34,4 +34,11 @@ const InteractiveLessons = {
   "resonance": ResonanceLesson,
   "chest-voice-foundations": ChestVoiceFoundationsLesson,
   "head-voice-foundations": HeadVoiceFoundationsLesson,
+  "connecting-chest-head": ConnectingChestHeadLesson,
+  "intro-mixed-coordination": IntroMixedCoordinationLesson,
+  "vowel-modification": VowelModificationLesson,
+  "resonance-tone-colour": ResonanceToneColourLesson,
+  "projection-without-pushing": ProjectionWithoutPushingLesson,
+  "register-transitions": RegisterTransitionsLesson,
+  "controlled-range-development": ControlledRangeDevelopmentLesson,
 };

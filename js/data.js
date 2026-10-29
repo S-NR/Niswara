@@ -779,12 +779,14 @@ const APP_DATA = (() => {
   }
 
   const levelClassDefs = {
-    // Classes 1 "Voice Placement", 2 "Resonance", 3 "Chest Voice Foundations" and 4 "Head Voice
-    // Foundations" are now real, authored classes (voicePlacementClass, resonanceClass,
-    // chestVoiceFoundationsClass, headVoiceFoundationsClass below) — these remaining 6 stay
-    // comingSoon placeholders, numbered 5-10 via startNumber.
-    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 5,
-      titles: ["Mixed Voice", "Vocal Range", "Dynamics", "Expression", "Phrasing", "First Performance Assessment"] },
+    // Classes 1-11 ("Voice Placement" ... "Controlled Range Development") are now real, authored
+    // classes. Class 10's spec had already consumed the last original placeholder, so there was
+    // nothing left to rename here — Class 11's own spec instead names the real Class 12 as
+    // "Sustained Notes and Stability", so this is a brand-new placeholder entry (not a rename),
+    // the first time this list has needed genuine addition rather than renaming. Whether Level 2
+    // keeps growing after Class 12 is for that class's own spec to reveal — not guessed here.
+    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 12,
+      titles: ["Sustained Notes and Stability"] },
     3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
       titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
@@ -1084,9 +1086,193 @@ const APP_DATA = (() => {
     }
   };
 
+  /* ---------- Level 2, Class 5 (interactive) ---------- */
+  const connectingChestHeadClass = {
+    number: 5, title: "Connecting Chest & Head Voice", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/connectingChestHead.js
+    interactive: "connecting-chest-head",
+    subtitle: "Begin exploring gentle transitions between comfortable, speech-like and lighter vocal sounds.",
+    description: "An interactive lesson: how the voice can change quality across its range, and a first, gentle exploration of moving between comfortable, speech-like sound (Class 3) and a lighter sound (Class 4). Not a promise of a seamless transition — 'mix voice' is a later skill.",
+    content: {
+      whatYoullLearn: "That the voice can change in quality across its range, that chest and head voice describe vocal coordination rather than separate sound sources, how to explore small comfortable pitch movements, that transitions may feel uneven or produce a voice break while learning, and why ease and gradual exploration matter more than a perfect transition.",
+      whyItMatters: "One short lesson can't create a seamless register transition, and it isn't trying to. Noticing how the voice moves — evenly or not — is useful information either way, and forcing a transition (through volume or pushing) is exactly what this class asks the learner not to do.",
+      theory: "A transition is a change in how the voice coordinates as pitch or vocal quality changes. It may be smooth, uneven, or noticeable, and the voice doesn't have to sound perfectly blended at this stage. 'Mix voice' is a later skill and shouldn't be forced here.",
+      guidedPractice: [
+        "Reviewed Classes 3 and 4, compared a comfortable 'ah' with a gentle 'oo', tried a small pitch glide, optionally explored a further 'oo' or lip trill, learned what a transition is without needing to force one, and reflected on comfort and tension rather than a perfect result.",
+      ],
+      assignment: {
+        instructions: [
+          "One short sentence, spoken naturally",
+          "One comfortable “ah”",
+          "One comfortable “oo”",
+          "One small glide, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 6 (interactive) ---------- */
+  const introMixedCoordinationClass = {
+    number: 6, title: "Introduction to Mixed Coordination", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/introMixedCoordination.js
+    interactive: "intro-mixed-coordination",
+    subtitle: "A broad, gentle introduction to balancing comfortable chest- and head-voice qualities.",
+    description: "An interactive lesson: mixed coordination as a broad teaching term for balancing qualities commonly associated with chest and head voice — not a literal 50/50 split, not proof via any single sensation, and not something to force into existing in one lesson.",
+    content: {
+      whatYoullLearn: "What singers mean by 'mix' or 'mixed coordination', why it isn't simply singing loudly in chest voice or breathily in head voice, why vocal coordination depends on more than one sensation, how to explore comfortable sounds without forcing a transition, and why gradual, consistent practice matters more than achieving a particular sound today.",
+      whyItMatters: "Mixed coordination is a broad teaching term, and singers may use it somewhat differently. No single sensation proves the voice is 'mixed' — comfort and repeatability matter more than chasing a recognisable sound in one short lesson.",
+      theory: "'Mix' describes coordination that balances qualities commonly associated with chest and head voice. It is not a literal 50/50 combination. A voice break is not a failure, and increasing volume is never the solution to a difficult transition.",
+      guidedPractice: [
+        "Reviewed Classes 3-5, compared a comfortable 'ah' and 'oo', tried a small upward pitch movement, explored a gentle 'mm-oo' or 'ng-oo' transition (or the easier separate alternative), learned what mixed coordination is not, and reflected on comfort and effort rather than a perfect result.",
+      ],
+      assignment: {
+        instructions: [
+          "One short sentence, spoken naturally",
+          "One comfortable “ah”",
+          "One comfortable “oo”",
+          "One small movement between pitches, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 7 (interactive) ---------- */
+  const vowelModificationClass = {
+    number: 7, title: "Vowel Modification Foundations", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/vowelModification.js
+    interactive: "vowel-modification",
+    subtitle: "Hear and explore how small changes in vowel shape affect the sound and comfort of singing.",
+    description: "An interactive lesson: the five basic vowel sounds (ah/ee/oo/eh/oh), how mouth, tongue and lip shape affect them, and how singing may call for a small, gentle adjustment — never a distorted word. The first Level 2 class about diction rather than register coordination.",
+    content: {
+      whatYoullLearn: "What vowels are and how they differ from consonants, how mouth opening, tongue position and lip shape influence vowel sounds, why vowel sounds can change slightly when singing, how to explore vowel shapes without exaggerating or forcing them, and why clear pronunciation and comfortable singing both matter.",
+      whyItMatters: "Vowel modification is gradual and depends on pitch, voice, language, musical context and the individual singer — there's no single vowel shape that's correct for every person or every note.",
+      theory: "Vowel modification is a small adjustment, not a completely different word. Clear pronunciation remains important, and different musical phrases and languages may call for different choices.",
+      guidedPractice: [
+        "Explored the five basic vowel sounds, compared vowel pairs, tried gentle transitions between vowels, noticed how a vowel can change slightly on a comfortable note, and reflected on which vowels felt easiest without exaggerating or forcing any of them.",
+      ],
+      assignment: {
+        instructions: [
+          "“Ah,” “ee” and “oo,” spoken naturally",
+          "“Ah–oh” once or twice",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 8 (interactive) ---------- */
+  const resonanceToneColourClass = {
+    number: 8, title: "Resonance and Tone Colour", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/resonanceToneColour.js
+    interactive: "resonance-tone-colour",
+    subtitle: "Explore natural differences in vocal tone colour through comfortable sounds and small vowel changes.",
+    description: "An interactive lesson: tone colour (timbre) as the quality that distinguishes one voice from another — vocal-tract shape, vowel choice and coordination all play a part. Connects directly back to Class 2 (Resonance) and Class 7 (Vowel Modification).",
+    content: {
+      whatYoullLearn: "What singers mean by vocal tone colour or timbre, how vowel shape and vocal-tract configuration influence the sound, how to compare vocal sounds without assuming one is universally better, how to explore small tone-colour changes without pushing volume or pitch, and why a healthy, comfortable sound matters more than imitating another singer's tone.",
+      whyItMatters: "Words like 'bright,' 'warm,' 'dark' and 'light' are descriptive listening terms, not rigid categories or medical assessments. Two people can sing the same note at the same volume and still sound different — and that's normal, not a problem to fix.",
+      theory: "Tone colour is influenced by vocal-tract shape, vowel choice and vocal coordination. A brighter tone isn't automatically better than a warmer one. Consistency and comfort matter more than trying to sound artificially bright, dark or powerful.",
+      guidedPractice: [
+        "Listened to my natural speaking voice, compared four comfortable vowels, explored two versions of a comfortable 'ah,' listened for contrast between them, tried a vowel on a comfortable note, and reflected on what I noticed without forcing brightness, darkness or volume.",
+      ],
+      assignment: {
+        instructions: [
+          "A short sentence, spoken naturally",
+          "“Ah” and “oo,” comfortably",
+          "One “ah” with a small, natural vowel adjustment",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 9 (interactive) ---------- */
+  const projectionWithoutPushingClass = {
+    number: 9, title: "Projection Without Pushing", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/projectionWithoutPushing.js
+    interactive: "projection-without-pushing",
+    subtitle: "Discover comfortable vocal clarity — the difference between easy, audible singing and forced loudness.",
+    description: "An interactive lesson: vocal projection as being heard clearly for the situation — not shouting. Articulation, vowel shape and comfortable volume all contribute to clarity, which matters more than raw loudness.",
+    content: {
+      whatYoullLearn: "What vocal projection means in beginner-friendly language, why projection isn't the same as shouting, how comfortable articulation and natural vocal coordination contribute to clarity, how to explore a slightly clearer sound without increasing effort, and why volume, pitch and vocal effort should be managed separately.",
+      whyItMatters: "A louder sound is not automatically a better sound. Microphone use, room acoustics and distance also affect how audible a singer sounds — vocal effort isn't always the solution to an acoustic problem.",
+      theory: "Projection means allowing the voice to be heard clearly for the situation. Clarity can be influenced by articulation, vowel shape, vocal coordination, and appropriate volume — not by forcing more air or tightening the throat.",
+      guidedPractice: [
+        "Checked a comfortable speaking baseline, practised clear articulation at the same volume, explored a gentle voiced phrase, compared a natural version with a more clearly articulated one, learned the difference between comfortable effort and forcing, and reflected on volume and tension rather than loudness.",
+      ],
+      assignment: {
+        instructions: [
+          "One short sentence, spoken naturally",
+          "The same sentence, with clear articulation",
+          "One small portion on a comfortable pitch, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 10 (interactive) ---------- */
+  const registerTransitionsClass = {
+    number: 10, title: "Register Transitions and Vocal Continuity", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/registerTransitions.js
+    interactive: "register-transitions",
+    subtitle: "Notice changes in vocal quality and explore small, comfortable pitch movements.",
+    description: "An interactive lesson: a synthesis of Classes 3-6 and 9 — noticing vocal-quality changes as pitch changes, rather than eliminating every difference. A voice break is not automatically a failure; vocal continuity develops gradually.",
+    content: {
+      whatYoullLearn: "That vocal quality and coordination can change as pitch changes, that a noticeable transition or voice break is not automatically a failure, how to explore small pitch movements with comfortable volume, how to distinguish gentle vocal exploration from pushing or squeezing, and why vocal continuity develops gradually through practice.",
+      whyItMatters: "A noticeable transition or voice break is not automatically a failure — the amount of change varies between singers and exercises, and persistent discomfort (never a break itself) is the only thing that should never be ignored.",
+      theory: "The voice may change in quality as pitch changes. A transition may feel smooth, noticeable, or uneven. A voice break does not automatically indicate damage or incorrect technique — mixed coordination and smoother transitions develop gradually.",
+      guidedPractice: [
+        "Reviewed Classes 3, 4, 5, 6 and 9, explored a comfortable reference pitch, tried a small 'oo' glide, compared two separate sounds with one gentle glide, learned about voice breaks and transitions, and reflected on comfort and tension rather than forcing a perfect result.",
+      ],
+      assignment: {
+        instructions: [
+          "One short sentence, spoken naturally",
+          "One comfortable “oo”",
+          "One small glide, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 11 (interactive) ---------- */
+  const controlledRangeDevelopmentClass = {
+    number: 11, title: "Controlled Range Development", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/controlledRangeDevelopment.js
+    interactive: "controlled-range-development",
+    subtitle: "Explore a few comfortable notes above and below a familiar starting note.",
+    description: "An interactive lesson: vocal range as the span between lower and higher notes — explored gently in both directions from a comfortable reference note. A wider range is never the goal of one lesson; range develops from gradual coordination, not force.",
+    content: {
+      whatYoullLearn: "What vocal range means in simple terms, how to explore a few comfortable notes above and below a familiar starting note, how to notice when a note feels easy versus strained, that range development comes from gradual coordination and practice rather than forcing the voice, and how to record a simple observation about which notes felt comfortable.",
+      whyItMatters: "Everyone's range is different — there's no universal starting note or required highest or lowest note. It's completely fine if only the starting note feels comfortable on a given day; that's still a successful lesson.",
+      theory: "Vocal range is the span between the lower and higher notes a person can sing. A wider range is not automatically better singing, and singing louder does not mean you can sing higher — a comfortable starting note is a reference point, not a test.",
+      guidedPractice: [
+        "Found a comfortable starting note, explored one nearby higher note and one nearby lower note if comfortable, returned to the starting note each time, and reflected on which direction felt easier and whether any note felt tight or strained.",
+      ],
+      assignment: {
+        instructions: [
+          "Your comfortable starting note",
+          "One nearby higher note, if comfortable",
+          "One nearby lower note, if comfortable",
+          "A return to the starting note",
+        ],
+        questions: []
+      }
+    }
+  };
+
   const CLASSES = [
     ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
-    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass].map(c => ({ ...c, levelId: 2 })),
+    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass].map(c => ({ ...c, levelId: 2 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
