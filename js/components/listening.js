@@ -144,7 +144,10 @@ const WaveformPlayer = (() => {
       VoiceRecorder.announce(token);
       PianoSynth.stopAll();
       if (stopAt === null && pos() < 0.05) fromStart = true; // Play pressed at 0:00 counts as a full listen
-      audio.play().then(() => { setPlayingUi(true); emit("play", pos()); loop(); }).catch(() => {});
+      audio.play().then(() => { setPlayingUi(true); emit("play", pos()); loop(); }).catch((err) => {
+        console.warn("[WaveformPlayer] couldn't play this recording:", err);
+        timeEl.textContent = "Couldn't play this recording" + (err && err.name ? ` (${err.name})` : "");
+      });
     }
     function pause() {
       if (!audio) return;
