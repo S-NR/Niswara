@@ -33,6 +33,20 @@ const SongLessonKit = (() => {
   const { p, narrow, chapter: kitChapter, wireViewedSentinel, wireStepper } = LessonKit;
   const chapter = (...args) => kitChapter(STAGES, ...args);
 
+  const CHECKLIST_ITEMS = [
+    { key: "understood", label: "I understand the meaning." },
+    { key: "triedRhythm", label: "I tried the rhythm practice, or chose to skip it." },
+    { key: "exploredPitch", label: "I explored the pitch/swara information." },
+    { key: "triedSinging", label: "I attempted singing at least one line, or chose to skip." },
+    { key: "reflected", label: "I reflected on my practice, or chose not to." },
+  ];
+
+  const opt = (value, label, tone = "neutral") => ({ value, label, tone });
+  const Q = {
+    pronunciation: { question: "How did your pronunciation feel?", options: [opt("good", "Comfortable", "good"), opt("okay", "A bit unsure"), opt("hard", "Difficult"), opt("unsure", "Not sure")] },
+    expression: { question: "Did you feel you communicated the song's feeling?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
+  };
+
   const A = (rec, g) => rec.answers[g] || {};
   const q = (rec, k) => A(rec, "q")[k] || null;
   const checklist = (rec) => A(rec, "checklist");
@@ -179,8 +193,10 @@ const SongLessonKit = (() => {
 
   function render(song, status) {
     const rec = SongActivity.get(song.id);
-    const pct = 0; // real percentage lands once the completion checklist exists (Task 6)
+    const pct = Math.round((CHECKLIST_ITEMS.filter((i) => rec.checkpoints[i.key]).length / CHECKLIST_ITEMS.length) * 100);
     const c = checklist(rec);
+    const sel = (k) => q(rec, k);
+    const take = (k) => A(rec, "recs")[k] || null;
 
     return `
     <div class="pitch-lesson">
@@ -280,6 +296,64 @@ const SongLessonKit = (() => {
           </div>
         `, { wide: true })}
 
+        ${chapter("perform", 8, "Perform", `
+          ${narrow(p("A guided sequence — skip any of these, record only what feels comfortable."))}
+          <div class="flex flex-col gap-5">
+            ${[
+              ["line1Take", "Line 1, on its own", `“${song.lines[0].text}”`],
+              ["line2Take", "Line 2, on its own", `“${song.lines[1].text}”`],
+              ["combinedTake", "Both lines, combined — this is the one compared in the next stage", `“${song.lines[0].text} ${song.lines[1].text}”`],
+              ["slowTake", "Both lines, slow tempo", ""],
+              ["fullTempoTake", "Both lines, full tempo", ""],
+            ].map(([key, title, hint]) => `
+              <div>
+                ${RecordingCard.render(`rc-${key}`, { title, hint, maxSeconds: 20, section: false })}
+              </div>`).join("")}
+          </div>
+        `, { wide: true })}
+
+        ${chapter("assess", 9, "Compare my attempt", `
+          ${narrow(`
+            ${p("Compares your combined-lines recording above against the reference transcription — segment by segment, honestly. If recording isn't supported on this device, the self-reflection questions below work just as well.")}
+            <div data-compare-host>
+              ${PitchAnalysis.isAvailable
+                ? `<button type="button" data-compare-attempt class="vr-btn vr-btn-gold" ${take("combinedTake") ? "" : "disabled"}>${icon("play", "w-4 h-4")} Compare my attempt</button>
+                   ${!take("combinedTake") ? `<p class="text-xs text-ink-500 mt-2">Record the combined take above first.</p>` : ""}`
+                : `<p class="text-sm text-ink-400">Comparison isn't available on this device.</p>`}
+            </div>
+            <div data-compare-result class="mt-5"></div>
+          `)}
+        `)}
+
+        ${chapter("assess", 10, "Reflect", `
+          ${narrow(`
+            <div class="flex flex-col gap-4">
+              ${SelfAssessment.render("pronunciation-q", { ...Q.pronunciation, selected: sel("pronunciation") })}
+              ${SelfAssessment.render("expression-q", { ...Q.expression, selected: sel("expression") })}
+            </div>
+          `)}
+        `)}
+
+        ${chapter("assess", 11, "My Notes", `
+          ${p("Your private notebook for this song. Only you can see it.")}
+          ${PersonalNotes.render("notes-song", { placeholder: "e.g. Which part felt most natural... What I want to try next time..." })}
+        `)}
+
+        ${chapter("assess", 12, "Reflection and completion", `
+          ${narrow(`
+            ${p("A simple checklist — tick what's true for you. Completion doesn't depend on singing the whole song, a recording, or the comparison succeeding.")}
+            <div class="flex flex-col gap-1 mb-5">
+              ${CHECKLIST_ITEMS.map((item, i) => `
+                <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">
+                  <input type="checkbox" data-checklist="${i}" ${c[i] ? "checked" : ""} class="mt-0.5 w-4 h-4 accent-amber-400 shrink-0">
+                  <span class="text-sm text-ink-200">${item.label}</span>
+                </label>`).join("")}
+            </div>
+          `)}
+        `)}
+
+        ${chapter("assess", 13, "Your progress", `<div data-lesson-progress>${renderComplete(song, rec, status, CHECKLIST_ITEMS)}</div>`)}
+
       </div>
     </div>`;
   }
@@ -339,6 +413,106 @@ const SongLessonKit = (() => {
     }
     container.addEventListener("click", onPlayMelody);
     cleanups.push(() => container.removeEventListener("click", onPlayMelody));
+
+    /* ---- refresh the complete/progress panel + compare button availability ---- */
+    function refreshLive() {
+      const rec = rec0();
+      const progHost = $("[data-lesson-progress]");
+      if (progHost) progHost.innerHTML = renderComplete(song, rec, rec.completedAt ? "completed" : "available", CHECKLIST_ITEMS);
+      const pctEl = $("[data-lesson-pct]");
+      if (pctEl) pctEl.textContent = `${Math.round((CHECKLIST_ITEMS.filter((i) => rec.checkpoints[i.key]).length / CHECKLIST_ITEMS.length) * 100)}% complete`;
+      const compareBtn = $("[data-compare-attempt]");
+      if (compareBtn) compareBtn.disabled = !A(rec, "recs").combinedTake;
+    }
+
+    /* ---- Perform: 5 recordings ---- */
+    const RECORDING_NAMES = {
+      line1Take: "Line 1", line2Take: "Line 2", combinedTake: "Both lines, combined",
+      slowTake: "Both lines, slow tempo", fullTempoTake: "Both lines, full tempo",
+    };
+    Object.keys(RECORDING_NAMES).forEach((key) => {
+      own(RecordingCard.wire(container, `rc-${key}`, {
+        classId: song.id, take: A(rec0(), "recs")[key] || null, maxSeconds: 20,
+        meta: { name: `Song — ${song.titleTransliteration} — ${RECORDING_NAMES[key]}`, exercise: `song-${song.id}-${key}` },
+        onSaved: (t) => { SongActivity.setAnswer(song.id, "recs", key, t); SongActivity.bump(song.id, "recordings"); refreshLive(); },
+      }));
+    });
+
+    /* ---- Assess: compare my attempt ---- */
+    async function onCompareAttempt(e) {
+      const btn = e.target.closest("[data-compare-attempt]");
+      if (!btn || btn.disabled) return;
+      const take = A(rec0(), "recs").combinedTake;
+      if (!take) return;
+      btn.disabled = true;
+      btn.textContent = "Comparing…";
+      const resultHost = $("[data-compare-result]");
+      try {
+        const blob = await Media.getBlob(take.mediaId);
+        const pitchResult = await SongPitchCompare.compareRecording(blob, song);
+        let timingHtml = "";
+        if (pitchResult.aligned) {
+          const referenceOnsets = measured(song).map((s) => s.start - measured(song)[0].start);
+          const learnerOnsets = pitchResult.segments.map((s) => s.start - pitchResult.segments[0].start);
+          const timing = SongTimingCompare.compare(learnerOnsets, referenceOnsets);
+          timingHtml = timing.aligned
+            ? `<p class="text-sm text-ink-200 mt-4"><strong class="text-ink-100">Rhythm:</strong> ${timing.rating}</p>`
+            : `<p class="text-sm text-ink-500 mt-4">${timing.note}</p>`;
+        }
+        if (resultHost) {
+          resultHost.innerHTML = pitchResult.aligned
+            ? `<table class="w-full text-sm border-collapse">
+                <thead><tr class="text-[11px] uppercase tracking-wider text-ink-500"><th class="text-left py-1.5 pr-3">Swara</th><th class="text-left py-1.5">How it compared</th></tr></thead>
+                <tbody>${pitchResult.perSegment.map((s) => `<tr class="border-t border-white/5"><td class="py-2 pr-3 text-ink-50 font-display">${s.swara}</td><td class="py-2 text-ink-300">${s.verdict === "close" ? "Close to the reference" : s.verdict === "off" ? `A little ${s.direction} the reference` : "Couldn't tell clearly"}</td></tr>`).join("")}</tbody>
+              </table>${timingHtml}`
+            : `<p class="text-sm text-ink-400">${pitchResult.note}</p>`;
+        }
+      } catch (err) {
+        console.error(err);
+        if (resultHost) resultHost.textContent = "Couldn't analyze that recording. You can still trust your own ears.";
+      }
+      btn.disabled = false;
+      btn.textContent = "Compare my attempt";
+    }
+    container.addEventListener("click", onCompareAttempt);
+    cleanups.push(() => container.removeEventListener("click", onCompareAttempt));
+
+    /* ---- Assess: self-assessment chips ---- */
+    const assessMap = { "pronunciation-q": "pronunciation", "expression-q": "expression" };
+    function onAssess(e) {
+      const chip = e.target.closest("[data-assess-choice]");
+      if (!chip) return;
+      const group = chip.closest("[data-assess]");
+      const name = group && group.dataset.assess;
+      if (!name || !assessMap[name]) return;
+      group.querySelectorAll("[data-assess-choice]").forEach((x) => x.classList.toggle("is-selected", x === chip));
+      SongActivity.setAnswer(song.id, "q", assessMap[name], chip.dataset.assessChoice);
+    }
+    container.addEventListener("click", onAssess);
+    cleanups.push(() => container.removeEventListener("click", onAssess));
+
+    /* ---- notes (reuses ClassActivity.loadNote/saveNote directly — generic, opaque-keyed) ---- */
+    own(PersonalNotes.wire(container, "notes-song", { classId: song.id, onSaved: () => {} }));
+
+    /* ---- completion checklist ---- */
+    function onChecklist(e) {
+      const cb = e.target.closest("[data-checklist]");
+      if (!cb) return;
+      SongActivity.markCheckpoint(song.id, CHECKLIST_ITEMS[cb.dataset.checklist].key, cb.checked);
+      refreshLive();
+    }
+    container.addEventListener("change", onChecklist);
+    cleanups.push(() => container.removeEventListener("change", onChecklist));
+
+    /* ---- complete ---- */
+    function onComplete(e) {
+      const btn = e.target.closest("[data-complete-song]");
+      if (!btn || btn.disabled) return;
+      SongActivity.markCompleted(song.id);
+      Router.softRefresh(container, SongDetailPage, params);
+    }
+    container.addEventListener("click", onComplete);
+    cleanups.push(() => container.removeEventListener("click", onComplete));
 
     return () => {
       cleanups.forEach((fn) => { try { fn(); } catch (err) { console.error(err); } });
