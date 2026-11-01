@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body>
+<script src="../js/data/songs.js"></script>
+<script>
+const assert = {
+  strictEqual(a, b, msg) { if (a !== b) throw new Error(msg || `expected ${b}, got ${a}`); },
+  ok(v, msg) { if (!v) throw new Error(msg || "expected truthy"); },
+};
+
+try {
+  assert.strictEqual(Array.isArray(SONGS), true, "SONGS must be an array");
+  assert.strictEqual(SONGS.length, 1, "exactly one song for v1");
+  const s = SONGS[0];
+  assert.strictEqual(s.id, "oo-nanna-chetana");
+  assert.strictEqual(s.lines.length, 2);
+  assert.strictEqual(s.lines[0].rhythm.length, 4);
+  assert.strictEqual(s.lines[1].rhythm.length, 4);
+  assert.strictEqual(s.reference.tonicMidi, 70);
+  assert.strictEqual(s.reference.segments.length, 5);
+  const uncertain = s.reference.segments[4];
+  assert.strictEqual(uncertain.swara, null);
+  assert.strictEqual(uncertain.western, null);
+  assert.ok(uncertain.confidence.includes("uncertain"));
+  const measured = s.reference.segments.slice(0, 4);
+  measured.forEach((seg) => assert.strictEqual(seg.confidence, "measured"));
+  assert.strictEqual(s.practiceAudio, null);
+  console.log("songs.data.test.html: all assertions passed");
+} catch (e) {
+  console.error("songs.data.test.html: FAILED -", e.message);
+}
+</script>
+</body></html>
