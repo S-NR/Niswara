@@ -41,4 +41,10 @@ const InteractiveLessons = {
   "projection-without-pushing": ProjectionWithoutPushingLesson,
   "register-transitions": RegisterTransitionsLesson,
   "controlled-range-development": ControlledRangeDevelopmentLesson,
+  "sustained-notes-stability": SustainedNotesStabilityLesson,
+  "vocal-dynamics-control": VocalDynamicsControlLesson,
+  "expressive-singing-foundations": ExpressiveSingingFoundationsLesson,
+  "applying-vocal-skills-to-song": ApplyingVocalSkillsToSongLesson,
+  "phrase-shaping-interpretation": PhraseShapingInterpretationLesson,
+  "vocal-agility-development": VocalAgilityDevelopmentLesson,
 };

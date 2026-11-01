@@ -5,3 +5,8 @@
 # OS / editor noise
 .DS_Store
 Thumbs.db
+
+# Personal reference recordings used only as local source material for
+# song-transcription (never embedded or shipped — see docs/superpowers/specs/
+# 2026-11-01-song-learning-level-design.md §11)
+*.m4a

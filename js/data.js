@@ -779,14 +779,13 @@ const APP_DATA = (() => {
   }
 
   const levelClassDefs = {
-    // Classes 1-11 ("Voice Placement" ... "Controlled Range Development") are now real, authored
-    // classes. Class 10's spec had already consumed the last original placeholder, so there was
-    // nothing left to rename here — Class 11's own spec instead names the real Class 12 as
-    // "Sustained Notes and Stability", so this is a brand-new placeholder entry (not a rename),
-    // the first time this list has needed genuine addition rather than renaming. Whether Level 2
-    // keeps growing after Class 12 is for that class's own spec to reveal — not guessed here.
-    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 12,
-      titles: ["Sustained Notes and Stability"] },
+    // Classes 1-17 ("Voice Placement" ... "Vocal Agility Development") are now real, authored
+    // classes. Class 17's own spec names the real Class 18 as "Register Coordination Practice", so
+    // this entry is renamed in place again, the same precedent every class since 5 has followed
+    // (apart from Class 11's one-off addition). Whether Level 2 keeps growing after Class 18 is for
+    // that class's own spec to reveal — not guessed here.
+    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 18,
+      titles: ["Register Coordination Practice"] },
     3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
       titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
@@ -1270,9 +1269,165 @@ const APP_DATA = (() => {
     }
   };
 
+  /* ---------- Level 2, Class 12 (interactive) ---------- */
+  const sustainedNotesStabilityClass = {
+    number: 12, title: "Sustained Notes and Stability", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/sustainedNotesStability.js
+    interactive: "sustained-notes-stability",
+    subtitle: "Hold a short, comfortable note gently — without pushing for length or power.",
+    description: "An interactive lesson: a sustained note is held continuously for a short duration, not louder or longer through extra effort. A brief, comfortable, reasonably steady note is already a real achievement — stability develops gradually through relaxed coordination, not force.",
+    content: {
+      whatYoullLearn: "What a sustained note is, how to begin and end a note gently, how to maintain a comfortable, reasonably steady sound, how to notice changes in pitch, volume, and tone, and why relaxed coordination matters more than holding a note for a long time.",
+      whyItMatters: "A short, comfortable, steady note is a better achievement than a long note produced with tension. Natural variation while learning is completely normal, and stopping early is never a failure.",
+      theory: "A sustained note is a note held continuously for a short duration. Singing it steadily does not mean making it louder or pushing more air — the aim is a comfortable, reasonably consistent sound, not maximum length.",
+      guidedPractice: [
+        "Relaxed the shoulders, jaw and neck, tried a short comfortable note on 'mmm' or 'oo', practised a gentle beginning and ending across a few attempts, listened back to two short recordings, and reflected on steadiness and tension rather than duration.",
+      ],
+      assignment: {
+        instructions: [
+          "One short, comfortable note (2-3 seconds, if comfortable)",
+          "A first listen-back attempt",
+          "A second listen-back attempt",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 13 (interactive) ---------- */
+  const vocalDynamicsControlClass = {
+    number: 13, title: "Vocal Dynamics and Control", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/vocalDynamicsControl.js
+    interactive: "vocal-dynamics-control",
+    subtitle: "Explore soft, medium and slightly stronger singing on one comfortable note.",
+    description: "An interactive lesson: vocal dynamics as variations in loudness and softness, not a test of power. Control is more important than volume — strong singing is never the same as shouting, and soft or medium singing alone is already enough to complete the class.",
+    content: {
+      whatYoullLearn: "What vocal dynamics means, the difference between soft, medium and stronger singing, how to change vocal intensity gradually, how to avoid confusing loudness with good singing, and how dynamics can communicate emotion and make a musical phrase interesting.",
+      whyItMatters: "Strong singing does not mean shouting. A song doesn't need to be sung at the same volume throughout — dynamics help a phrase feel expressive, and control matters far more than raw volume.",
+      theory: "Vocal dynamics refers to variations in loudness and softness while singing. Three beginner-friendly levels — soft, medium, and slightly stronger — are enough to explore the idea, with no exact decibel targets.",
+      guidedPractice: [
+        "Relaxed the jaw, shoulders and neck, explored a comfortable note softly and at medium intensity, optionally tried a little more intensity, practised a gentle soft-to-medium-to-soft transition, applied dynamics to a short phrase three ways, and reflected on control and comfort rather than loudness.",
+      ],
+      assignment: {
+        instructions: [
+          "A short phrase at a comfortable medium intensity",
+          "The same phrase, soft to slightly stronger",
+          "The same phrase, medium to soft",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 14 (interactive) ---------- */
+  const expressiveSingingFoundationsClass = {
+    number: 14, title: "Expressive Singing Foundations", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/expressiveSingingFoundations.js
+    interactive: "expressive-singing-foundations",
+    subtitle: "Explore how tone, dynamics, timing and intention shape the feeling behind a phrase.",
+    description: "An interactive lesson: singing as communication, not just correct notes. The same melody and the same words can sound completely different depending on the feeling behind them — and good expression never needs shouting, excessive vibrato, or dramatic effects.",
+    content: {
+      whatYoullLearn: "What expressive singing means, how emotion and intention influence the way a phrase is sung, how to communicate different feelings without changing the melody, how to use natural dynamics and phrasing to support expression, and why expression should feel genuine rather than exaggerated.",
+      whyItMatters: "Singing is not only about producing correct notes — a singer also communicates a feeling, thought, or story. Expression comes from tone, dynamics, timing, phrasing and intention together.",
+      theory: "The same melody can sound different depending on the emotion behind it. A learner who doesn't connect with a suggested feeling can always choose Neutral instead — exploring expression is always optional and personal.",
+      guidedPractice: [
+        "Explored a short emotion vocabulary, spoke a sentence naturally and with two different feelings, sang a phrase with three different intentions, connected dynamics to emotion from Class 13, gently emphasized one important word in a phrase, and reflected on which attempt felt most genuine.",
+      ],
+      assignment: {
+        instructions: [
+          "A sentence spoken naturally, happily, and gently",
+          "A phrase sung with two different intentions",
+          "A phrase with one word gently emphasized",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 15 (interactive) ---------- */
+  const applyingVocalSkillsToSongClass = {
+    number: 15, title: "Applying Vocal Skills to a Song", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 18,
+    // Rendered by the interactive lesson in js/lessons/applyingVocalSkillsToSong.js
+    interactive: "applying-vocal-skills-to-song",
+    subtitle: "Bring Level 2's skills together on a short practice phrase, one small section at a time.",
+    description: "An interactive lesson: singing a song as several skills working together — pitch, rhythm, breathing, vocal stability, dynamics and expression. A beginner never needs to master all of them at once; this class breaks a short original practice phrase into small, manageable sections instead.",
+    content: {
+      whatYoullLearn: "How to listen to a phrase before attempting to sing it, how to identify its melody and basic phrase structure, where breathing may be needed, how to sing a short section at a comfortable pitch and intensity, how to apply pitch stability, dynamics and expression together, and how to evaluate your own practice without expecting perfection.",
+      whyItMatters: "A song is many skills working together, and trying to master all of them at once is overwhelming for a beginner. Learning one small section at a time — and changing the key to suit a comfortable range — makes a song approachable.",
+      theory: "A short phrase can be broken into smaller sections, each practiced on its own before being connected. Breathing between phrases is a musical decision, not something to force past.",
+      guidedPractice: [
+        "Chose a short original practice phrase, listened before singing, broke it into two small sections, reviewed how Classes 10-14 connect to singing a song, sang the phrase three ways (comfortable, technique-aware, expressive), tried connecting the two sections, and self-reviewed without expecting perfection.",
+      ],
+      assignment: {
+        instructions: [
+          "A short phrase, broken into two sections",
+          "At least one of the three singing attempts",
+          "The two sections connected, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 16 (interactive) ---------- */
+  const phraseShapingInterpretationClass = {
+    number: 16, title: "Phrase Shaping and Musical Interpretation", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 18,
+    // Rendered by the interactive lesson in js/lessons/phraseShapingInterpretation.js
+    interactive: "phrase-shaping-interpretation",
+    subtitle: "Shape a phrase's natural beginning, development and ending — one connected musical thought.",
+    description: "An interactive lesson: a musical phrase as a group of notes forming one connected thought, not a list of separate words or notes. Builds on Class 15's practice phrase, shaping it with timing, emphasis, dynamics, breathing and emotion rather than treating every note equally.",
+    content: {
+      whatYoullLearn: "What a musical phrase is, why a phrase should feel connected rather than separate, how to identify an important word or note, how to use gentle dynamic changes to shape a phrase, how to create a natural beginning, development and ending, and how musical interpretation can differ between singers while still respecting the melody.",
+      whyItMatters: "Individual notes matter, but their connection is what gives a phrase meaning — the same way a sentence means more than its individual words. Expression should feel natural, never forced or dramatic.",
+      theory: "A phrase usually has a natural beginning, development and ending, with breathing happening at sensible musical points — never mid-word, never held past comfort.",
+      guidedPractice: [
+        "Listened to a familiar phrase, spoke it naturally and with feeling, identified one important word, reviewed the beginning/development/ending shape, sang the phrase three ways (natural, shaped, personal interpretation), identified a comfortable breathing point, and compared a natural take with a shaped one.",
+      ],
+      assignment: {
+        instructions: [
+          "The phrase spoken naturally and with feeling",
+          "At least one of the three singing attempts",
+          "A comfortable breathing point identified",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 17 (interactive) ---------- */
+  const vocalAgilityDevelopmentClass = {
+    number: 17, title: "Vocal Agility Development", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/vocalAgilityDevelopment.js
+    interactive: "vocal-agility-development",
+    subtitle: "Move between nearby notes with control — smooth and slow, never fast and unclear.",
+    description: "An interactive lesson: vocal agility as moving between notes comfortably and accurately, not singing fast. Starts with a simple two-note movement, then a three-note pattern, with an optional five-note pattern for anyone ready to explore further.",
+    content: {
+      whatYoullLearn: "What vocal agility means, how to move between nearby notes with control, how to practise simple ascending and descending melodic patterns, why accuracy and smoothness matter more than speed, and how to gradually improve coordination through repetition and listening.",
+      whyItMatters: "A smooth and accurate slow pattern is more useful than a fast, unclear one. Speed comes later, after coordination improves — there's no benefit to rushing ahead of what feels comfortable.",
+      theory: "Ascending means moving from lower notes to higher notes; descending means moving from higher notes to lower notes. A melodic pattern is a small group of notes arranged in a sequence.",
+      guidedPractice: [
+        "Prepared gently, practised a two-note movement ascending and descending, tried a slow three-note pattern, optionally explored a five-note pattern, reviewed why smoothness comes before speed, and reflected on which pattern and direction felt easiest.",
+      ],
+      assignment: {
+        instructions: [
+          "A two-note movement, ascending or descending",
+          "The three-note pattern, if comfortable",
+          "The five-note pattern, only if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
   const CLASSES = [
     ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
-    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass].map(c => ({ ...c, levelId: 2 })),
+    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass].map(c => ({ ...c, levelId: 2 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
