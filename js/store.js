@@ -43,6 +43,7 @@ const Store = (() => {
       classActivity: {},     // classId -> interactive-lesson record; synced separately (class_progress)
       classNotes: {},        // classId -> { body, updatedAt }; synced separately (class_notes)
       warmupSessions: [],    // finished warm-ups (see Warmup); synced separately (warmup_sessions)
+      songActivity: {},      // per-song progress for Song Learning & Application; local-only, never touches completedClassIds
       createdAt: nowIso(),
       updatedAt: null,
     };
@@ -210,7 +211,7 @@ const Store = (() => {
   /* ---- Cloud sync support (see CloudSync) ---- */
 
   // Interactive-lesson records, class notes and warm-up history have their own tables, so they're not part of learner_state.
-  const LOCAL_ONLY_FIELDS = ["classActivity", "classNotes", "warmupSessions"];
+  const LOCAL_ONLY_FIELDS = ["classActivity", "classNotes", "warmupSessions", "songActivity"];
 
   /** The part of the state that's stored in the account (learner_state.state). */
   function exportSyncState() {
@@ -444,6 +445,21 @@ const Store = (() => {
     writeLocal(); // ClassActivity syncs this itself (class_progress)
   }
 
+  /* ---- Song Learning & Application progress (local-only; see SongActivity) ---- */
+  function emptySongActivity() {
+    return { checkpoints: {}, answers: {}, completedAt: null, updatedAt: null };
+  }
+
+  function getSongActivity(songId) {
+    const rec = state.songActivity[songId];
+    return rec ? { ...emptySongActivity(), ...rec } : emptySongActivity();
+  }
+
+  function setSongActivity(songId, record) {
+    state.songActivity[songId] = record;
+    writeLocal();
+  }
+
   function getClassNote(classId) {
     return state.classNotes[classId] || { body: "", updatedAt: null };
   }
@@ -639,6 +655,7 @@ const Store = (() => {
     setMilestoneUpload, skillProgress, isAchievementUnlocked, overallStats,
     resetAll, todayKey, switchUser, migrateLegacyUploads,
     emptyClassActivity, getClassActivity, setClassActivity, getClassNote, setClassNote,
+    emptySongActivity, getSongActivity, setSongActivity,
     getWarmupSessions, mergeWarmupSessions,
     legacyClassIds,
     onPersist, exportSyncState, normalizeForSync, importSyncState, mergeSyncStates, referencedMediaIds,
