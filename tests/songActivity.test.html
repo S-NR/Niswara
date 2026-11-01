@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body>
+<script src="../js/data.js"></script>
+<script src="../js/store.js"></script>
+<script src="../js/components/songActivity.js"></script>
+<script>
+const assert = {
+  strictEqual(a, b, msg) { if (a !== b) throw new Error(msg || `expected ${b}, got ${a}`); },
+  deepStrictEqual(a, b, msg) { const sa = JSON.stringify(a), sb = JSON.stringify(b); if (sa !== sb) throw new Error(msg || `expected ${sb}, got ${sa}`); },
+};
+
+try {
+  const before = Store.getState().completedClassIds.slice();
+
+  const rec = SongActivity.markCheckpoint("test-song", "foo", true);
+  assert.strictEqual(rec.checkpoints.foo, true);
+
+  SongActivity.setAnswer("test-song", "recs", "intro", { mediaId: "abc" });
+  assert.deepStrictEqual(SongActivity.get("test-song").answers.recs, { intro: { mediaId: "abc" } });
+
+  SongActivity.bump("test-song", "recordings");
+  SongActivity.bump("test-song", "recordings");
+  assert.strictEqual(SongActivity.count("test-song", "recordings"), 2);
+
+  const completed = SongActivity.markCompleted("test-song");
+  assert.strictEqual(typeof completed.completedAt, "string");
+
+  const after = Store.getState().completedClassIds;
+  assert.deepStrictEqual(after, before, "completedClassIds must be unaffected by song activity");
+  assert.strictEqual(after.includes("test-song"), false, "test-song must never appear in completedClassIds");
+
+  console.log("songActivity.test.html: all assertions passed");
+} catch (e) {
+  console.error("songActivity.test.html: FAILED -", e.message);
+}
+</script>
+</body></html>
