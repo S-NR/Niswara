@@ -6,6 +6,8 @@ Router.add("#/", HomePage);
 Router.add("#/journey", JourneyPage);
 Router.add("#/classes", ClassesPage);
 Router.add("#/classes/:id", ClassDetailPage);
+Router.add("#/songs", SongsPage);
+Router.add("#/songs/:id", SongDetailPage);
 Router.add("#/warmup", WarmupPage);
 Router.add("#/warmup/:mode", WarmupSessionPage);
 Router.add("#/practice", PracticePage);
