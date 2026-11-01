@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body>
+<script src="../js/components/songPitchCompare.js"></script>
+<script>
+const assert = {
+  strictEqual(a, b, msg) { if (a !== b) throw new Error(msg || `expected ${b}, got ${a}`); },
+  ok(v, msg) { if (!v) throw new Error(msg || "expected truthy"); },
+};
+
+try {
+  const refSegments = [
+    { midi: 70, swara: "Sa" }, { midi: 69, swara: "Ni (lower)" },
+    { midi: 66, swara: "Pa (lower)" }, { midi: 58, swara: "Sa (lower octave)" },
+    { midi: 43, swara: null }, // uncertain segment — excluded from "measured" count
+  ];
+
+  // Case 1: matching segment count, all close
+  let r = SongPitchCompare.summarize(
+    [{ midi: 70.2 }, { midi: 69.1 }, { midi: 66.3 }, { midi: 57.8 }],
+    refSegments
+  );
+  assert.strictEqual(r.aligned, true);
+  assert.strictEqual(r.perSegment.length, 4);
+  r.perSegment.forEach((s) => assert.strictEqual(s.verdict, "close"));
+
+  // Case 2: mismatched segment count
+  r = SongPitchCompare.summarize([{ midi: 70 }, { midi: 69 }], refSegments);
+  assert.strictEqual(r.aligned, false);
+  assert.strictEqual(r.perSegment.length, 0);
+  assert.ok(r.note);
+
+  console.log("songPitchCompare.test.html: all assertions passed");
+} catch (e) {
+  console.error("songPitchCompare.test.html: FAILED -", e.message);
+}
+</script>
+</body></html>
