@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body>
+<script src="../js/components/songTimingCompare.js"></script>
+<script>
+const assert = {
+  strictEqual(a, b, msg) { if (a !== b) throw new Error(msg || `expected ${b}, got ${a}`); },
+  ok(v, msg) { if (!v) throw new Error(msg || "expected truthy"); },
+};
+
+try {
+  const ref = [0.65, 3.20, 5.87, 9.26]; // reference segment starts, normalized so first = 0 before comparing
+  const toRelative = (arr) => arr.map((t) => t - arr[0]);
+
+  let r = SongTimingCompare.compare(toRelative([0.70, 3.30, 5.95, 9.40]), toRelative(ref));
+  assert.strictEqual(r.aligned, true);
+  assert.strictEqual(r.offsetsMs.length, 4);
+  assert.ok(["together", "a bit off"].includes(r.rating));
+
+  r = SongTimingCompare.compare(toRelative([0.70, 3.30]), toRelative(ref));
+  assert.strictEqual(r.aligned, false);
+  assert.ok(r.note);
+
+  console.log("songTimingCompare.test.html: all assertions passed");
+} catch (e) {
+  console.error("songTimingCompare.test.html: FAILED -", e.message);
+}
+</script>
+</body></html>
