@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body>
+<script>
+// Minimal stub so SongLessonKit's top-level `const { p, narrow, ... } = LessonKit`
+// destructuring doesn't throw. render()/mount() (which need the real RecordingCard,
+// icon, etc.) are never called by this test — only the pure segmentsForLine/measured
+// helpers are, so no other app script needs to load.
+window.LessonKit = { p: () => "", narrow: () => "", chapter: () => "", wireViewedSentinel: () => () => {}, wireStepper: () => () => {} };
+</script>
+<script src="../js/lessons/songLessonKit.js"></script>
+<script>
+const assert = {
+  strictEqual(a, b, msg) { if (a !== b) throw new Error(msg || `expected ${b}, got ${a}`); },
+};
+
+try {
+  const song = {
+    reference: {
+      segments: [
+        { swara: "Sa", line: 0, covers: ["Oo", "Na", "n", "na"] },
+        { swara: "Ni", line: 0, covers: ["Che", "tha", "na"] },
+        { swara: "Pa", line: 1, covers: ["Aa", "gu", "Nee", "a-ni", "ke"] },
+        { swara: "Sa (lower)", line: 1, covers: ["ta", "na"] },
+        { swara: null, line: null, covers: [] },
+      ],
+    },
+  };
+
+  // Post-review fix (Important #3): "na" appears in both lines' covers, so a
+  // text-matching approach would incorrectly pull line-1 segments into line 0's
+  // results (and vice versa). The `line` index must be the only thing that matters.
+  const line0 = SongLessonKit.segmentsForLine(song, 0);
+  assert.strictEqual(line0.length, 2, `line 0 should have exactly its 2 segments, got ${line0.length}`);
+  assert.strictEqual(line0[0].swara, "Sa");
+  assert.strictEqual(line0[1].swara, "Ni");
+
+  const line1 = SongLessonKit.segmentsForLine(song, 1);
+  assert.strictEqual(line1.length, 2, `line 1 should have exactly its 2 segments, got ${line1.length}`);
+  assert.strictEqual(line1[0].swara, "Pa");
+  assert.strictEqual(line1[1].swara, "Sa (lower)");
+
+  // measured() excludes the uncertain (swara: null) segment
+  assert.strictEqual(SongLessonKit.measured(song).length, 4);
+
+  console.log("songLessonKit.segmentsForLine.test.html: all assertions passed");
+} catch (e) {
+  console.error("songLessonKit.segmentsForLine.test.html: FAILED -", e.message);
+}
+</script>
+</body></html>

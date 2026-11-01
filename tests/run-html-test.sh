@@ -6,8 +6,8 @@
 set -euo pipefail
 FILE="$1"
 LOG=$(mktemp)
-"/c/Program Files/Google/Chrome/Application/chrome.exe" --headless=new --disable-gpu --no-sandbox \
-  --enable-logging=stderr --v=1 --virtual-time-budget=5000 --dump-dom \
+"/c/Program Files/Google/Chrome/Application/chrome.exe" --headless=new --no-sandbox \
+  --enable-logging=stderr --v=1 --virtual-time-budget=20000 --dump-dom \
   "http://localhost:8924/tests/${FILE}" > /dev/null 2> "$LOG"
 LINE=$(grep -E "CONSOLE.*(all assertions passed|FAILED)" "$LOG" | tail -n 1 || true)
 if echo "$LINE" | grep -q "FAILED"; then

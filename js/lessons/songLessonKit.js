@@ -86,11 +86,13 @@ const SongLessonKit = (() => {
 
   const measured = (song) => song.reference.segments.filter((s) => s.swara !== null);
 
-  /** Segments whose covered syllables overlap this line's own rhythm syllables. */
+  /**
+   * Segments belonging to this line, by the data's own explicit `line` index — not by
+   * matching syllable text, which breaks when the same syllable (e.g. "na") appears in
+   * more than one line (post-review fix, Important #3).
+   */
   function segmentsForLine(song, lineIndex) {
-    const line = song.lines[lineIndex];
-    const lineSyllables = new Set(line.rhythm.flatMap((r) => [r.tha, r.ki, r.ta]).filter((t) => t !== "–"));
-    return measured(song).filter((seg) => seg.covers.some((c) => lineSyllables.has(c)));
+    return measured(song).filter((seg) => seg.line === lineIndex);
   }
 
   function rhythmTableHtml(line) {
@@ -194,7 +196,6 @@ const SongLessonKit = (() => {
   function render(song, status) {
     const rec = SongActivity.get(song.id);
     const pct = Math.round((CHECKLIST_ITEMS.filter((i) => rec.checkpoints[i.key]).length / CHECKLIST_ITEMS.length) * 100);
-    const c = checklist(rec);
     const sel = (k) => q(rec, k);
     const take = (k) => A(rec, "recs")[k] || null;
 
@@ -260,7 +261,7 @@ const SongLessonKit = (() => {
           ${narrow(`
             ${p("Each measured segment, placed roughly by pitch — higher chips are higher notes.")}
             ${melodyContourHtml(song)}
-            ${p("The melody moves downward across the two lines — Line 1 begins on Sa and settles toward Ni, then Line 2 continues the same descent through Pa to a final Sa an octave down, a natural, idiomatic cadence.")}
+            ${p(song.reference.melodyNote)}
           `)}
         `)}
 
@@ -288,9 +289,8 @@ const SongLessonKit = (() => {
             <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
               <p class="text-sm text-ink-100 font-display mb-2">Melody Practice</p>
               <div class="flex flex-col gap-2">
-                <button type="button" data-play-melody="0:slow" class="vr-btn !text-xs">Line 1, slow</button>
-                <button type="button" data-play-melody="1:slow" class="vr-btn !text-xs">Line 2, slow</button>
-                <button type="button" data-play-melody="both:normal" class="vr-btn !text-xs vr-btn-gold">Both lines, normal tempo</button>
+                ${song.lines.map((line, i) => `<button type="button" data-play-melody="${i}:slow" class="vr-btn !text-xs">Line ${i + 1}, slow</button>`).join("")}
+                <button type="button" data-play-melody="both:normal" class="vr-btn !text-xs vr-btn-gold">${song.lines.length > 1 ? "Both lines, normal tempo" : "Full phrase, normal tempo"}</button>
               </div>
             </div>
           </div>
@@ -300,11 +300,10 @@ const SongLessonKit = (() => {
           ${narrow(p("A guided sequence — skip any of these, record only what feels comfortable."))}
           <div class="flex flex-col gap-5">
             ${[
-              ["line1Take", "Line 1, on its own", `“${song.lines[0].text}”`],
-              ["line2Take", "Line 2, on its own", `“${song.lines[1].text}”`],
-              ["combinedTake", "Both lines, combined — this is the one compared in the next stage", `“${song.lines[0].text} ${song.lines[1].text}”`],
-              ["slowTake", "Both lines, slow tempo", ""],
-              ["fullTempoTake", "Both lines, full tempo", ""],
+              ...song.lines.map((line, i) => [`line${i}Take`, `Line ${i + 1}, on its own`, `“${line.text}”`]),
+              ["combinedTake", "All lines, combined — this is the one compared in the next stage", `“${song.lines.map((l) => l.text).join(" ")}”`],
+              ["slowTake", "All lines, slow tempo", ""],
+              ["fullTempoTake", "All lines, full tempo", ""],
             ].map(([key, title, hint]) => `
               <div>
                 ${RecordingCard.render(`rc-${key}`, { title, hint, maxSeconds: 20, section: false })}
@@ -345,7 +344,7 @@ const SongLessonKit = (() => {
             <div class="flex flex-col gap-1 mb-5">
               ${CHECKLIST_ITEMS.map((item, i) => `
                 <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">
-                  <input type="checkbox" data-checklist="${i}" ${c[i] ? "checked" : ""} class="mt-0.5 w-4 h-4 accent-amber-400 shrink-0">
+                  <input type="checkbox" data-checklist="${i}" ${rec.checkpoints[item.key] ? "checked" : ""} class="mt-0.5 w-4 h-4 accent-amber-400 shrink-0">
                   <span class="text-sm text-ink-200">${item.label}</span>
                 </label>`).join("")}
             </div>
@@ -425,11 +424,13 @@ const SongLessonKit = (() => {
       if (compareBtn) compareBtn.disabled = !A(rec, "recs").combinedTake;
     }
 
-    /* ---- Perform: 5 recordings ---- */
-    const RECORDING_NAMES = {
-      line1Take: "Line 1", line2Take: "Line 2", combinedTake: "Both lines, combined",
-      slowTake: "Both lines, slow tempo", fullTempoTake: "Both lines, full tempo",
-    };
+    /* ---- Perform: one recording per line, plus combined/slow/full ---- */
+    const RECORDING_NAMES = {};
+    song.lines.forEach((line, i) => { RECORDING_NAMES[`line${i}Take`] = `Line ${i + 1}`; });
+    Object.assign(RECORDING_NAMES, {
+      combinedTake: "All lines, combined",
+      slowTake: "All lines, slow tempo", fullTempoTake: "All lines, full tempo",
+    });
     Object.keys(RECORDING_NAMES).forEach((key) => {
       own(RecordingCard.wire(container, `rc-${key}`, {
         classId: song.id, take: A(rec0(), "recs")[key] || null, maxSeconds: 20,
@@ -445,19 +446,17 @@ const SongLessonKit = (() => {
       const take = A(rec0(), "recs").combinedTake;
       if (!take) return;
       btn.disabled = true;
-      btn.textContent = "Comparing…";
+      btn.innerHTML = "Comparing…";
       const resultHost = $("[data-compare-result]");
       try {
         const blob = await Media.getBlob(take.mediaId);
         const pitchResult = await SongPitchCompare.compareRecording(blob, song);
         let timingHtml = "";
         if (pitchResult.aligned) {
-          const referenceOnsets = measured(song).map((s) => s.start - measured(song)[0].start);
-          const learnerOnsets = pitchResult.segments.map((s) => s.start - pitchResult.segments[0].start);
-          const timing = SongTimingCompare.compare(learnerOnsets, referenceOnsets);
-          timingHtml = timing.aligned
-            ? `<p class="text-sm text-ink-200 mt-4"><strong class="text-ink-100">Rhythm:</strong> ${timing.rating}</p>`
-            : `<p class="text-sm text-ink-500 mt-4">${timing.note}</p>`;
+          const refSegs = measured(song);
+          const referenceSpanSeconds = refSegs[refSegs.length - 1].end - refSegs[0].start;
+          const timing = SongTimingCompare.compare(pitchResult.learnerSpan, referenceSpanSeconds);
+          timingHtml = `<p class="text-sm text-ink-200 mt-4"><strong class="text-ink-100">Pace:</strong> ${timing.rating}</p>`;
         }
         if (resultHost) {
           resultHost.innerHTML = pitchResult.aligned
@@ -472,7 +471,7 @@ const SongLessonKit = (() => {
         if (resultHost) resultHost.textContent = "Couldn't analyze that recording. You can still trust your own ears.";
       }
       btn.disabled = false;
-      btn.textContent = "Compare my attempt";
+      btn.innerHTML = `${icon("play", "w-4 h-4")} Compare my attempt`;
     }
     container.addEventListener("click", onCompareAttempt);
     cleanups.push(() => container.removeEventListener("click", onCompareAttempt));

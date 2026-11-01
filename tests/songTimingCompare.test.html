@@ -9,17 +9,22 @@ const assert = {
 };
 
 try {
-  const ref = [0.65, 3.20, 5.87, 9.26]; // reference segment starts, normalized so first = 0 before comparing
-  const toRelative = (arr) => arr.map((t) => t - arr[0]);
+  // Same pace
+  let r = SongTimingCompare.compare(10.2, 10.17);
+  assert.strictEqual(r.rating, "about the same pace as the reference");
 
-  let r = SongTimingCompare.compare(toRelative([0.70, 3.30, 5.95, 9.40]), toRelative(ref));
-  assert.strictEqual(r.aligned, true);
-  assert.strictEqual(r.offsetsMs.length, 4);
-  assert.ok(["together", "a bit off"].includes(r.rating));
+  // Learner much faster (short span relative to reference)
+  r = SongTimingCompare.compare(6, 10.17);
+  assert.strictEqual(r.rating, "faster than the reference");
 
-  r = SongTimingCompare.compare(toRelative([0.70, 3.30]), toRelative(ref));
-  assert.strictEqual(r.aligned, false);
-  assert.ok(r.note);
+  // Learner much slower
+  r = SongTimingCompare.compare(14, 10.17);
+  assert.strictEqual(r.rating, "slower than the reference");
+
+  // Missing/zero reference span -> honest fallback, never a fabricated rating
+  r = SongTimingCompare.compare(5, 0);
+  assert.strictEqual(r.rating, "hard to tell");
+  assert.strictEqual(r.ratio, null);
 
   console.log("songTimingCompare.test.html: all assertions passed");
 } catch (e) {

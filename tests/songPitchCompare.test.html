@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
 <body>
+<script src="../js/audio/pitchAnalysis.js"></script>
 <script src="../js/components/songPitchCompare.js"></script>
 <script>
 const assert = {
@@ -8,31 +9,90 @@ const assert = {
   ok(v, msg) { if (!v) throw new Error(msg || "expected truthy"); },
 };
 
-try {
-  const refSegments = [
-    { midi: 70, swara: "Sa" }, { midi: 69, swara: "Ni (lower)" },
-    { midi: 66, swara: "Pa (lower)" }, { midi: 58, swara: "Sa (lower octave)" },
-    { midi: 43, swara: null }, // uncertain segment — excluded from "measured" count
-  ];
+/* ---- a minimal song fixture matching SONGS[0]'s real reference segments ---- */
+const song = {
+  reference: {
+    tonicMidi: 70,
+    segments: [
+      { start: 0.65, end: 3.16, hz: 454.2, midi: 70, swara: "Sa", western: "A#4", confidence: "measured", covers: ["Oo", "Na", "n", "na"] },
+      { start: 3.20, end: 5.36, hz: 437.5, midi: 69, swara: "Ni (lower)", western: "A4", confidence: "measured", covers: ["Che", "tha", "na"] },
+      { start: 5.87, end: 9.24, hz: 378.6, midi: 66, swara: "Pa (lower)", western: "F#4", confidence: "measured", covers: ["Aa", "gu", "Nee", "a-ni", "ke"] },
+      { start: 9.26, end: 10.82, hz: 238.5, midi: 58, swara: "Sa (lower octave)", western: "A#3", confidence: "measured", covers: ["ta", "na"] },
+      { start: 11.05, end: 11.35, hz: 102.9, midi: 43, swara: null, western: null, confidence: "uncertain", covers: [] },
+    ],
+  },
+};
 
-  // Case 1: matching segment count, all close
-  let r = SongPitchCompare.summarize(
-    [{ midi: 70.2 }, { midi: 69.1 }, { midi: 66.3 }, { midi: 57.8 }],
-    refSegments
-  );
-  assert.strictEqual(r.aligned, true);
-  assert.strictEqual(r.perSegment.length, 4);
-  r.perSegment.forEach((s) => assert.strictEqual(s.verdict, "close"));
+/* ---- pure function tests: computeWindows / compareWindows ---- */
+function testPureFunctions() {
+  const windows = SongPitchCompare.computeWindows(song.reference.segments, 0, 10.17);
+  assert.strictEqual(windows.length, 4, "4 measured segments, uncertain one excluded");
+  assert.strictEqual(windows[0].refIndex, 0);
+  assert.strictEqual(windows[0].windowStart, 0, "first window starts at the learner's own frame start");
+  assert.ok(Math.abs(windows[3].windowEnd - 10.17) < 0.001, "last window ends at the learner's own frame end");
 
-  // Case 2: mismatched segment count
-  r = SongPitchCompare.summarize([{ midi: 70 }, { midi: 69 }], refSegments);
-  assert.strictEqual(r.aligned, false);
-  assert.strictEqual(r.perSegment.length, 0);
-  assert.ok(r.note);
+  // compareWindows with frames that exactly match each window's reference pitch
+  const frames = [];
+  windows.forEach((w) => {
+    const midi = PitchAnalysis.toMidi(w.hz);
+    for (let t = w.windowStart; t < w.windowEnd; t += 0.02) frames.push({ t, midi });
+  });
+  const result = SongPitchCompare.compareWindows(frames, windows);
+  assert.strictEqual(result.length, 4);
+  result.forEach((r) => assert.strictEqual(r.verdict, "close", `segment ${r.refIndex} (${r.swara}) should read close`));
 
-  console.log("songPitchCompare.test.html: all assertions passed");
-} catch (e) {
-  console.error("songPitchCompare.test.html: FAILED -", e.message);
+  // Too few frames in a window -> "unclear", never a guessed verdict
+  const sparse = SongPitchCompare.compareWindows([{ t: windows[0].windowStart + 0.1, midi: 70 }], windows);
+  assert.strictEqual(sparse[0].verdict, "unclear");
 }
+
+/* ---- synthetic-WAV end-to-end test: reproduces the reviewer's probe scenario A ---- */
+function buildWavBlob(segments, sampleRate, octaveShift) {
+  const totalSeconds = segments[segments.length - 1].end;
+  const samples = new Float32Array(Math.ceil(totalSeconds * sampleRate));
+  segments.forEach((seg) => {
+    if (seg.swara === null) return; // skip the uncertain tail — not a real note to synthesize
+    const freq = seg.hz * Math.pow(2, octaveShift);
+    const startSample = Math.floor(seg.start * sampleRate);
+    const endSample = Math.floor(seg.end * sampleRate);
+    for (let i = startSample; i < endSample && i < samples.length; i++) {
+      samples[i] = 0.4 * Math.sin((2 * Math.PI * freq * i) / sampleRate);
+    }
+  });
+  // 16-bit PCM mono WAV
+  const buf = new ArrayBuffer(44 + samples.length * 2);
+  const view = new DataView(buf);
+  const writeStr = (off, s) => { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); };
+  writeStr(0, "RIFF"); view.setUint32(4, 36 + samples.length * 2, true); writeStr(8, "WAVE");
+  writeStr(12, "fmt "); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+  writeStr(36, "data"); view.setUint32(40, samples.length * 2, true);
+  for (let i = 0; i < samples.length; i++) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    view.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+  }
+  return new Blob([buf], { type: "audio/wav" });
+}
+async function testFaithfulRecording() {
+  // A faithful rendition, exact reference timing and pitch — must align and read close
+  // (this exact case is what the pre-fix code reported as "different number of pauses" — Critical #1)
+  const faithfulBlob = buildWavBlob(song.reference.segments, 22050, 0);
+  const faithful = await SongPitchCompare.compareRecording(faithfulBlob, song);
+  assert.strictEqual(faithful.aligned, true, "a faithful rendition must align");
+  assert.strictEqual(faithful.perSegment.length, 4);
+  const closeCount = faithful.perSegment.filter((s) => s.verdict === "close").length;
+  assert.ok(closeCount >= 3, `expected most segments close, got ${closeCount}/4: ${JSON.stringify(faithful.perSegment)}`);
+}
+
+(async () => {
+  try {
+    testPureFunctions();
+    await testFaithfulRecording();
+    console.log("songPitchCompare.test.html: all assertions passed");
+  } catch (e) {
+    console.error("songPitchCompare.test.html: FAILED -", e.message);
+  }
+})();
 </script>
 </body></html>

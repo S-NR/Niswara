@@ -25,6 +25,15 @@ try {
   const measured = s.reference.segments.slice(0, 4);
   measured.forEach((seg) => assert.strictEqual(seg.confidence, "measured"));
   assert.strictEqual(s.practiceAudio, null);
+
+  // line field: each measured segment belongs to exactly one of the 2 lines;
+  // the uncertain segment belongs to neither (post-review fix, Important #3)
+  assert.strictEqual(s.reference.segments[0].line, 0);
+  assert.strictEqual(s.reference.segments[1].line, 0);
+  assert.strictEqual(s.reference.segments[2].line, 1);
+  assert.strictEqual(s.reference.segments[3].line, 1);
+  assert.strictEqual(s.reference.segments[4].line, null);
+  assert.ok(typeof s.reference.melodyNote === "string" && s.reference.melodyNote.length > 0);
   console.log("songs.data.test.html: all assertions passed");
 } catch (e) {
   console.error("songs.data.test.html: FAILED -", e.message);

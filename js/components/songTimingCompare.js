@@ -1,39 +1,27 @@
 /* ============================================================
-   SONG TIMING COMPARE — onset-timing comparison for a learner's
+   SONG TIMING COMPARE — overall-pace comparison for a learner's
    own song recording against a song's reference segment timing.
 
-   Modeled on TimingAnalysis.analyze's statistics (js/components/
-   rhythm.js), but matches two freeform timestamp arrays (segment
-   start times) instead of taps against a fixed beat grid. Honest
-   by construction: a mismatched segment count reports that rather
-   than forcing a misleading comparison (same posture as
-   SongPitchCompare — see docs/superpowers/specs/
-   2026-11-01-song-learning-level-design.md §8).
+   Originally matched onset-by-onset against the reference (modeled
+   on TimingAnalysis's statistics), but that requires the learner's
+   recording to independently segment into the same COUNT of voiced
+   regions as the reference — which SongPitchCompare's own
+   time-proportional window mapping (see that file's fix-pass note)
+   no longer produces or needs. Comparing overall pace instead is
+   simpler, always computable, and still honest: it reports how the
+   learner's total voiced duration compares to the reference's own
+   measured span, never a fabricated beat-by-beat verdict.
    ============================================================ */
 
 const SongTimingCompare = (() => {
-  function median(arr) {
-    if (!arr.length) return NaN;
-    const s = arr.slice().sort((a, b) => a - b);
-    const m = s.length >> 1;
-    return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
-  }
-
-  /** learnerOnsets, referenceOnsets: arrays of seconds (segment start times, both relative to their own first onset). */
-  function compare(learnerOnsets, referenceOnsets) {
-    if (learnerOnsets.length !== referenceOnsets.length) {
-      return {
-        aligned: false,
-        offsetsMs: [],
-        medianAbsMs: null,
-        rating: "hard to tell",
-        note: "Your attempt had a different number of pauses than the reference, so a timing comparison isn't reliable this time.",
-      };
+  /** learnerSpanSeconds, referenceSpanSeconds: both > 0 expected; a zero/missing reference span is reported as "hard to tell". */
+  function compare(learnerSpanSeconds, referenceSpanSeconds) {
+    if (!referenceSpanSeconds || !learnerSpanSeconds) {
+      return { ratio: null, rating: "hard to tell" };
     }
-    const offsetsMs = learnerOnsets.map((t, i) => Math.round((t - referenceOnsets[i]) * 1000));
-    const medianAbsMs = median(offsetsMs.map(Math.abs));
-    const rating = medianAbsMs <= 150 ? "together" : medianAbsMs <= 400 ? "a bit off" : "hard to tell";
-    return { aligned: true, offsetsMs, medianAbsMs, rating };
+    const ratio = learnerSpanSeconds / referenceSpanSeconds;
+    const rating = ratio < 0.8 ? "faster than the reference" : ratio > 1.25 ? "slower than the reference" : "about the same pace as the reference";
+    return { ratio: Math.round(ratio * 100) / 100, rating };
   }
 
   return { compare };

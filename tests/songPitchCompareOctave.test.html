@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"></head>
+<body>
+<script src="../js/audio/pitchAnalysis.js"></script>
+<script src="../js/components/songPitchCompare.js"></script>
+<script>
+/* Split from songPitchCompare.test.html: this headless Chrome build hangs on a
+   second sequential OfflineAudioContext decode within one page load (a sandbox
+   quirk of this environment, not a production bug — see
+   .superpowers/sdd/2026-11-01-song-learning-level/progress.md, the post-review
+   fix-pass note). One synthetic-recording scenario per page avoids it. */
+const assert = {
+  strictEqual(a, b, msg) { if (a !== b) throw new Error(msg || `expected ${b}, got ${a}`); },
+  ok(v, msg) { if (!v) throw new Error(msg || "expected truthy"); },
+};
+
+const song = {
+  reference: {
+    tonicMidi: 70,
+    segments: [
+      { start: 0.65, end: 3.16, hz: 454.2, midi: 70, swara: "Sa", western: "A#4", confidence: "measured", covers: ["Oo", "Na", "n", "na"] },
+      { start: 3.20, end: 5.36, hz: 437.5, midi: 69, swara: "Ni (lower)", western: "A4", confidence: "measured", covers: ["Che", "tha", "na"] },
+      { start: 5.87, end: 9.24, hz: 378.6, midi: 66, swara: "Pa (lower)", western: "F#4", confidence: "measured", covers: ["Aa", "gu", "Nee", "a-ni", "ke"] },
+      { start: 9.26, end: 10.82, hz: 238.5, midi: 58, swara: "Sa (lower octave)", western: "A#3", confidence: "measured", covers: ["ta", "na"] },
+      { start: 11.05, end: 11.35, hz: 102.9, midi: 43, swara: null, western: null, confidence: "uncertain", covers: [] },
+    ],
+  },
+};
+
+function buildWavBlob(segments, sampleRate, octaveShift) {
+  const totalSeconds = segments[segments.length - 1].end;
+  const samples = new Float32Array(Math.ceil(totalSeconds * sampleRate));
+  segments.forEach((seg) => {
+    if (seg.swara === null) return;
+    const freq = seg.hz * Math.pow(2, octaveShift);
+    const startSample = Math.floor(seg.start * sampleRate);
+    const endSample = Math.floor(seg.end * sampleRate);
+    for (let i = startSample; i < endSample && i < samples.length; i++) {
+      samples[i] = 0.4 * Math.sin((2 * Math.PI * freq * i) / sampleRate);
+    }
+  });
+  const buf = new ArrayBuffer(44 + samples.length * 2);
+  const view = new DataView(buf);
+  const writeStr = (off, s) => { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); };
+  writeStr(0, "RIFF"); view.setUint32(4, 36 + samples.length * 2, true); writeStr(8, "WAVE");
+  writeStr(12, "fmt "); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+  writeStr(36, "data"); view.setUint32(40, samples.length * 2, true);
+  for (let i = 0; i < samples.length; i++) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    view.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+  }
+  return new Blob([buf], { type: "audio/wav" });
+}
+
+async function testOctaveShiftedRecording() {
+  // The same melody sung one octave lower — must still read close via octave folding
+  // (pre-fix code reported "off/below/-1200ish" on every segment — Important #2)
+  const octaveBlob = buildWavBlob(song.reference.segments, 22050, -1);
+  const octave = await SongPitchCompare.compareRecording(octaveBlob, song);
+  assert.strictEqual(octave.aligned, true);
+  const octaveCloseCount = octave.perSegment.filter((s) => s.verdict === "close").length;
+  assert.ok(octaveCloseCount >= 3, `expected octave-shifted take to still read close via folding, got ${octaveCloseCount}/4: ${JSON.stringify(octave.perSegment)}`);
+  octave.perSegment.forEach((s) => {
+    if (s.verdict !== "unclear") assert.ok(Math.abs(s.cents) < 60, `cents should be small after octave folding, got ${s.cents} for ${s.swara}`);
+  });
+}
+
+(async () => {
+  try {
+    await testOctaveShiftedRecording();
+    console.log("songPitchCompareOctave.test.html: all assertions passed");
+  } catch (e) {
+    console.error("songPitchCompareOctave.test.html: FAILED -", e.message);
+  }
+})();
+</script>
+</body></html>

@@ -53,12 +53,16 @@ window.SONGS = [
     reference: {
       sourceNote: "Tonic (Sa) taken as the first stable sustained pitch in the uploaded reference recording (≈A♯4, 454 Hz) — a convention for an unaccompanied take, not a measured fact; confirmed with the learner rather than assumed.",
       tonicMidi: 70,
+      // melodyNote: a short, honest description of how the melody moves across the measured
+      // segments — written from the data above, not fabricated music theory. Shown on the
+      // Melody stage; kept here (not hardcoded in songLessonKit.js) so it travels with the song.
+      melodyNote: "The melody moves downward across the two lines — Line 1 begins on Sa and settles toward Ni, then Line 2 continues the same descent through Pa to a final Sa an octave down, a natural, idiomatic cadence.",
       segments: [
-        { start: 0.65, end: 3.16, hz: 454.2, midi: 70, swara: "Sa", western: "A♯4", confidence: "measured", covers: ["Oo", "Na", "n", "na"] },
-        { start: 3.20, end: 5.36, hz: 437.5, midi: 69, swara: "Ni (lower)", western: "A4", confidence: "measured", covers: ["Che", "tha", "na"] },
-        { start: 5.87, end: 9.24, hz: 378.6, midi: 66, swara: "Pa (lower)", western: "F♯4", confidence: "measured", covers: ["Aa", "gu", "Nee", "a-ni", "ke"] },
-        { start: 9.26, end: 10.82, hz: 238.5, midi: 58, swara: "Sa (lower octave)", western: "A♯3", confidence: "measured", covers: ["ta", "na"] },
-        { start: 11.05, end: 11.35, hz: 102.9, midi: 43, swara: null, western: null, confidence: "uncertain — likely a breath/vocal-fry tail, not a sung note", covers: [] },
+        { start: 0.65, end: 3.16, hz: 454.2, midi: 70, swara: "Sa", western: "A♯4", confidence: "measured", line: 0, covers: ["Oo", "Na", "n", "na"] },
+        { start: 3.20, end: 5.36, hz: 437.5, midi: 69, swara: "Ni (lower)", western: "A4", confidence: "measured", line: 0, covers: ["Che", "tha", "na"] },
+        { start: 5.87, end: 9.24, hz: 378.6, midi: 66, swara: "Pa (lower)", western: "F♯4", confidence: "measured", line: 1, covers: ["Aa", "gu", "Nee", "a-ni", "ke"] },
+        { start: 9.26, end: 10.82, hz: 238.5, midi: 58, swara: "Sa (lower octave)", western: "A♯3", confidence: "measured", line: 1, covers: ["ta", "na"] },
+        { start: 11.05, end: 11.35, hz: 102.9, midi: 43, swara: null, western: null, confidence: "uncertain — likely a breath/vocal-fry tail, not a sung note", line: null, covers: [] },
       ],
     },
     practiceAudio: null,
