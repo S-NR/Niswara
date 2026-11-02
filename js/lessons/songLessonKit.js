@@ -208,18 +208,22 @@ const SongLessonKit = (() => {
       </table>`;
   }
 
+  // One chip per sounding beat (from syllablesForLine — the by-ear per-beat data when
+  // the song has it, see songs.js), not per broad measured segment, so the contour
+  // actually traces the real melody shape rather than 4 averaged regions. A held beat
+  // (no new syllable) renders dimmed with "(held)" instead of lyric text.
   function melodyContourHtml(song) {
     const tonic = song.reference.tonicMidi;
-    return `<div class="flex flex-wrap items-end gap-2 my-5" style="min-height:80px">
-      ${song.reference.segments.map((seg) => {
-        const rel = seg.midi - tonic; // semitones relative to Sa; purely visual placement
-        const offset = Math.max(0, Math.min(60, 30 - rel * 3));
-        return `<div class="flex flex-col items-center" style="margin-bottom:${offset}px">
-          <span class="flow-chip !text-xs">${seg.swara || "?"}</span>
-          <span class="text-[10px] text-ink-500 mt-1">${seg.covers.join(" ") || "(uncertain)"}</span>
-        </div>`;
-      }).join("")}
-    </div>`;
+    const chip = (b) => {
+      const offset = b.midi == null ? 0 : Math.max(0, Math.min(60, 30 - (b.midi - tonic) * 3));
+      return `<div class="flex flex-col items-center" style="margin-bottom:${offset}px">
+        <span class="flow-chip !text-xs${b.sustain ? " opacity-60" : ""}">${b.swara || b.western || "?"}</span>
+        <span class="text-[10px] text-ink-500 mt-1">${b.sustain ? "(held)" : b.text || "(uncertain)"}</span>
+      </div>`;
+    };
+    return song.lines
+      .map((_, i) => `<div class="flex flex-wrap items-end gap-2 my-3" style="min-height:80px">${syllablesForLine(song, i).map(chip).join("")}</div>`)
+      .join(`<div class="border-t border-white/5 my-1"></div>`);
   }
 
   function milestone() {
@@ -337,7 +341,7 @@ const SongLessonKit = (() => {
 
         ${chapter("melody", 5, "Melody", `
           ${narrow(`
-            ${p("Each measured segment, placed roughly by pitch — higher chips are higher notes.")}
+            ${p("Each beat, placed roughly by pitch — higher chips are higher notes, and dimmed chips are held beats rather than new syllables.")}
             ${melodyContourHtml(song)}
             ${p(song.reference.melodyNote)}
           `)}
@@ -485,9 +489,11 @@ const SongLessonKit = (() => {
       const btn = e.target.closest("[data-play-melody]");
       if (!btn) return;
       const [which, speed] = btn.dataset.playMelody.split(":");
-      const segs = which === "both" ? measured(song) : segmentsForLine(song, Number(which));
+      // Every sounding beat, in order (held beats included) — not just the 4 broad
+      // measured segments — so playback actually traces the real melody.
+      const beats = which === "both" ? allSyllables(song) : syllablesForLine(song, Number(which));
       const opts = speed === "slow" ? { duration: 0.75, gap: 0.3 } : { duration: 0.5, gap: 0.18 };
-      PianoSynth.playSequence(segs.map((s) => s.midi), opts);
+      PianoSynth.playSequence(beats.filter((b) => b.midi != null).map((b) => b.midi), opts);
     }
     container.addEventListener("click", onPlayMelody);
     cleanups.push(() => container.removeEventListener("click", onPlayMelody));

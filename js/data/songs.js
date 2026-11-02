@@ -75,10 +75,11 @@ window.SONGS = [
     reference: {
       sourceNote: "Tonic (Sa) taken as the first stable sustained pitch in the uploaded reference recording (≈A♯4, 454 Hz) — a convention for an unaccompanied take, not a measured fact; confirmed with the learner rather than assumed.",
       tonicMidi: 70,
-      // melodyNote: a short, honest description of how the melody moves across the measured
-      // segments — written from the data above, not fabricated music theory. Shown on the
+      // melodyNote: a short, honest description of how the melody actually moves, written
+      // from the by-ear per-beat data below (`byEarRow`), not from the broader measured
+      // segments (which only resolve 4 regions and don't show this shape). Shown on the
       // Melody stage; kept here (not hardcoded in songLessonKit.js) so it travels with the song.
-      melodyNote: "The melody moves downward across the two lines — Line 1 begins on Sa and settles toward Ni, then Line 2 continues the same descent through Pa to a final Sa an octave down, a natural, idiomatic cadence.",
+      melodyNote: "Line 1 opens steady on Sa, dips down through a short descending run during “Nanna” (Sa → Ni → a lower G → a lower E), then climbs back up through “Chetana” to settle on Ni rather than returning all the way to Sa — a dip-and-rise shape, not a straight slide down. Line 2 opens on that same Ni and continues the same downward direction through “Aagu Nee anikethana”, with one brief re-attack on “ke”, before settling on Sa a full octave below the opening note for the closing “tana”.",
       segments: [
         { start: 0.65, end: 3.16, hz: 454.2, midi: 70, swara: "Sa", western: "A♯4", confidence: "measured", line: 0, covers: ["Oo", "Na", "n", "na"] },
         { start: 3.20, end: 5.36, hz: 437.5, midi: 69, swara: "Ni (lower)", western: "A4", confidence: "measured", line: 0, covers: ["Che", "tha", "na"] },
