@@ -467,29 +467,34 @@ const SongLessonKit = (() => {
         `)}
 
         ${chapter("practice", 7, "Practice", `
-          ${narrow(p("Three practice modes, plus one flowing playback engine behind all of them — change the tempo once and every phrase, held note, and gap adjusts together."))}
-          <div class="grid sm:grid-cols-2 gap-4 mb-4">
-            <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-              <p class="text-sm text-ink-100 font-display mb-2">Swara Practice</p>
-              <p class="text-xs text-ink-500 mb-3">Every beat, individually — tap any one.</p>
-              <div class="flex flex-wrap gap-2">
-                ${allSyllables(song).map((syl, i) => syl.midi != null ? `<button type="button" data-play-syllable="${i}" class="vr-btn !text-xs">${icon("play", "w-3 h-3")} ${syl.sustain ? "(held)" : syl.text}</button>` : "").join("")}
-              </div>
+          ${narrow(p("One flowing playback engine behind every section below — set the tempo once (Step 1) and every phrase, held note, and gap adjusts together, wherever you play it from."))}
+
+          <div class="rounded-2xl border border-gold-400/20 bg-white/[0.02] p-5 mb-4">
+            <p class="text-[11px] uppercase tracking-wider text-ink-500 mb-3">Step 1 — Choose a tempo</p>
+            <div class="flex flex-wrap gap-3 mb-2">
+              <button type="button" data-flow-bpm="60" class="ex-chip !text-sm !py-2.5 !px-5 is-selected">Slow</button>
+              <button type="button" data-flow-bpm="90" class="ex-chip !text-sm !py-2.5 !px-5">Normal</button>
             </div>
-            <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-              <p class="text-sm text-ink-100 font-display mb-2">Mode</p>
-              <div class="flex flex-wrap gap-2 mb-3" role="group" aria-label="Practice mode" data-flow-modes>
-                ${FLOW_MODES.map((m) => `<button type="button" data-flow-mode="${m.key}" class="ex-chip ${m.key === "full" ? "is-selected" : ""}">${m.label}</button>`).join("")}
-              </div>
-              <p class="text-xs text-ink-500" data-flow-mode-hint>${FLOW_MODES.find((m) => m.key === "full").hint}</p>
-            </div>
+            <p class="text-xs text-ink-500">More tempo options: ${TEMPO_PRESETS.map((t) => `<button type="button" data-flow-bpm="${t.bpm}" class="underline hover:text-ink-300">${t.label}</button>`).join(" · ")}</p>
           </div>
-          <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-              <p class="text-sm text-ink-100 font-display">Flowing playback</p>
-              <div class="flex flex-wrap gap-1.5" role="group" aria-label="Tempo">
-                ${TEMPO_PRESETS.map((t) => `<button type="button" data-flow-bpm="${t.bpm}" class="ex-chip !py-1.5 !px-3 tabular-nums ${t.bpm === DEFAULT_BPM ? "is-selected" : ""}">${t.bpm} · ${t.label}</button>`).join("")}
-              </div>
+
+          <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-5 mb-4">
+            <p class="text-sm text-ink-100 font-display mb-1">Step 2 — Beat Practice</p>
+            <p class="text-xs text-ink-500 mb-4">Tap any beat below to hear it on its own — a plain click in Mode A, the real note in Mode B/C.</p>
+            <div class="flex flex-wrap gap-2 mb-3" role="group" aria-label="Practice mode">
+              ${FLOW_MODES.map((m) => `<button type="button" data-flow-mode="${m.key}" class="ex-chip ${m.key === "full" ? "is-selected" : ""}">${m.label}</button>`).join("")}
+            </div>
+            <p class="text-xs text-ink-500 mb-4" data-flow-mode-hint>${FLOW_MODES.find((m) => m.key === "full").hint}</p>
+            ${song.lines.map((_, i) => rhythmTableHtml(song, i)).join("")}
+          </div>
+
+          <div class="rounded-2xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.06] to-transparent p-5 mb-4">
+            <p class="text-sm text-ink-100 font-display mb-1">Step 3 &amp; 4 — Sing Along, Guided Practice</p>
+            <p class="text-xs text-ink-500 mb-4">Play the whole song and follow the highlighted syllable and note as they sound — exactly what to sing, right now.</p>
+            <div class="rounded-2xl border border-white/10 bg-ink-950/60 p-6 text-center mb-4">
+              <p class="text-[11px] uppercase tracking-wider text-ink-500 mb-2" data-singalong-phrase>Ready</p>
+              <p class="font-display text-4xl text-ink-50 mb-1" data-singalong-syllable>—</p>
+              <p class="text-sm text-gold-300 min-h-[1.25rem]" data-singalong-note>&nbsp;</p>
             </div>
             <div class="flex flex-wrap items-center gap-2 mb-1">
               <button type="button" data-flow-play="both" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play</button>
@@ -500,10 +505,27 @@ const SongLessonKit = (() => {
             </div>
             <p class="text-xs text-ink-500 mt-2" data-flow-status>Ready — tap a beat above to play it on its own, or Play for the whole flowing sequence.</p>
           </div>
+
+          <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+            <p class="text-sm text-ink-100 font-display mb-2">Swara Practice</p>
+            <p class="text-xs text-ink-500 mb-3">Every beat, individually — tap any one.</p>
+            <div class="flex flex-wrap gap-2">
+              ${allSyllables(song).map((syl, i) => syl.midi != null ? `<button type="button" data-play-syllable="${i}" class="vr-btn !text-xs">${icon("play", "w-3 h-3")} ${syl.sustain ? "(held)" : syl.text}</button>` : "").join("")}
+            </div>
+          </div>
         `, { wide: true })}
 
         ${chapter("perform", 8, "Perform", `
           ${narrow(p("A guided sequence — skip any of these, record only what feels comfortable. Play the reference for any of them before or while you sing — it uses whichever tempo is currently selected above, unless noted otherwise."))}
+          <div class="rounded-2xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.06] to-transparent p-5 mb-5">
+            <p class="text-sm text-ink-100 font-display mb-1">My Singing Recording</p>
+            <p class="text-xs text-ink-500 mb-4">Starts the reference and your microphone together, at the tempo chosen in Practice — listen and sing at the same time. Saves into "All lines, combined" below, so you can replay it, compare it, or record again from there.</p>
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" data-singalong-start class="vr-btn vr-btn-primary"><span class="vr-rec-dot"></span> Start singing with reference</button>
+              <button type="button" data-singalong-stop class="vr-btn" disabled>■ Stop</button>
+              <span class="text-xs text-ink-500" data-singalong-rec-status></span>
+            </div>
+          </div>
           <div class="flex flex-col gap-5">
             ${[
               ...song.lines.map((line, i) => [`line${i}Take`, `Line ${i + 1}, on its own`, `“${line.text}”`, String(i), null]),
@@ -626,12 +648,32 @@ const SongLessonKit = (() => {
     let flowPausedAt = { scope: null, index: 0 };
     let flowLoopKey = null; // "line:phrase" currently looping, or null
 
+    // Updates every matching .song-beat (Beat Practice and the earlier Rhythm stage
+    // both render the same beats, so querySelectorAll keeps every copy in sync) plus
+    // the Sing Along readout — one highlight call drives both, from the same address.
     function setHighlight(addr) {
       container.querySelectorAll(".song-beat.is-lit").forEach((el) => el.classList.remove("is-lit"));
-      if (!addr) return;
+      const phraseEl = $("[data-singalong-phrase]"), sylEl = $("[data-singalong-syllable]"), noteEl = $("[data-singalong-note]");
+      if (!addr) {
+        if (phraseEl) phraseEl.textContent = "Ready";
+        if (sylEl) sylEl.textContent = "—";
+        if (noteEl) noteEl.innerHTML = "&nbsp;";
+        return;
+      }
       const sel = addr.gap ? `[data-beat-line="${addr.line}"][data-beat-gap]` : `[data-beat-line="${addr.line}"][data-beat-cell="${addr.cell}"]`;
-      const el = container.querySelector(sel);
-      if (el) el.classList.add("is-lit");
+      container.querySelectorAll(sel).forEach((el) => el.classList.add("is-lit"));
+      if (addr.gap) {
+        if (phraseEl) phraseEl.textContent = `Line ${addr.line + 1} — pause`;
+        if (sylEl) sylEl.textContent = "( — )";
+        if (noteEl) noteEl.innerHTML = "&nbsp;";
+        return;
+      }
+      const beat = syllablesForLine(song, addr.line)[addr.cell];
+      if (!beat) return;
+      const total = song.lines[addr.line].phrases.length * 3;
+      if (phraseEl) phraseEl.textContent = `Line ${addr.line + 1} — beat ${addr.cell + 1} of ${total}`;
+      if (sylEl) sylEl.textContent = beat.sustain ? "( held )" : beat.text;
+      if (noteEl) noteEl.textContent = beat.swara || beat.western || "";
     }
 
     // Mode A (rhythm only): every beat becomes the same fixed click pitch, and never
@@ -739,7 +781,10 @@ const SongLessonKit = (() => {
         const scope = (flowPlayer && flowPlayer.scope) ?? flowPausedAt.scope ?? "both";
         flowPausedAt = { scope: null, index: 0 };
         playScope(scope, 0);
+        return;
       }
+      if (e.target.closest("[data-singalong-start]")) { onSingAlongStart(); return; }
+      if (e.target.closest("[data-singalong-stop]")) { onSingAlongStop(); }
     }
     container.addEventListener("click", onFlowClick);
     cleanups.push(() => { stopFlow(); container.removeEventListener("click", onFlowClick); });
@@ -772,13 +817,42 @@ const SongLessonKit = (() => {
       combinedTake: "All lines, combined",
       slowTake: "All lines, slow tempo", fullTempoTake: "All lines, full tempo",
     });
+    const recordingCards = {};
     Object.keys(RECORDING_NAMES).forEach((key) => {
-      own(RecordingCard.wire(container, `rc-${key}`, {
+      recordingCards[key] = own(RecordingCard.wire(container, `rc-${key}`, {
         classId: song.id, take: A(rec0(), "recs")[key] || null, maxSeconds: 20,
         meta: { name: `Song — ${song.titleTransliteration} — ${RECORDING_NAMES[key]}`, exercise: `song-${song.id}-${key}` },
-        onSaved: (t) => { SongActivity.setAnswer(song.id, "recs", key, t); SongActivity.bump(song.id, "recordings"); refreshLive(); },
+        onSaved: (t) => {
+          SongActivity.setAnswer(song.id, "recs", key, t); SongActivity.bump(song.id, "recordings"); refreshLive();
+          if (key === "combinedTake") endSingAlongRecording("Saved — play it back below, or compare it in the next stage.");
+        },
       }));
     });
+
+    /* ---- My Singing Recording: play the reference + record the mic together,
+       reusing combinedTake's own RecordingCard (so the result is the exact same take
+       the next stage compares) rather than a second, parallel recording pathway. ---- */
+    function endSingAlongRecording(statusText) {
+      stopFlow();
+      const startBtn = $("[data-singalong-start]"), stopBtn = $("[data-singalong-stop]"), status = $("[data-singalong-rec-status]");
+      if (startBtn) startBtn.disabled = false;
+      if (stopBtn) stopBtn.disabled = true;
+      if (status) status.textContent = statusText || "";
+    }
+    function onSingAlongStart() {
+      const card = recordingCards.combinedTake;
+      if (!card || !VoiceRecorder.isSupported()) return;
+      playScope("both", 0);
+      card.record();
+      $("[data-singalong-start]").disabled = true;
+      $("[data-singalong-stop]").disabled = false;
+      $("[data-singalong-rec-status]").textContent = "Playing the reference and recording together…";
+    }
+    function onSingAlongStop() {
+      const card = recordingCards.combinedTake;
+      if (card) card.stop(); // its own onSaved above calls endSingAlongRecording once the take is saved
+      else endSingAlongRecording();
+    }
 
     /* ---- Assess: compare my attempt ---- */
     async function onCompareAttempt(e) {

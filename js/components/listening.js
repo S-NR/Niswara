@@ -427,6 +427,8 @@ const RecordingCard = (() => {
     return {
       getTake: () => take,
       getPlayer: () => player,
+      record, // lets a caller start recording programmatically (e.g. a combined "play reference + record" action), same mic-permission/consent flow as the Record button itself
+      stop: () => { if (session) session.stop(); },
       destroy() {
         root.removeEventListener("click", onClick);
         if (session) session.cancel();
