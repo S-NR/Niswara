@@ -86,6 +86,38 @@ try {
   assert.strictEqual(all[13].text, "na");
   assert.strictEqual(all[13].swara, "Sa (lower)");
 
+  // By-ear per-beat path: when a line's rows carry their own `notes` (finer than the
+  // measured segments — see BY_EAR_NOTE/byEarRow in songs.js), syllablesForLine must
+  // use those directly, one beat per sounding cell — including a beat that holds the
+  // PREVIOUS syllable (lyric "–", `notes[col]` still set) rather than starting a new
+  // one, and skipping a true rest (lyric "–" AND no note) entirely.
+  const byEarSong = {
+    lines: [{
+      rhythm: [
+        { tha: "Oo", ki: "–", ta: "–", notes: {
+          tha: { midi: 70, western: "A♯4", swara: "Sa", confidence: "by ear" },
+          ki: { midi: 70, western: "A♯4", swara: "Sa", confidence: "by ear" },
+          ta: { midi: 70, western: "A♯4", swara: "Sa", confidence: "by ear" },
+        } },
+        { tha: "na", ki: "–", ta: "–", notes: {
+          tha: { midi: 69, western: "A4", swara: "Ni (lower)", confidence: "by ear" },
+          ki: null, ta: null,
+        } },
+      ],
+    }],
+  };
+  const beats = SongLessonKit.syllablesForLine(byEarSong, 0);
+  assert.strictEqual(beats.length, 4, `by-ear line should have 4 sounding beats (3 held + 1 new), got ${beats.length}`);
+  assert.strictEqual(beats[0].text, "Oo");
+  assert.strictEqual(beats[0].sustain, false);
+  assert.strictEqual(beats[1].sustain, true, "row0's 2nd beat has no new lyric but IS still a sounding (held) beat");
+  assert.strictEqual(beats[1].swara, "Sa", "a held beat still carries its own note");
+  assert.strictEqual(beats[2].sustain, true);
+  assert.strictEqual(beats[3].text, "na");
+  assert.strictEqual(beats[3].swara, "Ni (lower)");
+  // row1's ki/ta cells are true rests (lyric "–" AND no note) — correctly absent above
+  // (only 1 beat came from row1, not 3), confirmed by the total count already asserted.
+
   console.log("songLessonKit.segmentsForLine.test.html: all assertions passed");
 } catch (e) {
   console.error("songLessonKit.segmentsForLine.test.html: FAILED -", e.message);

@@ -95,18 +95,40 @@ const SongLessonKit = (() => {
     return measured(song).filter((seg) => seg.line === lineIndex);
   }
 
-  /**
-   * Every syllable in this line, in reading order (tha, ki, ta per row, top to bottom),
-   * each carrying the note of the measured segment it falls under. Assigned POSITIONALLY
-   * (this line's segments, in order, each "claiming" as many syllables as its own
-   * `covers.length` says) — never by matching syllable TEXT, which breaks the moment the
-   * same syllable (e.g. "na") appears more than once, exactly the bug the per-line
-   * segment lookup itself was already fixed for. Several adjacent syllables legitimately
-   * share one note here — that's what the actual recording measured, not a shortcut.
+/**
+   * Every sounding beat in this line, in reading order (tha, ki, ta per row, top to
+   * bottom) — one entry per beat, not per syllable, so a syllable held across more
+   * than one Tha-Ki-Ta slot (`sustain: true`, no new lyric at that beat) still gets
+   * its own playable note, exactly as the learner asked ("each and every beat").
+   *
+   * Prefers each row's own `notes` field when the song has it — a finer, by-ear
+   * transcription (see `BY_EAR_NOTE`/`byEarRow` in songs.js) that can tell a held
+   * beat's pitch apart from the next syllable's, unlike the broadly measured
+   * `reference.segments`. Falls back to the older segment-covers positional mapping
+   * for a future song that doesn't have by-ear per-beat data yet — never by matching
+   * syllable TEXT, which breaks the moment the same syllable (e.g. "na") appears more
+   * than once, exactly the bug the per-line segment lookup was already fixed for.
    */
   function syllablesForLine(song, lineIndex) {
+    const rows = song.lines[lineIndex].rhythm;
+    if (rows.some((row) => row.notes)) {
+      const out = [];
+      rows.forEach((row, r) => {
+        ["tha", "ki", "ta"].forEach((col) => {
+          const note = row.notes && row.notes[col];
+          if (!note) return; // true rest — no sound at this beat
+          const text = row[col];
+          const sustain = !text || text === "–";
+          out.push({
+            text: sustain ? null : text, sustain, line: lineIndex, row: r, col,
+            swara: note.swara, western: note.western, midi: note.midi, confidence: note.confidence,
+          });
+        });
+      });
+      return out;
+    }
     const cells = [];
-    song.lines[lineIndex].rhythm.forEach((row, r) => {
+    rows.forEach((row, r) => {
       ["tha", "ki", "ta"].forEach((col) => {
         const text = row[col];
         if (text && text !== "–") cells.push({ text, line: lineIndex, row: r, col });
@@ -127,24 +149,38 @@ const SongLessonKit = (() => {
 
   const allSyllables = (song) => song.lines.flatMap((_, i) => syllablesForLine(song, i));
 
+  // Index of this line's first beat within allSyllables(song)'s flat list — lets
+  // rhythmTableHtml wire the same data-play-syllable index pitchTableHtml/Swara
+  // Practice use, without re-flattening every line on every cell.
+  function lineBeatOffset(song, lineIndex) {
+    let n = 0;
+    for (let i = 0; i < lineIndex; i++) n += syllablesForLine(song, i).length;
+    return n;
+  }
+
   function rhythmTableHtml(song, lineIndex) {
-    const syllables = syllablesForLine(song, lineIndex);
-    let si = 0;
+    const beats = syllablesForLine(song, lineIndex);
+    const offset = lineBeatOffset(song, lineIndex);
     return `
       <table class="w-full text-sm border-collapse mb-4">
         <thead><tr class="text-[11px] uppercase tracking-wider text-ink-500">
           <th class="text-left py-1.5 pr-3">Tha</th><th class="text-left py-1.5 pr-3">Ki</th><th class="text-left py-1.5">Ta</th>
         </tr></thead>
         <tbody>
-          ${song.lines[lineIndex].rhythm.map((row) => `
+          ${song.lines[lineIndex].rhythm.map((row, r) => `
           <tr class="border-t border-white/5">
             ${["tha", "ki", "ta"].map((col) => {
-              const text = row[col];
-              if (!text || text === "–") return `<td class="py-2 pr-3 text-ink-600">–</td>`;
-              const syl = syllables[si]; si++;
+              const bi = beats.findIndex((b) => b.row === r && b.col === col);
+              if (bi === -1) return `<td class="py-2 pr-3 text-ink-600">–</td>`;
+              const beat = beats[bi];
+              const label = beat.sustain
+                ? `<span class="text-ink-500 italic">(held)</span>`
+                : `<span class="text-ink-100">${beat.text}</span>`;
               return `<td class="py-2 pr-3">
-                <span class="text-ink-100">${text}</span>
-                ${syl && syl.swara ? `<span class="block text-[11px] text-gold-300/80 font-display">${syl.swara}</span>` : ""}
+                <button type="button" data-play-syllable="${offset + bi}" class="text-left group">
+                  ${label}
+                  ${beat.swara || beat.western ? `<span class="block text-[11px] text-gold-300/80 font-display group-hover:text-gold-200">${beat.swara || beat.western}</span>` : ""}
+                </button>
               </td>`;
             }).join("")}
           </tr>`).join("")}
@@ -164,9 +200,9 @@ const SongLessonKit = (() => {
           ${allSyllables(song).map((syl, i) => `
           <tr class="border-t border-white/5">
             <td class="py-2 pr-2">${syl.midi != null ? `<button type="button" data-play-syllable="${i}" class="vr-btn !text-[11px] !px-2 !py-1">${icon("play", "w-3 h-3")}</button>` : ""}</td>
-            <td class="py-2 pr-3 text-ink-100 font-display">${syl.text}</td>
+            <td class="py-2 pr-3 text-ink-100 font-display">${syl.sustain ? `<span class="text-ink-500 italic">(held)</span>` : syl.text}</td>
             <td class="py-2 pr-3 text-ink-50">${(western ? syl.western : syl.swara) || "—"}</td>
-            <td class="py-2 text-xs ${syl.confidence === "measured" ? "text-emerald-300" : "text-amber-300"}">${syl.confidence}</td>
+            <td class="py-2 text-xs ${syl.confidence === "measured" ? "text-emerald-300" : syl.confidence === "by ear" ? "text-teal-300" : "text-amber-300"}">${syl.confidence}</td>
           </tr>`).join("")}
         </tbody>
       </table>`;
@@ -326,7 +362,7 @@ const SongLessonKit = (() => {
               <p class="text-sm text-ink-100 font-display mb-2">Swara Practice</p>
               <p class="text-xs text-ink-500 mb-3">Every syllable, individually — tap any one.</p>
               <div class="flex flex-wrap gap-2">
-                ${allSyllables(song).map((syl, i) => syl.midi != null ? `<button type="button" data-play-syllable="${i}" class="vr-btn !text-xs">${icon("play", "w-3 h-3")} ${syl.text}</button>` : "").join("")}
+                ${allSyllables(song).map((syl, i) => syl.midi != null ? `<button type="button" data-play-syllable="${i}" class="vr-btn !text-xs">${icon("play", "w-3 h-3")} ${syl.sustain ? "(held)" : syl.text}</button>` : "").join("")}
               </div>
             </div>
             <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
