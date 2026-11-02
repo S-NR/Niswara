@@ -43,6 +43,49 @@ try {
   // measured() excludes the uncertain (swara: null) segment
   assert.strictEqual(SongLessonKit.measured(song).length, 4);
 
+  // syllablesForLine/allSyllables: positional mapping (per-syllable note display).
+  // Line 0's rhythm has 4 syllable cells ("Oo","Na","n","na" then "Che","tha","na")
+  // split across 2 rows; segment 0 covers the first 4, segment 1 covers the next 3.
+  // "na" appears as a syllable text in BOTH segments here — if the mapping were
+  // text-based (not positional/count-based) it could mismatch, so this also guards
+  // against reintroducing the Important #3 bug class at the syllable level.
+  const songWithRhythm = {
+    reference: song.reference,
+    lines: [
+      { rhythm: [
+        { tha: "Oo", ki: "Na", ta: "n" },
+        { tha: "na", ki: "Che", ta: "tha" },
+        { tha: "na", ki: "–", ta: "–" },
+      ] },
+      { rhythm: [
+        { tha: "Aa", ki: "gu", ta: "Nee" },
+        { tha: "a-ni", ki: "ke", ta: "ta" },
+        { tha: "na", ki: "–", ta: "–" },
+      ] },
+    ],
+  };
+
+  const syl0 = SongLessonKit.syllablesForLine(songWithRhythm, 0);
+  assert.strictEqual(syl0.length, 7, `line 0 should have 7 syllable cells, got ${syl0.length}`);
+  ["Oo", "Na", "n", "na", "Che", "tha", "na"].forEach((text, i) => assert.strictEqual(syl0[i].text, text));
+  // first 4 syllables ("Oo","Na","n","na") come from segment 0 (swara "Sa")
+  [0, 1, 2, 3].forEach(i => assert.strictEqual(syl0[i].swara, "Sa", `syllable ${i} ("${syl0[i].text}") should map to segment 0`));
+  // next 3 ("Che","tha","na") come from segment 1 (swara "Ni") — note the second
+  // "na" (index 6) must still resolve to "Ni", not fall back to segment 0's "Sa"
+  // just because the text matches an earlier syllable.
+  [4, 5, 6].forEach(i => assert.strictEqual(syl0[i].swara, "Ni", `syllable ${i} ("${syl0[i].text}") should map to segment 1`));
+
+  const syl1 = SongLessonKit.syllablesForLine(songWithRhythm, 1);
+  assert.strictEqual(syl1.length, 7, `line 1 should have 7 syllable cells, got ${syl1.length}`);
+  [0, 1, 2, 3, 4].forEach(i => assert.strictEqual(syl1[i].swara, "Pa", `syllable ${i} ("${syl1[i].text}") should map to segment 2`));
+  [5, 6].forEach(i => assert.strictEqual(syl1[i].swara, "Sa (lower)", `syllable ${i} ("${syl1[i].text}") should map to segment 3`));
+
+  const all = SongLessonKit.allSyllables(songWithRhythm);
+  assert.strictEqual(all.length, 14, `allSyllables should concat both lines, got ${all.length}`);
+  assert.strictEqual(all[0].text, "Oo");
+  assert.strictEqual(all[13].text, "na");
+  assert.strictEqual(all[13].swara, "Sa (lower)");
+
   console.log("songLessonKit.segmentsForLine.test.html: all assertions passed");
 } catch (e) {
   console.error("songLessonKit.segmentsForLine.test.html: FAILED -", e.message);
