@@ -62,8 +62,15 @@ const SongPitchCompare = (() => {
     });
   }
 
-  /** blob: a recording Blob. song: a SONGS entry. Browser-only (needs PitchAnalysis/OfflineAudioContext). */
-  async function compareRecording(blob, song) {
+  /**
+   * blob: a recording Blob. song: a SONGS entry. segments: which reference segments to
+   * map the recording onto — defaults to the whole song, but a caller comparing a
+   * single-line take (which only covers that line's segments) passes a filtered subset,
+   * e.g. `song.reference.segments.filter(s => s.line === 0)`, so the proportional
+   * mapping isn't stretched across segments the learner never actually sang in that take.
+   * Browser-only (needs PitchAnalysis/OfflineAudioContext).
+   */
+  async function compareRecording(blob, song, segments = song.reference.segments) {
     const analysis = await PitchAnalysis.analyzeBlob(blob);
     if (!analysis.frames.length) {
       return {
@@ -73,7 +80,7 @@ const SongPitchCompare = (() => {
     }
     const frameStart = analysis.frames[0].t;
     const frameEnd = analysis.frames[analysis.frames.length - 1].t;
-    const windows = computeWindows(song.reference.segments, frameStart, frameEnd);
+    const windows = computeWindows(segments, frameStart, frameEnd);
     const perSegment = compareWindows(analysis.frames, windows);
     return { aligned: true, perSegment, learnerSpan: frameEnd - frameStart };
   }

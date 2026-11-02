@@ -118,6 +118,29 @@ try {
   // row1's ki/ta cells are true rests (lyric "–" AND no note) — correctly absent above
   // (only 1 beat came from row1, not 3), confirmed by the total count already asserted.
 
+  // beatsToNotes: a `sustain` beat continuing the SAME pitch should extend the
+  // previous note's duration, not retrigger it — but a re-attack on the same pitch
+  // (a new syllable, `sustain: false`) must still become its own discrete note, and a
+  // held beat at a DIFFERENT pitch (shouldn't happen in real data, but defensively)
+  // must not silently merge into the wrong note either.
+  const notes = SongLessonKit.beatsToNotes([
+    { midi: 70, sustain: false }, // new note
+    { midi: 70, sustain: true },  // held — extends the note above
+    { midi: 70, sustain: true },  // held — extends it again
+    { midi: 69, sustain: false }, // new note (different pitch)
+    { midi: 69, sustain: false }, // re-attack: SAME pitch as above, but not held — its own note
+    { midi: 67, sustain: true },  // "held" but a different pitch than the previous note — its own note
+  ], 0.5);
+  assert.strictEqual(notes.length, 4, `expected 4 discrete notes (1 merged x3 + 1 + 1 + 1), got ${notes.length}`);
+  assert.strictEqual(notes[0].midi, 70);
+  assert.strictEqual(notes[0].duration, 1.5, "3 beats at 0.5 each merged into one held note");
+  assert.strictEqual(notes[1].midi, 69);
+  assert.strictEqual(notes[1].duration, 0.5);
+  assert.strictEqual(notes[2].midi, 69, "a re-attack on the same pitch is still its own note, not merged");
+  assert.strictEqual(notes[2].duration, 0.5);
+  assert.strictEqual(notes[3].midi, 67, "a held beat at a different pitch starts its own note rather than merging");
+  assert.strictEqual(notes[3].duration, 0.5);
+
   console.log("songLessonKit.segmentsForLine.test.html: all assertions passed");
 } catch (e) {
   console.error("songLessonKit.segmentsForLine.test.html: FAILED -", e.message);

@@ -149,6 +149,24 @@ const SongLessonKit = (() => {
 
   const allSyllables = (song) => song.lines.flatMap((_, i) => syllablesForLine(song, i));
 
+  /**
+   * Turns a flat beat list into PianoSynth.playSequence notes, so playback traces the
+   * rhythm rather than ticking through every beat at one flat, equal duration: a `sustain`
+   * beat that continues the SAME pitch extends the previous note's duration instead of
+   * re-triggering it; anything else (a new syllable, or a beat at a different pitch, even
+   * if flagged `sustain`) becomes its own discrete note — "each beat, played as it is."
+   */
+  function beatsToNotes(beats, unit) {
+    const notes = [];
+    beats.forEach((b) => {
+      if (b.midi == null) return;
+      const prev = notes[notes.length - 1];
+      if (b.sustain && prev && prev.midi === b.midi) prev.duration += unit;
+      else notes.push({ midi: b.midi, duration: unit });
+    });
+    return notes;
+  }
+
   // Index of this line's first beat within allSyllables(song)'s flat list — lets
   // rhythmTableHtml wire the same data-play-syllable index pitchTableHtml/Swara
   // Practice use, without re-flattening every line on every cell.
@@ -380,30 +398,38 @@ const SongLessonKit = (() => {
         `, { wide: true })}
 
         ${chapter("perform", 8, "Perform", `
-          ${narrow(p("A guided sequence — skip any of these, record only what feels comfortable."))}
+          ${narrow(p("A guided sequence — skip any of these, record only what feels comfortable. Play the reference for any of them before or while you sing."))}
           <div class="flex flex-col gap-5">
             ${[
-              ...song.lines.map((line, i) => [`line${i}Take`, `Line ${i + 1}, on its own`, `“${line.text}”`]),
-              ["combinedTake", "All lines, combined — this is the one compared in the next stage", `“${song.lines.map((l) => l.text).join(" ")}”`],
-              ["slowTake", "All lines, slow tempo", ""],
-              ["fullTempoTake", "All lines, full tempo", ""],
-            ].map(([key, title, hint]) => `
+              ...song.lines.map((line, i) => [`line${i}Take`, `Line ${i + 1}, on its own`, `“${line.text}”`, `${i}:normal`]),
+              ["combinedTake", "All lines, combined — this is the one compared in the next stage", `“${song.lines.map((l) => l.text).join(" ")}”`, "both:normal"],
+              ["slowTake", "All lines, slow tempo", "", "both:slow"],
+              ["fullTempoTake", "All lines, full tempo", "", "both:normal"],
+            ].map(([key, title, hint, playKey]) => `
               <div>
-                ${RecordingCard.render(`rc-${key}`, { title, hint, maxSeconds: 20, section: false })}
+                ${RecordingCard.render(`rc-${key}`, {
+                  title, hint, maxSeconds: 20, section: false,
+                  extraTop: `<div class="mb-4"><button type="button" data-play-melody="${playKey}" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play Reference</button><p class="text-xs text-ink-500 mt-2">Play it before or while you sing.</p></div>`,
+                })}
               </div>`).join("")}
           </div>
         `, { wide: true })}
 
         ${chapter("assess", 9, "Compare my attempt", `
           ${narrow(`
-            ${p("Compares your combined-lines recording above against the reference transcription — segment by segment, honestly. If recording isn't supported on this device, the self-reflection questions below work just as well.")}
-            <div data-compare-host>
-              ${PitchAnalysis.isAvailable
-                ? `<button type="button" data-compare-attempt class="vr-btn vr-btn-gold" ${take("combinedTake") ? "" : "disabled"}>${icon("play", "w-4 h-4")} Compare my attempt</button>
-                   ${!take("combinedTake") ? `<p class="text-xs text-ink-500 mt-2">Record the combined take above first.</p>` : ""}`
-                : `<p class="text-sm text-ink-400">Comparison isn't available on this device.</p>`}
-            </div>
-            <div data-compare-result class="mt-5"></div>
+            ${p("Compares a recording above against the reference transcription — segment by segment, honestly. If recording isn't supported on this device, the self-reflection questions below work just as well.")}
+            ${PitchAnalysis.isAvailable
+              ? [
+                  ...song.lines.map((line, i) => [`line${i}`, `Line ${i + 1}`, `line${i}Take`]),
+                  ["combined", "All lines, combined", "combinedTake"],
+                ].map(([key, title, takeKey]) => `
+                  <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-4 mb-4">
+                    <p class="text-sm text-ink-100 font-display mb-2">${title}</p>
+                    <button type="button" data-compare-attempt="${key}" class="vr-btn vr-btn-gold" ${take(takeKey) ? "" : "disabled"}>${icon("play", "w-4 h-4")} Compare my attempt</button>
+                    ${!take(takeKey) ? `<p class="text-xs text-ink-500 mt-2">Record this take above first.</p>` : ""}
+                    <div data-compare-result="${key}" class="mt-4"></div>
+                  </div>`).join("")
+              : `<p class="text-sm text-ink-400">Comparison isn't available on this device.</p>`}
           `)}
         `)}
 
@@ -492,8 +518,9 @@ const SongLessonKit = (() => {
       // Every sounding beat, in order (held beats included) — not just the 4 broad
       // measured segments — so playback actually traces the real melody.
       const beats = which === "both" ? allSyllables(song) : syllablesForLine(song, Number(which));
-      const opts = speed === "slow" ? { duration: 0.75, gap: 0.3 } : { duration: 0.5, gap: 0.18 };
-      PianoSynth.playSequence(beats.filter((b) => b.midi != null).map((b) => b.midi), opts);
+      const unit = speed === "slow" ? 0.75 : 0.5;
+      const gap = speed === "slow" ? 0.3 : 0.18;
+      PianoSynth.playSequence(beatsToNotes(beats, unit), { gap });
     }
     container.addEventListener("click", onPlayMelody);
     cleanups.push(() => container.removeEventListener("click", onPlayMelody));
@@ -505,9 +532,19 @@ const SongLessonKit = (() => {
       if (progHost) progHost.innerHTML = renderComplete(song, rec, rec.completedAt ? "completed" : "available", CHECKLIST_ITEMS);
       const pctEl = $("[data-lesson-pct]");
       if (pctEl) pctEl.textContent = `${Math.round((CHECKLIST_ITEMS.filter((i) => rec.checkpoints[i.key]).length / CHECKLIST_ITEMS.length) * 100)}% complete`;
-      const compareBtn = $("[data-compare-attempt]");
-      if (compareBtn) compareBtn.disabled = !A(rec, "recs").combinedTake;
+      container.querySelectorAll("[data-compare-attempt]").forEach((btn) => {
+        const target = COMPARE_TARGETS[btn.dataset.compareAttempt];
+        if (target) btn.disabled = !A(rec, "recs")[target.takeKey];
+      });
     }
+
+    /* ---- Assess: which take + which reference segments each compare button uses ---- */
+    const COMPARE_TARGETS = {
+      combined: { takeKey: "combinedTake", segments: song.reference.segments },
+      ...Object.fromEntries(song.lines.map((_, i) => [`line${i}`, {
+        takeKey: `line${i}Take`, segments: song.reference.segments.filter((s) => s.line === i),
+      }])),
+    };
 
     /* ---- Perform: one recording per line, plus combined/slow/full ---- */
     const RECORDING_NAMES = {};
@@ -528,17 +565,19 @@ const SongLessonKit = (() => {
     async function onCompareAttempt(e) {
       const btn = e.target.closest("[data-compare-attempt]");
       if (!btn || btn.disabled) return;
-      const take = A(rec0(), "recs").combinedTake;
-      if (!take) return;
+      const key = btn.dataset.compareAttempt;
+      const target = COMPARE_TARGETS[key];
+      const rtake = target && A(rec0(), "recs")[target.takeKey];
+      if (!rtake) return;
       btn.disabled = true;
       btn.innerHTML = "Comparing…";
-      const resultHost = $("[data-compare-result]");
+      const resultHost = $(`[data-compare-result="${key}"]`);
       try {
-        const blob = await Media.getBlob(take.mediaId);
-        const pitchResult = await SongPitchCompare.compareRecording(blob, song);
+        const blob = await Media.getBlob(rtake.mediaId);
+        const pitchResult = await SongPitchCompare.compareRecording(blob, song, target.segments);
         let timingHtml = "";
         if (pitchResult.aligned) {
-          const refSegs = measured(song);
+          const refSegs = target.segments.filter((s) => s.swara !== null);
           const referenceSpanSeconds = refSegs[refSegs.length - 1].end - refSegs[0].start;
           const timing = SongTimingCompare.compare(pitchResult.learnerSpan, referenceSpanSeconds);
           timingHtml = `<p class="text-sm text-ink-200 mt-4"><strong class="text-ink-100">Pace:</strong> ${timing.rating}</p>`;
@@ -606,7 +645,7 @@ const SongLessonKit = (() => {
 
   return {
     STAGES, header, stepper, chapter, p, narrow,
-    measured, segmentsForLine, syllablesForLine, allSyllables, rhythmTableHtml, pitchTableHtml, melodyContourHtml,
+    measured, segmentsForLine, syllablesForLine, allSyllables, beatsToNotes, rhythmTableHtml, pitchTableHtml, melodyContourHtml,
     milestone, renderComplete, progressStats, A, q, checklist,
     wireViewedSentinel, wireStepper,
     render, mount,
