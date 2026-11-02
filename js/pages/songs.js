@@ -4,9 +4,14 @@
    see docs/superpowers/specs/2026-11-01-song-learning-level-design.md.
    ============================================================ */
 
+// TEMPORARY, at the user's explicit request — unlocked for their own review
+// before Foundation is finished. Set back to `false` (or remove) to restore
+// the real "Level 1 complete" gate (Store.isLevelUnlocked(2)) once reviewed.
+const SONGS_TEMP_UNLOCKED_FOR_REVIEW = true;
+
 const SongsPage = {
   render() {
-    if (!Store.isLevelUnlocked(2)) {
+    if (!SONGS_TEMP_UNLOCKED_FOR_REVIEW && !Store.isLevelUnlocked(2)) {
       return `
       <section class="max-w-3xl mx-auto px-5 lg:px-8 py-20 text-center">
         ${Components.EmptyState("lock", "Song Learning is locked", "Complete Level 1 — Foundation to unlock this optional section.")}

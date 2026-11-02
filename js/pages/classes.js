@@ -34,7 +34,10 @@ const ClassesPage = {
           // 2026-11-01-song-learning-level-design.md §3). Inserted by Singer's array position
           // (level.id === 2), not a hardcoded index, so this stays correct if LEVELS ever reorders.
           const singerIdx = APP_DATA.LEVELS.findIndex(l => l.id === 2);
-          const unlocked = Store.isLevelUnlocked(2); // same "all of Level 1 done" check Singer itself uses
+          // TEMPORARY, at the user's explicit request — unlocked for their own review before
+          // Foundation is finished. Change back to `Store.isLevelUnlocked(2)` (same "all of
+          // Level 1 done" check Singer itself uses) once reviewed.
+          const unlocked = true;
           blocks.splice(singerIdx, 0, `
             <div>
               <div class="flex items-baseline gap-3 mb-5">
