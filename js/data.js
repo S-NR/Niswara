@@ -779,13 +779,13 @@ const APP_DATA = (() => {
   }
 
   const levelClassDefs = {
-    // Classes 1-17 ("Voice Placement" ... "Vocal Agility Development") are now real, authored
-    // classes. Class 17's own spec names the real Class 18 as "Register Coordination Practice", so
-    // this entry is renamed in place again, the same precedent every class since 5 has followed
-    // (apart from Class 11's one-off addition). Whether Level 2 keeps growing after Class 18 is for
-    // that class's own spec to reveal — not guessed here.
-    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 18,
-      titles: ["Register Coordination Practice"] },
+    // Classes 1-19 ("Voice Placement" ... "Tone Consistency Across Range") are now real, authored
+    // classes. Class 19's own spec names the real Class 20 as "Articulation and Style", so this
+    // entry is renamed in place again, the same precedent every class since 5 has followed (apart
+    // from Class 11's one-off addition). Whether Level 2 keeps growing after Class 20 is for that
+    // class's own spec to reveal — not guessed here.
+    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 20,
+      titles: ["Articulation and Style"] },
     3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
       titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
@@ -1425,9 +1425,61 @@ const APP_DATA = (() => {
     }
   };
 
+  /* ---------- Level 2, Class 18 (interactive) ---------- */
+  const registerCoordinationPracticeClass = {
+    number: 18, title: "Register Coordination Practice", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner–Intermediate", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/registerCoordinationPractice.js
+    interactive: "register-coordination-practice",
+    subtitle: "Chest, head, and mixed voice are names for coordination patterns — not places sound is produced.",
+    description: "An interactive lesson: a gentle first look at how different vocal registers coordinate together. Explores a comfortable lower area, a lighter higher area, and a small transition between them, with an optional short melodic pattern — never requiring a smooth transition, a particular pitch, or a 'mixed voice' sound.",
+    content: {
+      whatYoullLearn: "What vocal registers mean, why the voice can feel or sound different across its range, how chest-dominant and head-dominant coordination can differ, why register transitions can feel noticeable at first, how to explore transitions gently, and why smooth coordination matters more than forcing a particular sound.",
+      whyItMatters: "Register transitions are a normal part of how voices work, not a flaw to eliminate immediately. Noticing how your own voice behaves across its range is the first step toward more comfortable coordination over time.",
+      theory: "Chest voice and head voice are terms for different patterns of vocal coordination and sensation — they do not mean sound is literally produced in the chest or the head. Mixed coordination describes a more balanced transition between the two.",
+      guidedPractice: [
+        "Prepared gently, explored a comfortable lower-range area, tried a lighter higher-range area, attempted a small gentle transition between them, optionally tried a short melodic pattern, and reflected on what felt most comfortable.",
+      ],
+      assignment: {
+        instructions: [
+          "A comfortable lower-area hum",
+          "A lighter higher-area hum",
+          "A gentle transition between the two, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 19 (interactive) ---------- */
+  const toneConsistencyAcrossRangeClass = {
+    number: 19, title: "Tone Consistency Across Range", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner–Intermediate", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/toneConsistencyAcrossRange.js
+    interactive: "tone-consistency-across-range",
+    subtitle: "Consistency means comfortable coordination across your range — not making every note sound identical.",
+    description: "An interactive lesson: listening to how tone changes across nearby notes, and recognising unnecessary tension versus natural variation. Compares a reference note with one nearby higher and lower note, and the same vowel across pitches, with an optional short melodic pattern.",
+    content: {
+      whatYoullLearn: "What vocal tone means, why tone can change as pitch changes, the difference between natural register changes and unnecessary tension, how to maintain a comfortable, clear sound across nearby notes, how to listen to and compare your own tone, and why consistency does not mean making every note identical.",
+      whyItMatters: "Every voice has natural tonal variation across its range. Learning to notice that variation — rather than fighting it — is what allows comfortable coordination to develop over time.",
+      theory: "Vocal tone is the quality or character of the sound a voice produces. Tone can change naturally with pitch, vowel, register, and coordination; descriptive words like clear, breathier, brighter, darker, lighter, and fuller are listening tools, not judgments.",
+      guidedPractice: [
+        "Prepared gently, found a comfortable reference tone, explored one nearby higher and lower note, compared the same vowel across those notes, optionally tried a short melodic pattern, and reflected on where tone felt most natural versus where it felt forced.",
+      ],
+      assignment: {
+        instructions: [
+          "A comfortable reference note",
+          "One nearby higher note",
+          "One nearby lower note",
+        ],
+        questions: []
+      }
+    }
+  };
+
   const CLASSES = [
     ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
-    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass].map(c => ({ ...c, levelId: 2 })),
+    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass].map(c => ({ ...c, levelId: 2 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))

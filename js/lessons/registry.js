@@ -47,4 +47,6 @@ const InteractiveLessons = {
   "applying-vocal-skills-to-song": ApplyingVocalSkillsToSongLesson,
   "phrase-shaping-interpretation": PhraseShapingInterpretationLesson,
   "vocal-agility-development": VocalAgilityDevelopmentLesson,
+  "register-coordination-practice": RegisterCoordinationPracticeLesson,
+  "tone-consistency-across-range": ToneConsistencyAcrossRangeLesson,
 };
