@@ -22,6 +22,7 @@ const BY_EAR_NOTE = {
   "E4": { midi: 64, western: "E4", swara: null },
   "D4": { midi: 62, western: "D4", swara: null },
   "A#3": { midi: 58, western: "A♯3", swara: "Sa (lower octave)" },
+  "C5": { midi: 72, western: "C5", swara: null },
 };
 function byEarRow(tha, ki, ta) {
   return {
@@ -52,7 +53,7 @@ window.SONGS = [
         text: "ಆಗು ನೀ ಅನಿಕೇತನ",
         transliteration: "Aagu nee anikethana",
         rhythm: [
-          { tha: "Aa", ki: "–", ta: "gu", notes: byEarRow("A4", "A4", "A4") },
+          { tha: "Aa", ki: "–", ta: "gu", notes: byEarRow("A4", "A4", "C5") },
           { tha: "Nee", ki: "A", ta: "ni", notes: byEarRow("G4", "E4", "D4") },
           { tha: "ke", ki: "–", ta: "ta", notes: byEarRow("E4", "D4", "A#3") },
           { tha: "na", ki: "–", ta: "–", notes: byEarRow("A#3", null, null) },
@@ -79,7 +80,7 @@ window.SONGS = [
       // from the by-ear per-beat data below (`byEarRow`), not from the broader measured
       // segments (which only resolve 4 regions and don't show this shape). Shown on the
       // Melody stage; kept here (not hardcoded in songLessonKit.js) so it travels with the song.
-      melodyNote: "Line 1 opens steady on Sa, dips down through a short descending run during “Nanna” (Sa → Ni → a lower G → a lower E), then climbs back up through “Chetana” to settle on Ni rather than returning all the way to Sa — a dip-and-rise shape, not a straight slide down. Line 2 opens on that same Ni and continues the same downward direction through “Aagu Nee anikethana”, with one brief re-attack on “ke”, before settling on Sa a full octave below the opening note for the closing “tana”.",
+      melodyNote: "Line 1 opens steady on Sa, dips down through a short descending run during “Nanna” (Sa → Ni → a lower G → a lower E), then climbs back up through “Chetana” to settle on Ni rather than returning all the way to Sa — a dip-and-rise shape, not a straight slide down. Line 2 opens on that same Ni, lifts briefly to a higher C on “gu”, then drops back down and continues descending through “Nee anikethana” (with one brief re-attack on “ke”) before settling on Sa a full octave below the opening note for the closing “tana”.",
       segments: [
         { start: 0.65, end: 3.16, hz: 454.2, midi: 70, swara: "Sa", western: "A♯4", confidence: "measured", line: 0, covers: ["Oo", "Na", "n", "na"] },
         { start: 3.20, end: 5.36, hz: 437.5, midi: 69, swara: "Ni (lower)", western: "A4", confidence: "measured", line: 0, covers: ["Che", "tha", "na"] },
