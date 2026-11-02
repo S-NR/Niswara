@@ -368,6 +368,10 @@ body {
 [data-ref-line].is-playing .ps-ref-line { stroke: rgba(243, 218, 158, 0.95); }
 @keyframes psRefTravel { from { transform: translateX(0); } to { transform: translateX(500px); } }
 
+/* Song Learning & Application (js/lessons/songLessonKit.js) */
+.song-beat { transition: background 0.15s, box-shadow 0.15s; border-radius: 0.5rem; }
+.song-beat.is-lit { background: rgba(214, 162, 67, 0.18); box-shadow: 0 0 18px rgba(214, 162, 67, 0.35); }
+
 /* Meet Your Voice (js/lessons/meetYourVoice.js, Class 1) */
 .obs-single [data-obs-root] { grid-template-columns: minmax(0, 1fr); }
 .mv-tile { transition: border-color 0.4s, background 0.4s, box-shadow 0.4s, transform 0.4s; }

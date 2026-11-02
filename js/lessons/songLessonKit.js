@@ -41,6 +41,20 @@ const SongLessonKit = (() => {
     { key: "reflected", label: "I reflected on my practice, or chose not to." },
   ];
 
+  // Flowing Playback's central timing engine runs off these — a single BPM selection
+  // drives every phrase, held note, and gap proportionally (60 / BPM seconds per beat).
+  const TEMPO_PRESETS = [
+    { bpm: 50, label: "Very Slow" }, { bpm: 60, label: "Slow" }, { bpm: 75, label: "Moderate" },
+    { bpm: 90, label: "Normal" }, { bpm: 110, label: "Fast" },
+  ];
+  const DEFAULT_BPM = 90;
+  const CLICK_MIDI = 81; // a fixed, consistent click pitch for Mode A (rhythm only) — never a melodic note
+  const FLOW_MODES = [
+    { key: "rhythm", label: "Mode A · Rhythm only", hint: "A click on every beat — no melody, just the Tha-Ki-Ta pattern and lyrics." },
+    { key: "swara", label: "Mode B · Swara only", hint: "The mapped notes, at the correct durations — note names shown, lyrics muted." },
+    { key: "full", label: "Mode C · Full song", hint: "Notes and lyrics together, at your chosen tempo — the complete flowing passage." },
+  ];
+
   const opt = (value, label, tone = "neutral") => ({ value, label, tone });
   const Q = {
     pronunciation: { question: "How did your pronunciation feel?", options: [opt("good", "Comfortable", "good"), opt("okay", "A bit unsure"), opt("hard", "Difficult"), opt("unsure", "Not sure")] },
@@ -96,37 +110,34 @@ const SongLessonKit = (() => {
   }
 
 /**
-   * Every sounding beat in this line, in reading order (tha, ki, ta per row, top to
-   * bottom) — one entry per beat, not per syllable, so a syllable held across more
-   * than one Tha-Ki-Ta slot (`sustain: true`, no new lyric at that beat) still gets
-   * its own playable note, exactly as the learner asked ("each and every beat").
+   * Every sounding beat in this line, in reading order — one entry per beat, not per
+   * syllable, so a beat held across more than one Tha-Ki-Ta slot (`sustain: true`, no
+   * new lyric at that beat) still gets its own playable note.
    *
-   * Prefers each row's own `notes` field when the song has it — a finer, by-ear
-   * transcription (see `BY_EAR_NOTE`/`byEarRow` in songs.js) that can tell a held
-   * beat's pitch apart from the next syllable's, unlike the broadly measured
-   * `reference.segments`. Falls back to the older segment-covers positional mapping
-   * for a future song that doesn't have by-ear per-beat data yet — never by matching
-   * syllable TEXT, which breaks the moment the same syllable (e.g. "na") appears more
-   * than once, exactly the bug the per-line segment lookup was already fixed for.
+   * Prefers the line's own `phrases` (teacher-provided phrase/beat mapping — see
+   * `phrase()` in songs.js): each phrase is exactly 3 beats, every beat already carries
+   * its own resolved pitch (a "Sustain" cell already resolved to the previous beat's
+   * note when the data was built), so this is a straight flatten, not a guess. Falls
+   * back to the original segment-covers positional mapping for a future song that only
+   * has the broader measured `reference.segments` and no phrase data yet — never by
+   * matching syllable TEXT, which breaks the moment the same syllable (e.g. "na")
+   * appears more than once.
    */
   function syllablesForLine(song, lineIndex) {
-    const rows = song.lines[lineIndex].rhythm;
-    if (rows.some((row) => row.notes)) {
+    const line = song.lines[lineIndex];
+    if (line.phrases) {
       const out = [];
-      rows.forEach((row, r) => {
-        ["tha", "ki", "ta"].forEach((col) => {
-          const note = row.notes && row.notes[col];
-          if (!note) return; // true rest — no sound at this beat
-          const text = row[col];
-          const sustain = !text || text === "–";
+      line.phrases.forEach((ph, pi) => {
+        ph.beats.forEach((b, bi) => {
           out.push({
-            text: sustain ? null : text, sustain, line: lineIndex, row: r, col,
-            swara: note.swara, western: note.western, midi: note.midi, confidence: note.confidence,
+            text: b.sustain ? null : b.syl, sustain: b.sustain, line: lineIndex, row: pi, col: bi,
+            swara: b.swara, western: b.western, midi: b.midi, confidence: b.confidence,
           });
         });
       });
       return out;
     }
+    const rows = line.rhythm;
     const cells = [];
     rows.forEach((row, r) => {
       ["tha", "ki", "ta"].forEach((col) => {
@@ -150,49 +161,51 @@ const SongLessonKit = (() => {
   const allSyllables = (song) => song.lines.flatMap((_, i) => syllablesForLine(song, i));
 
   /**
-   * Turns a flat beat list into PianoSynth.playSequence notes, so playback traces the
-   * rhythm rather than ticking through every beat at one flat, equal duration: a `sustain`
-   * beat that continues the SAME pitch extends the previous note's duration instead of
-   * re-triggering it; anything else (a new syllable, or a beat at a different pitch, even
-   * if flagged `sustain`) becomes its own discrete note — "each beat, played as it is."
+   * This line's full playback plan: `cells` (every beat's midi/sustain, PLUS its
+   * trailing `gapBeats` true rests, so a tempo-driven player gives the gap its own
+   * real duration instead of skipping straight to the next line) and `addresses`,
+   * the matching `{ line, cell }` (or `{ line, gap: true }`) DOM address for each
+   * cell, in lockstep, so a highlighter never has to re-derive one from the other.
    */
-  function beatsToNotes(beats, unit) {
-    const notes = [];
-    beats.forEach((b) => {
-      if (b.midi == null) return;
-      const prev = notes[notes.length - 1];
-      if (b.sustain && prev && prev.midi === b.midi) prev.duration += unit;
-      else notes.push({ midi: b.midi, duration: unit });
-    });
-    return notes;
+  function linePlaybackPlan(song, lineIndex) {
+    const beats = syllablesForLine(song, lineIndex);
+    const cells = beats.map((b) => ({ midi: b.midi, sustain: b.sustain }));
+    const addresses = beats.map((_, i) => ({ line: lineIndex, cell: i }));
+    const gapBeats = song.lines[lineIndex].gapBeats || 0;
+    for (let g = 0; g < gapBeats; g++) { cells.push({ midi: null, sustain: false }); addresses.push({ line: lineIndex, gap: true }); }
+    return { cells, addresses };
   }
 
   /**
-   * Every Tha-Ki-Ta cell in this line, in order — INCLUDING true rests (`midi: null`) —
-   * so playback can let a blank beat actually take up its own time in the rhythm instead
-   * of being silently skipped. Only available for a song with by-ear per-beat `notes`
-   * (see songs.js); returns null otherwise, so the caller can fall back to the older,
-   * rest-less sequence for a song that doesn't have this data yet.
+   * Resolves a playback scope into a `{ cells, addresses }` plan: "both" (the whole
+   * song, line by line, each with its own trailing gap), a line index, or
+   * `{ line, phrase }` for a single phrase's 3 beats on their own (no gap — used by
+   * phrase-by-phrase/loop playback).
    */
-  function lineBeatTimeline(song, lineIndex) {
-    const rows = song.lines[lineIndex].rhythm;
-    if (!rows.some((row) => row.notes)) return null;
-    const out = [];
-    rows.forEach((row) => {
-      ["tha", "ki", "ta"].forEach((col) => {
-        const note = row.notes && row.notes[col];
-        if (!note) { out.push({ midi: null, sustain: false }); return; }
-        const text = row[col];
-        out.push({ midi: note.midi, sustain: !text || text === "–" });
-      });
-    });
-    return out;
+  function songPlaybackPlan(song, scope) {
+    if (scope === "both") {
+      return song.lines.reduce((acc, _, i) => {
+        const p = linePlaybackPlan(song, i);
+        return { cells: [...acc.cells, ...p.cells], addresses: [...acc.addresses, ...p.addresses] };
+      }, { cells: [], addresses: [] });
+    }
+    if (typeof scope === "object") {
+      const ph = song.lines[scope.line].phrases[scope.phrase];
+      return {
+        cells: ph.beats.map((b) => ({ midi: b.midi, sustain: b.sustain })),
+        addresses: ph.beats.map((_, bi) => ({ line: scope.line, cell: scope.phrase * 3 + bi })),
+      };
+    }
+    return linePlaybackPlan(song, scope);
   }
 
   /**
-   * Turns a lineBeatTimeline() cell list into PianoSynth.playSequence events, each `unit`
-   * long: consecutive rest cells merge into one longer rest (a real pause, not silence
-   * ticking by one beat at a time), exactly like beatsToNotes merges held notes.
+   * Turns a flat cells list into PianoSynth.playSequence events, each `unit` seconds
+   * long: a `sustain` beat continuing the SAME pitch extends the previous note's
+   * duration instead of re-triggering it; a true rest (`midi: null`) becomes an actual
+   * pause (`{ rest: true }`, see PianoSynth.playSequence) — and consecutive rests merge
+   * into one longer pause — so a tempo change scales every phrase, every sustain, and
+   * every gap proportionally, from one single pass over the same cell list.
    */
   function timelineToEvents(cells, unit) {
     const events = [];
@@ -219,34 +232,71 @@ const SongLessonKit = (() => {
     return n;
   }
 
+  /**
+   * One block per phrase (always exactly 3 beats — Tha, Ki, Ta), followed by a
+   * separate, visually distinct block for the line's trailing gap (if any) — gaps are
+   * never folded into a phrase's own 3 beats. Each beat is its own play button, tagged
+   * with `data-beat-line`/`data-beat-cell` so the playback engine can highlight the
+   * current beat during Flowing Playback without re-deriving its position.
+   */
   function rhythmTableHtml(song, lineIndex) {
+    const line = song.lines[lineIndex];
     const beats = syllablesForLine(song, lineIndex);
     const offset = lineBeatOffset(song, lineIndex);
+    if (!line.phrases) {
+      // Fallback for a future song without the phrase/gap model yet — a flat Tha-Ki-Ta
+      // table matching its own plain `rhythm` rows.
+      return `
+        <table class="w-full text-sm border-collapse mb-4">
+          <thead><tr class="text-[11px] uppercase tracking-wider text-ink-500">
+            <th class="text-left py-1.5 pr-3">Tha</th><th class="text-left py-1.5 pr-3">Ki</th><th class="text-left py-1.5">Ta</th>
+          </tr></thead>
+          <tbody>
+            ${line.rhythm.map((row, r) => `
+            <tr class="border-t border-white/5">
+              ${["tha", "ki", "ta"].map((col) => {
+                const bi = beats.findIndex((b) => b.row === r && b.col === col);
+                if (bi === -1) return `<td class="py-2 pr-3 text-ink-600">–</td>`;
+                const beat = beats[bi];
+                const label = beat.sustain ? `<span class="text-ink-500 italic">(held)</span>` : `<span class="text-ink-100">${beat.text}</span>`;
+                return `<td class="py-2 pr-3">
+                  <button type="button" data-play-syllable="${offset + bi}" class="text-left group">
+                    ${label}
+                    ${beat.swara || beat.western ? `<span class="block text-[11px] text-gold-300/80 font-display group-hover:text-gold-200">${beat.swara || beat.western}</span>` : ""}
+                  </button>
+                </td>`;
+              }).join("")}
+            </tr>`).join("")}
+          </tbody>
+        </table>`;
+    }
     return `
-      <table class="w-full text-sm border-collapse mb-4">
-        <thead><tr class="text-[11px] uppercase tracking-wider text-ink-500">
-          <th class="text-left py-1.5 pr-3">Tha</th><th class="text-left py-1.5 pr-3">Ki</th><th class="text-left py-1.5">Ta</th>
-        </tr></thead>
-        <tbody>
-          ${song.lines[lineIndex].rhythm.map((row, r) => `
-          <tr class="border-t border-white/5">
-            ${["tha", "ki", "ta"].map((col) => {
-              const bi = beats.findIndex((b) => b.row === r && b.col === col);
-              if (bi === -1) return `<td class="py-2 pr-3 text-ink-600">–</td>`;
-              const beat = beats[bi];
-              const label = beat.sustain
-                ? `<span class="text-ink-500 italic">(held)</span>`
-                : `<span class="text-ink-100">${beat.text}</span>`;
-              return `<td class="py-2 pr-3">
-                <button type="button" data-play-syllable="${offset + bi}" class="text-left group">
+      <div class="flex flex-wrap gap-2.5 mb-4">
+        ${line.phrases.map((ph, pi) => `
+          <div class="rounded-xl border border-white/5 bg-white/[0.02] p-3">
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <p class="text-[11px] uppercase tracking-wider text-ink-500">${ph.label}</p>
+              <div class="flex items-center gap-2">
+                <button type="button" data-play-phrase="${lineIndex}:${pi}" class="text-ink-500 hover:text-gold-300" aria-label="Play this phrase">${icon("play", "w-3 h-3")}</button>
+                <button type="button" data-loop-phrase="${lineIndex}:${pi}" class="text-ink-500 hover:text-gold-300" aria-label="Loop this phrase" aria-pressed="false">↺</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              ${ph.beats.map((b, bi) => {
+                const gi = offset + pi * 3 + bi;
+                const label = b.sustain ? `<span class="text-ink-500 italic">(held)</span>` : `<span class="text-ink-100">${b.syl}</span>`;
+                return `<button type="button" data-play-syllable="${gi}" data-beat-line="${lineIndex}" data-beat-cell="${pi * 3 + bi}" class="song-beat text-left group px-1.5 py-1 -mx-1.5 -my-1 transition-colors">
                   ${label}
-                  ${beat.swara || beat.western ? `<span class="block text-[11px] text-gold-300/80 font-display group-hover:text-gold-200">${beat.swara || beat.western}</span>` : ""}
-                </button>
-              </td>`;
-            }).join("")}
-          </tr>`).join("")}
-        </tbody>
-      </table>`;
+                  ${b.swara || b.western ? `<span class="block text-[11px] text-gold-300/80 font-display group-hover:text-gold-200">${b.swara || b.western}</span>` : ""}
+                </button>`;
+              }).join("")}
+            </div>
+          </div>`).join("")}
+        ${line.gapBeats ? `
+          <div class="song-beat rounded-xl border border-dashed border-white/10 bg-white/[0.01] p-3 flex items-center justify-center min-w-[88px]" data-beat-line="${lineIndex}" data-beat-gap="1">
+            <span class="text-[11px] uppercase tracking-wider text-ink-600">${line.gapBeats}-beat pause</span>
+          </div>` : ""}
+      </div>`;
   }
 
   function pitchTableHtml(song, western) {
@@ -417,42 +467,54 @@ const SongLessonKit = (() => {
         `)}
 
         ${chapter("practice", 7, "Practice", `
-          ${narrow(p("Three short practice modes — explore any or all of them."))}
-          <div class="grid sm:grid-cols-3 gap-4">
-            <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-              <p class="text-sm text-ink-100 font-display mb-2">Rhythm Practice</p>
-              <p class="text-xs text-ink-500 mb-3">Speak the syllables along with the beat above, at either tempo.</p>
-            </div>
+          ${narrow(p("Three practice modes, plus one flowing playback engine behind all of them — change the tempo once and every phrase, held note, and gap adjusts together."))}
+          <div class="grid sm:grid-cols-2 gap-4 mb-4">
             <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
               <p class="text-sm text-ink-100 font-display mb-2">Swara Practice</p>
-              <p class="text-xs text-ink-500 mb-3">Every syllable, individually — tap any one.</p>
+              <p class="text-xs text-ink-500 mb-3">Every beat, individually — tap any one.</p>
               <div class="flex flex-wrap gap-2">
                 ${allSyllables(song).map((syl, i) => syl.midi != null ? `<button type="button" data-play-syllable="${i}" class="vr-btn !text-xs">${icon("play", "w-3 h-3")} ${syl.sustain ? "(held)" : syl.text}</button>` : "").join("")}
               </div>
             </div>
             <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-              <p class="text-sm text-ink-100 font-display mb-2">Melody Practice</p>
-              <div class="flex flex-col gap-2">
-                ${song.lines.map((line, i) => `<button type="button" data-play-melody="${i}:slow" class="vr-btn !text-xs">Line ${i + 1}, slow</button>`).join("")}
-                <button type="button" data-play-melody="both:normal" class="vr-btn !text-xs vr-btn-gold">${song.lines.length > 1 ? "Both lines, normal tempo" : "Full phrase, normal tempo"}</button>
+              <p class="text-sm text-ink-100 font-display mb-2">Mode</p>
+              <div class="flex flex-wrap gap-2 mb-3" role="group" aria-label="Practice mode" data-flow-modes>
+                ${FLOW_MODES.map((m) => `<button type="button" data-flow-mode="${m.key}" class="ex-chip ${m.key === "full" ? "is-selected" : ""}">${m.label}</button>`).join("")}
+              </div>
+              <p class="text-xs text-ink-500" data-flow-mode-hint>${FLOW_MODES.find((m) => m.key === "full").hint}</p>
+            </div>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <p class="text-sm text-ink-100 font-display">Flowing playback</p>
+              <div class="flex flex-wrap gap-1.5" role="group" aria-label="Tempo">
+                ${TEMPO_PRESETS.map((t) => `<button type="button" data-flow-bpm="${t.bpm}" class="ex-chip !py-1.5 !px-3 tabular-nums ${t.bpm === DEFAULT_BPM ? "is-selected" : ""}">${t.bpm} · ${t.label}</button>`).join("")}
               </div>
             </div>
+            <div class="flex flex-wrap items-center gap-2 mb-1">
+              <button type="button" data-flow-play="both" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play</button>
+              <button type="button" data-flow-pause class="vr-btn" disabled>${icon("pause", "w-4 h-4")} Pause</button>
+              <button type="button" data-flow-stop class="vr-btn" disabled>■ Stop</button>
+              <button type="button" data-flow-restart class="vr-btn">↺ Restart</button>
+              ${song.lines.map((_, i) => `<button type="button" data-flow-play="${i}" class="vr-btn !text-xs">Line ${i + 1} only</button>`).join("")}
+            </div>
+            <p class="text-xs text-ink-500 mt-2" data-flow-status>Ready — tap a beat above to play it on its own, or Play for the whole flowing sequence.</p>
           </div>
         `, { wide: true })}
 
         ${chapter("perform", 8, "Perform", `
-          ${narrow(p("A guided sequence — skip any of these, record only what feels comfortable. Play the reference for any of them before or while you sing."))}
+          ${narrow(p("A guided sequence — skip any of these, record only what feels comfortable. Play the reference for any of them before or while you sing — it uses whichever tempo is currently selected above, unless noted otherwise."))}
           <div class="flex flex-col gap-5">
             ${[
-              ...song.lines.map((line, i) => [`line${i}Take`, `Line ${i + 1}, on its own`, `“${line.text}”`, `${i}:normal`]),
-              ["combinedTake", "All lines, combined — this is the one compared in the next stage", `“${song.lines.map((l) => l.text).join(" ")}”`, "both:normal"],
-              ["slowTake", "All lines, slow tempo", "", "both:slow"],
-              ["fullTempoTake", "All lines, full tempo", "", "both:normal"],
-            ].map(([key, title, hint, playKey]) => `
+              ...song.lines.map((line, i) => [`line${i}Take`, `Line ${i + 1}, on its own`, `“${line.text}”`, String(i), null]),
+              ["combinedTake", "All lines, combined — this is the one compared in the next stage", `“${song.lines.map((l) => l.text).join(" ")}”`, "both", null],
+              ["slowTake", "All lines, slow tempo", "", "both", 50],
+              ["fullTempoTake", "All lines, full tempo", "", "both", 110],
+            ].map(([key, title, hint, scope, bpmOverride]) => `
               <div>
                 ${RecordingCard.render(`rc-${key}`, {
                   title, hint, maxSeconds: 20, section: false,
-                  extraTop: `<div class="mb-4"><button type="button" data-play-melody="${playKey}" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play Reference</button><p class="text-xs text-ink-500 mt-2">Play it before or while you sing.</p></div>`,
+                  extraTop: `<div class="mb-4"><button type="button" data-flow-play="${scope}" ${bpmOverride ? `data-flow-play-bpm="${bpmOverride}"` : ""} class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play Reference</button><p class="text-xs text-ink-500 mt-2">Play it before or while you sing.</p></div>`,
                 })}
               </div>`).join("")}
           </div>
@@ -553,28 +615,134 @@ const SongLessonKit = (() => {
     container.addEventListener("click", onPlaySyllable);
     cleanups.push(() => container.removeEventListener("click", onPlaySyllable));
 
-    /* ---- Practice: melody playback ---- */
-    function onPlayMelody(e) {
-      const btn = e.target.closest("[data-play-melody]");
-      if (!btn) return;
-      const [which, speed] = btn.dataset.playMelody.split(":");
-      const lineIndexes = which === "both" ? song.lines.map((_, i) => i) : [Number(which)];
-      const unit = speed === "slow" ? 0.75 : 0.5;
-      const gap = speed === "slow" ? 0.3 : 0.18;
-      // Prefer the full per-beat timeline (every Tha-Ki-Ta cell, rests included) when the
-      // song has by-ear data, so a blank beat (e.g. the 2 rest beats after the final "na")
-      // actually takes up its own time at the chosen tempo instead of being skipped —
-      // the song flows as written, not as a flat list of only its sounding notes.
-      const timelines = lineIndexes.map((i) => lineBeatTimeline(song, i));
-      if (timelines.every(Boolean)) {
-        PianoSynth.playSequence(timelines.flatMap((cells) => timelineToEvents(cells, unit)), { gap });
-      } else {
-        const beats = which === "both" ? allSyllables(song) : syllablesForLine(song, Number(which));
-        PianoSynth.playSequence(beatsToNotes(beats, unit), { gap });
+    /* ---- Flowing Playback: one central BPM-driven engine, shared by the Rhythm
+       table's per-phrase/beat buttons, the Practice panel, and every "Play Reference"
+       button in Perform — a single tempo selection drives every phrase, held note,
+       and gap proportionally (60 / BPM seconds per beat), never independent timers
+       per phrase. ---- */
+    let flowBpm = DEFAULT_BPM;
+    let flowMode = "full";
+    let flowPlayer = null; // { scope, cancel(), currentIndex }
+    let flowPausedAt = { scope: null, index: 0 };
+    let flowLoopKey = null; // "line:phrase" currently looping, or null
+
+    function setHighlight(addr) {
+      container.querySelectorAll(".song-beat.is-lit").forEach((el) => el.classList.remove("is-lit"));
+      if (!addr) return;
+      const sel = addr.gap ? `[data-beat-line="${addr.line}"][data-beat-gap]` : `[data-beat-line="${addr.line}"][data-beat-cell="${addr.cell}"]`;
+      const el = container.querySelector(sel);
+      if (el) el.classList.add("is-lit");
+    }
+
+    // Mode A (rhythm only): every beat becomes the same fixed click pitch, and never
+    // merges with its neighbour even if flagged `sustain` — rhythm practice means
+    // hearing each beat land, not a held melodic tone.
+    function modeCells(cells) {
+      return flowMode === "rhythm" ? cells.map((c) => (c.midi == null ? c : { midi: CLICK_MIDI, sustain: false })) : cells;
+    }
+
+    function setTransportUi(state) {
+      container.querySelectorAll("[data-flow-play]").forEach((b) => { b.disabled = state === "playing"; });
+      const pauseBtn = $("[data-flow-pause]"), stopBtn = $("[data-flow-stop]"), status = $("[data-flow-status]");
+      if (pauseBtn) pauseBtn.disabled = state !== "playing";
+      if (stopBtn) stopBtn.disabled = state === "stopped";
+      if (status) status.textContent = state === "playing" ? "Playing…" : state === "paused" ? "Paused — Play resumes from here." : "Ready — tap a beat above to play it on its own, or Play for the whole flowing sequence.";
+    }
+
+    function stopFlow() {
+      if (flowPlayer) { flowPlayer.cancel(); flowPlayer = null; }
+      setHighlight(null);
+      setTransportUi("stopped");
+    }
+
+    /** scope: "both" | lineIndex | { line, phrase }. fromIndex: resume point (beats). */
+    function playScope(scope, fromIndex = 0, { bpmOverride, loop = false } = {}) {
+      if (flowPlayer) { flowPlayer.cancel(); flowPlayer = null; }
+      const plan = songPlaybackPlan(song, scope);
+      const unit = 60 / (bpmOverride || flowBpm);
+      const cells = modeCells(plan.cells).slice(fromIndex);
+      const addresses = plan.addresses.slice(fromIndex);
+      if (!cells.length) return;
+      const audio = PianoSynth.playSequence(timelineToEvents(cells, unit), { gap: 0 });
+      const timers = [];
+      let liveIndex = fromIndex;
+      addresses.forEach((addr, i) => {
+        timers.push(setTimeout(() => { liveIndex = fromIndex + i; setHighlight(addr); }, i * unit * 1000));
+      });
+      timers.push(setTimeout(() => {
+        setHighlight(null);
+        flowPlayer = null;
+        const key = typeof scope === "object" ? `${scope.line}:${scope.phrase}` : null;
+        if (loop && key && key === flowLoopKey) playScope(scope, 0, { bpmOverride, loop: true });
+        else { flowPausedAt = { scope: null, index: 0 }; setTransportUi("stopped"); }
+      }, addresses.length * unit * 1000));
+      flowPlayer = { scope, cancel() { audio.cancel(); timers.forEach(clearTimeout); }, get currentIndex() { return liveIndex; } };
+      setTransportUi("playing");
+    }
+
+    function onFlowClick(e) {
+      const modeBtn = e.target.closest("[data-flow-mode]");
+      if (modeBtn) {
+        flowMode = modeBtn.dataset.flowMode;
+        container.querySelectorAll("[data-flow-mode]").forEach((b) => b.classList.toggle("is-selected", b === modeBtn));
+        const hint = $("[data-flow-mode-hint]");
+        if (hint) hint.textContent = FLOW_MODES.find((m) => m.key === flowMode).hint;
+        return;
+      }
+      const bpmBtn = e.target.closest("[data-flow-bpm]");
+      if (bpmBtn) {
+        flowBpm = Number(bpmBtn.dataset.flowBpm);
+        container.querySelectorAll("[data-flow-bpm]").forEach((b) => b.classList.toggle("is-selected", b === bpmBtn));
+        // Tempo changes take effect at the next beat boundary rather than losing position.
+        if (flowPlayer) { const scope = flowPlayer.scope; const idx = flowPlayer.currentIndex + 1; playScope(scope, idx); }
+        return;
+      }
+      const phraseBtn = e.target.closest("[data-play-phrase]");
+      if (phraseBtn) {
+        const [line, ph] = phraseBtn.dataset.playPhrase.split(":").map(Number);
+        flowLoopKey = null;
+        container.querySelectorAll("[data-loop-phrase]").forEach((b) => { b.setAttribute("aria-pressed", "false"); b.classList.remove("is-lit"); });
+        playScope({ line, phrase: ph }, 0);
+        return;
+      }
+      const loopBtn = e.target.closest("[data-loop-phrase]");
+      if (loopBtn) {
+        const key = loopBtn.dataset.loopPhrase;
+        container.querySelectorAll("[data-loop-phrase]").forEach((b) => { b.setAttribute("aria-pressed", "false"); b.classList.remove("is-lit"); });
+        if (flowLoopKey === key) { flowLoopKey = null; stopFlow(); return; }
+        flowLoopKey = key;
+        loopBtn.setAttribute("aria-pressed", "true"); loopBtn.classList.add("is-lit");
+        const [line, ph] = key.split(":").map(Number);
+        playScope({ line, phrase: ph }, 0, { loop: true });
+        return;
+      }
+      const playBtn = e.target.closest("[data-flow-play]");
+      if (playBtn) {
+        const raw = playBtn.dataset.flowPlay;
+        const scope = raw === "both" ? "both" : Number(raw);
+        const bpmOverride = playBtn.dataset.flowPlayBpm ? Number(playBtn.dataset.flowPlayBpm) : undefined;
+        const resumeIndex = !bpmOverride && flowPausedAt.scope === scope ? flowPausedAt.index : 0;
+        flowPausedAt = { scope: null, index: 0 };
+        playScope(scope, resumeIndex, { bpmOverride });
+        return;
+      }
+      if (e.target.closest("[data-flow-pause]")) {
+        if (!flowPlayer) return;
+        flowPausedAt = { scope: flowPlayer.scope, index: flowPlayer.currentIndex + 1 };
+        flowPlayer.cancel(); flowPlayer = null;
+        setHighlight(null);
+        setTransportUi("paused");
+        return;
+      }
+      if (e.target.closest("[data-flow-stop]")) { flowPausedAt = { scope: null, index: 0 }; stopFlow(); return; }
+      if (e.target.closest("[data-flow-restart]")) {
+        const scope = (flowPlayer && flowPlayer.scope) ?? flowPausedAt.scope ?? "both";
+        flowPausedAt = { scope: null, index: 0 };
+        playScope(scope, 0);
       }
     }
-    container.addEventListener("click", onPlayMelody);
-    cleanups.push(() => container.removeEventListener("click", onPlayMelody));
+    container.addEventListener("click", onFlowClick);
+    cleanups.push(() => { stopFlow(); container.removeEventListener("click", onFlowClick); });
 
     /* ---- refresh the complete/progress panel + compare button availability ---- */
     function refreshLive() {
@@ -696,7 +864,7 @@ const SongLessonKit = (() => {
 
   return {
     STAGES, header, stepper, chapter, p, narrow,
-    measured, segmentsForLine, syllablesForLine, allSyllables, beatsToNotes, lineBeatTimeline, timelineToEvents, rhythmTableHtml, pitchTableHtml, melodyContourHtml,
+    measured, segmentsForLine, syllablesForLine, allSyllables, linePlaybackPlan, songPlaybackPlan, timelineToEvents, rhythmTableHtml, pitchTableHtml, melodyContourHtml,
     milestone, renderComplete, progressStats, A, q, checklist,
     wireViewedSentinel, wireStepper,
     render, mount,

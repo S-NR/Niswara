@@ -86,98 +86,93 @@ try {
   assert.strictEqual(all[13].text, "na");
   assert.strictEqual(all[13].swara, "Sa (lower)");
 
-  // By-ear per-beat path: when a line's rows carry their own `notes` (finer than the
-  // measured segments — see BY_EAR_NOTE/byEarRow in songs.js), syllablesForLine must
-  // use those directly, one beat per sounding cell — including a beat that holds the
-  // PREVIOUS syllable (lyric "–", `notes[col]` still set) rather than starting a new
-  // one, and skipping a true rest (lyric "–" AND no note) entirely.
-  const byEarSong = {
-    lines: [{
-      rhythm: [
-        { tha: "Oo", ki: "–", ta: "–", notes: {
-          tha: { midi: 70, western: "A♯4", swara: "Sa", confidence: "by ear" },
-          ki: { midi: 70, western: "A♯4", swara: "Sa", confidence: "by ear" },
-          ta: { midi: 70, western: "A♯4", swara: "Sa", confidence: "by ear" },
-        } },
-        { tha: "na", ki: "–", ta: "–", notes: {
-          tha: { midi: 69, western: "A4", swara: "Ni (lower)", confidence: "by ear" },
-          ki: null, ta: null,
-        } },
-      ],
-    }],
+  // Phrase model: when a line has its own `phrases` (teacher-provided phrase/beat
+  // mapping — see `phrase()` in songs.js), syllablesForLine must read beats straight
+  // from it, one entry per beat (3 per phrase) — including a beat that holds the
+  // PREVIOUS phrase's pitch (`sustain: true`) rather than starting a new one.
+  const phraseSong = {
+    lines: [
+      {
+        phrases: [
+          { label: "P1", beats: [
+            { syl: "Oo", sustain: false, midi: 70, western: "A♯4", swara: "Sa", confidence: "by ear" },
+            { syl: null, sustain: true, midi: 70, western: "A♯4", swara: "Sa", confidence: "by ear" },
+            { syl: null, sustain: true, midi: 70, western: "A♯4", swara: "Sa", confidence: "by ear" },
+          ] },
+          { label: "P2", beats: [
+            { syl: "Na", sustain: false, midi: 69, western: "A4", swara: "Ni (lower)", confidence: "by ear" },
+            { syl: null, sustain: true, midi: 69, western: "A4", swara: "Ni (lower)", confidence: "by ear" },
+            { syl: null, sustain: true, midi: 69, western: "A4", swara: "Ni (lower)", confidence: "by ear" },
+          ] },
+        ],
+        gapBeats: 2,
+      },
+      {
+        phrases: [{ label: "P3", beats: [
+          { syl: "Ke", sustain: false, midi: 64, western: "E4", swara: null, confidence: "by ear" },
+          { syl: null, sustain: true, midi: 64, western: "E4", swara: null, confidence: "by ear" },
+          { syl: "ta", sustain: false, midi: 58, western: "A♯3", swara: "Sa (lower octave)", confidence: "by ear" },
+        ] }],
+        gapBeats: 2,
+      },
+    ],
   };
-  const beats = SongLessonKit.syllablesForLine(byEarSong, 0);
-  assert.strictEqual(beats.length, 4, `by-ear line should have 4 sounding beats (3 held + 1 new), got ${beats.length}`);
+  const beats = SongLessonKit.syllablesForLine(phraseSong, 0);
+  assert.strictEqual(beats.length, 6, `2 phrases of 3 beats each = 6, got ${beats.length}`);
   assert.strictEqual(beats[0].text, "Oo");
   assert.strictEqual(beats[0].sustain, false);
-  assert.strictEqual(beats[1].sustain, true, "row0's 2nd beat has no new lyric but IS still a sounding (held) beat");
+  assert.strictEqual(beats[1].sustain, true, "a phrase beat with no new syllable is still a sounding (held) beat");
   assert.strictEqual(beats[1].swara, "Sa", "a held beat still carries its own note");
-  assert.strictEqual(beats[2].sustain, true);
-  assert.strictEqual(beats[3].text, "na");
+  assert.strictEqual(beats[3].text, "Na");
   assert.strictEqual(beats[3].swara, "Ni (lower)");
-  // row1's ki/ta cells are true rests (lyric "–" AND no note) — correctly absent above
-  // (only 1 beat came from row1, not 3), confirmed by the total count already asserted.
 
-  // beatsToNotes: a `sustain` beat continuing the SAME pitch should extend the
-  // previous note's duration, not retrigger it — but a re-attack on the same pitch
-  // (a new syllable, `sustain: false`) must still become its own discrete note, and a
-  // held beat at a DIFFERENT pitch (shouldn't happen in real data, but defensively)
-  // must not silently merge into the wrong note either.
-  const notes = SongLessonKit.beatsToNotes([
-    { midi: 70, sustain: false }, // new note
-    { midi: 70, sustain: true },  // held — extends the note above
-    { midi: 70, sustain: true },  // held — extends it again
-    { midi: 69, sustain: false }, // new note (different pitch)
-    { midi: 69, sustain: false }, // re-attack: SAME pitch as above, but not held — its own note
-    { midi: 67, sustain: true },  // "held" but a different pitch than the previous note — its own note
-  ], 0.5);
-  assert.strictEqual(notes.length, 4, `expected 4 discrete notes (1 merged x3 + 1 + 1 + 1), got ${notes.length}`);
-  assert.strictEqual(notes[0].midi, 70);
-  assert.strictEqual(notes[0].duration, 1.5, "3 beats at 0.5 each merged into one held note");
-  assert.strictEqual(notes[1].midi, 69);
-  assert.strictEqual(notes[1].duration, 0.5);
-  assert.strictEqual(notes[2].midi, 69, "a re-attack on the same pitch is still its own note, not merged");
-  assert.strictEqual(notes[2].duration, 0.5);
-  assert.strictEqual(notes[3].midi, 67, "a held beat at a different pitch starts its own note rather than merging");
-  assert.strictEqual(notes[3].duration, 0.5);
+  // linePlaybackPlan/songPlaybackPlan: every beat PLUS the line's trailing gap beats
+  // (true rests, addressed as `{ gap: true }` rather than a beat cell) must appear in
+  // both `cells` (for the audio engine) and `addresses` (for highlighting), in lockstep.
+  const plan0 = SongLessonKit.linePlaybackPlan(phraseSong, 0);
+  assert.strictEqual(plan0.cells.length, 8, `6 beats + 2 gap cells = 8, got ${plan0.cells.length}`);
+  assert.strictEqual(plan0.addresses.length, 8);
+  assert.strictEqual(plan0.cells[6].midi, null, "the 2 trailing gap cells are true rests");
+  assert.strictEqual(plan0.addresses[6].gap, true, "a gap cell's address is flagged `gap`, not a beat cell index");
+  assert.strictEqual(plan0.addresses[0].line, 0);
+  assert.strictEqual(plan0.addresses[0].cell, 0);
 
-  // lineBeatTimeline/timelineToEvents: a line's true rests (e.g. 2 blank beats after
-  // the final syllable) must take up their own real time when played at a given tempo,
-  // not be skipped — "the song flows as written," rests included.
-  const restSong = {
-    lines: [{
-      rhythm: [
-        { tha: "Oo", ki: "–", ta: "–", notes: {
-          tha: { midi: 70, western: "A♯4", swara: "Sa", confidence: "by ear" },
-          ki: { midi: 70, western: "A♯4", swara: "Sa", confidence: "by ear" },
-          ta: null,
-        } },
-        { tha: "na", ki: "–", ta: "–", notes: { tha: { midi: 69, western: "A4", swara: "Ni (lower)", confidence: "by ear" }, ki: null, ta: null } },
-      ],
-    }],
-  };
-  const timeline = SongLessonKit.lineBeatTimeline(restSong, 0);
-  assert.strictEqual(timeline.length, 6, `expected all 6 cells (not just the 3 sounding ones), got ${timeline.length}`);
-  assert.strictEqual(timeline[2].midi, null, "ta of row 0 is a true rest");
-  assert.strictEqual(timeline[4].midi, null, "ki of row 1 is a true rest");
-  assert.strictEqual(timeline[5].midi, null, "ta of row 1 is a true rest");
+  const bothPlan = SongLessonKit.songPlaybackPlan(phraseSong, "both");
+  assert.strictEqual(bothPlan.cells.length, 8 + 5, `line 0's 8 + line 1's (3 beats + 2 gap) = 13, got ${bothPlan.cells.length}`);
+  assert.strictEqual(bothPlan.addresses[8].line, 1, "line 1's beats must carry line:1 in their address, not keep line 0's");
 
-  const events = SongLessonKit.timelineToEvents(timeline, 0.5);
-  // Oo(new)+held(same pitch) merge into one note; 1 true rest (row0.ta); na(new) note;
-  // then row1's 2 trailing rests merge into one longer rest — 4 events total.
-  assert.strictEqual(events.length, 4, `expected 4 events (1 note + 1 rest + 1 note + 1 merged rest), got ${events.length}`);
+  const phrasePlan = SongLessonKit.songPlaybackPlan(phraseSong, { line: 1, phrase: 0 });
+  assert.strictEqual(phrasePlan.cells.length, 3, "a single-phrase scope is exactly 3 beats, no gap");
+  assert.strictEqual(phrasePlan.cells[2].midi, 58);
+
+  // timelineToEvents: a `sustain` beat continuing the SAME pitch extends the previous
+  // note's duration; a true rest becomes an actual pause and consecutive rests merge
+  // into one longer pause — so a tempo change scales every phrase, sustain, and gap
+  // proportionally from a single pass over the cells list.
+  const events = SongLessonKit.timelineToEvents(plan0.cells, 0.5);
+  // Oo + its 2 held beats merge into 1 note; Na + its 2 held beats merge into 1 note;
+  // the 2 trailing gap cells merge into 1 rest — 3 events total, not 8.
+  assert.strictEqual(events.length, 3, `expected 3 merged events, got ${events.length}`);
   assert.strictEqual(events[0].midi, 70);
-  assert.strictEqual(events[0].duration, 1, "Oo + its held beat merge into one 1-second note");
-  assert.strictEqual(events[1].rest, true);
-  assert.strictEqual(events[1].duration, 0.5, "a single true rest beat");
-  assert.strictEqual(events[2].midi, 69);
-  assert.strictEqual(events[3].rest, true);
-  assert.strictEqual(events[3].duration, 1, "row 1's 2 trailing rest beats merge into one 1-second rest, not 2 ticks");
+  assert.strictEqual(events[0].duration, 1.5, "3 beats at 0.5 each merged into one held note");
+  assert.strictEqual(events[1].midi, 69);
+  assert.strictEqual(events[1].duration, 1.5);
+  assert.strictEqual(events[2].rest, true);
+  assert.strictEqual(events[2].duration, 1, "the 2 trailing gap beats merge into one 1-second rest, not 2 ticks");
 
-  // A song without by-ear `notes` at all has no rest-timing data — lineBeatTimeline
-  // must say so (null) rather than guessing, so callers fall back to the older,
-  // rest-less sequence (songWithRhythm, defined above, has no `notes` field on any row).
-  assert.strictEqual(SongLessonKit.lineBeatTimeline(songWithRhythm, 0), null);
+  // A re-attack on the same pitch (not flagged `sustain`) must still become its own
+  // discrete note, never merged into the previous one just because the pitch matches.
+  const reattack = SongLessonKit.timelineToEvents([
+    { midi: 70, sustain: false }, { midi: 70, sustain: false }, { midi: 67, sustain: true },
+  ], 0.5);
+  assert.strictEqual(reattack.length, 3, "a same-pitch re-attack and a held-but-different-pitch beat each stay their own note");
+  assert.strictEqual(reattack[1].duration, 0.5);
+  assert.strictEqual(reattack[2].midi, 67);
+
+  // A song without `phrases` or `gapBeats` (the oldest fallback, songWithRhythm above)
+  // still works: linePlaybackPlan just has no gap cells appended (0, not a crash).
+  const fallbackPlan = SongLessonKit.linePlaybackPlan(songWithRhythm, 0);
+  assert.strictEqual(fallbackPlan.cells.length, 7, "no gapBeats field means 0 gap cells, matching syl0's own 7 beats");
 
   console.log("songLessonKit.segmentsForLine.test.html: all assertions passed");
 } catch (e) {

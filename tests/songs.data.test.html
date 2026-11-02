@@ -14,8 +14,12 @@ try {
   const s = SONGS[0];
   assert.strictEqual(s.id, "oo-nanna-chetana");
   assert.strictEqual(s.lines.length, 2);
-  assert.strictEqual(s.lines[0].rhythm.length, 4);
-  assert.strictEqual(s.lines[1].rhythm.length, 4);
+  assert.strictEqual(s.lines[0].phrases.length, 4, "each line is exactly 4 phrases");
+  assert.strictEqual(s.lines[1].phrases.length, 4);
+  s.lines.forEach((line, li) => {
+    assert.strictEqual(line.gapBeats, 2, `line ${li} has a 2-beat gap`);
+    line.phrases.forEach((ph, pi) => assert.strictEqual(ph.beats.length, 3, `line ${li} phrase ${pi} must be exactly 3 beats`));
+  });
   assert.strictEqual(s.reference.tonicMidi, 70);
   assert.strictEqual(s.reference.segments.length, 5);
   const uncertain = s.reference.segments[4];

@@ -9,12 +9,12 @@
    entry here — no new UI code required.
    ============================================================ */
 
-// Per-beat pitches the learner transcribed by ear while reviewing the first draft
-// (finer than `reference.segments` below, which are pYIN-measured but only resolve
-// 4 broad regions across all 13 sung beats). Kept separate from those segments —
-// this is honest, by-ear data, not re-measured audio — and only `swara` names that
-// were already confirmed via a measured segment are reused here; a new pitch this
-// transcription introduces (G4, E4, D4) gets `swara: null` rather than a guessed name.
+// By-ear pitches for the song's rhythm, finer than `reference.segments` below (which
+// are pYIN-measured from the actual recording but only resolve 4 broad regions across
+// all 13 sung beats). Kept separate from those segments — this is honest, by-ear data,
+// not re-measured audio — and only `swara` names that were already confirmed via a
+// measured segment are reused here; a pitch this transcription introduces on its own
+// (G4, E4, D4, C5) gets `swara: null` rather than a guessed Carnatic name.
 const BY_EAR_NOTE = {
   "A#4": { midi: 70, western: "A♯4", swara: "Sa" },
   "A4": { midi: 69, western: "A4", swara: "Ni (lower)" },
@@ -24,12 +24,22 @@ const BY_EAR_NOTE = {
   "A#3": { midi: 58, western: "A♯3", swara: "Sa (lower octave)" },
   "C5": { midi: 72, western: "C5", swara: null },
 };
-function byEarRow(tha, ki, ta) {
-  return {
-    tha: tha ? { ...BY_EAR_NOTE[tha], confidence: "by ear" } : null,
-    ki: ki ? { ...BY_EAR_NOTE[ki], confidence: "by ear" } : null,
-    ta: ta ? { ...BY_EAR_NOTE[ta], confidence: "by ear" } : null,
-  };
+
+/**
+ * Builds one 3-beat phrase. `cells`: 3 entries of [syllable|null, noteKey|null].
+ * A syllable of `null` means this beat has no new lyric at all (the phrase's label
+ * carries the text); a noteKey of `null` means "sustain the previous beat's pitch"
+ * (a teacher-provided "Sustain" cell) rather than a new, distinct note.
+ */
+function phrase(label, cells) {
+  let lastKey = null;
+  const beats = cells.map(([syl, key]) => {
+    const resolvedKey = key || lastKey;
+    lastKey = resolvedKey;
+    const n = BY_EAR_NOTE[resolvedKey];
+    return { syl, sustain: !key, midi: n.midi, western: n.western, swara: n.swara, confidence: "by ear" };
+  });
+  return { label, beats };
 }
 
 window.SONGS = [
@@ -42,22 +52,26 @@ window.SONGS = [
       {
         text: "ಓ ನನ್ನ ಚೇತನ",
         transliteration: "Oo nanna chetana",
-        rhythm: [
-          { tha: "Oo", ki: "–", ta: "–", notes: byEarRow("A#4", "A#4", "A#4") },
-          { tha: "Na", ki: "n", ta: "na", notes: byEarRow("A4", "G4", "E4") },
-          { tha: "Che", ki: "–", ta: "tha", notes: byEarRow("E4", "G4", "A4") },
-          { tha: "na", ki: "–", ta: "–", notes: byEarRow("A4", null, null) },
+        // Teacher-provided phrase mapping — each phrase is exactly 3 beats; the 2-beat
+        // gap after this line's final phrase is a real musical pause, not missing data.
+        phrases: [
+          phrase("ಓ", [["Oo", "A#4"], [null, null], [null, null]]),
+          phrase("ನನ್ನ", [["Na", "A4"], ["n", "G4"], ["na", "E4"]]),
+          phrase("ಚೇತನ", [["Che", "E4"], ["tha", "G4"], ["na", "A4"]]),
+          phrase("ನಾ", [["Na", "A4"], [null, null], [null, null]]),
         ],
+        gapBeats: 2,
       },
       {
         text: "ಆಗು ನೀ ಅನಿಕೇತನ",
         transliteration: "Aagu nee anikethana",
-        rhythm: [
-          { tha: "Aa", ki: "–", ta: "gu", notes: byEarRow("A4", "A4", "C5") },
-          { tha: "Nee", ki: "A", ta: "ni", notes: byEarRow("A4", "G4", "D4") },
-          { tha: "ke", ki: "–", ta: "ta", notes: byEarRow("E4", "D4", "A#3") },
-          { tha: "na", ki: "–", ta: "–", notes: byEarRow("A#3", null, null) },
+        phrases: [
+          phrase("ಆಗು", [["Aa", "A4"], [null, null], ["Gu", "C5"]]),
+          phrase("ನೀ ಅನಿ", [["Nee", "A4"], ["A", "G4"], ["ni", "D4"]]),
+          phrase("ಕೆತನ", [["Ke", "E4"], [null, null], ["ta", "A#3"]]),
+          phrase("ನಾ", [["Na", "A#3"], [null, null], [null, null]]),
         ],
+        gapBeats: 2,
       },
     ],
     meaning: {
