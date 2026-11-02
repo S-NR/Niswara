@@ -779,13 +779,13 @@ const APP_DATA = (() => {
   }
 
   const levelClassDefs = {
-    // Classes 1-19 ("Voice Placement" ... "Tone Consistency Across Range") are now real, authored
-    // classes. Class 19's own spec names the real Class 20 as "Articulation and Style", so this
+    // Classes 1-21 ("Voice Placement" ... "Vocal Endurance Foundations") are now real, authored
+    // classes. Class 21's own spec names the real Class 22 as "Personal Vocal Style", so this
     // entry is renamed in place again, the same precedent every class since 5 has followed (apart
-    // from Class 11's one-off addition). Whether Level 2 keeps growing after Class 20 is for that
+    // from Class 11's one-off addition). Whether Level 2 keeps growing after Class 22 is for that
     // class's own spec to reveal — not guessed here.
-    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 20,
-      titles: ["Articulation and Style"] },
+    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 22,
+      titles: ["Personal Vocal Style"] },
     3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
       titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
@@ -1477,9 +1477,61 @@ const APP_DATA = (() => {
     }
   };
 
+  /* ---------- Level 2, Class 20 (interactive) ---------- */
+  const articulationAndStyleClass = {
+    number: 20, title: "Articulation and Style", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner–Intermediate", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/articulationAndStyle.js
+    interactive: "articulation-and-style",
+    subtitle: "Clear words without interrupting the melody.",
+    description: "An interactive lesson: pronouncing sung words clearly while keeping a smooth, comfortable tone. Practises simple syllables on a comfortable note, keeping words clear across nearby notes, a short original phrase, and a first look at musical style as natural choices, not imitation.",
+    content: {
+      whatYoullLearn: "How vowels and consonants work together while singing, how to make lyrics understandable without interrupting the melody, how to maintain vowel clarity across notes, how articulation and phrasing contribute to natural musical expression, and how to begin exploring personal singing style without imitating others.",
+      whyItMatters: "A listener needs to understand your words, but chasing crisp consonants at the cost of a smooth, sustained vowel works against the music rather than for it. Balancing the two is what makes singing both clear and musical.",
+      theory: "Vowels carry most of the sustained singing sound; consonants help a listener recognise the word. A consonant should never interrupt or cut off the vowel that follows it.",
+      guidedPractice: [
+        "Prepared gently, practised simple syllables on a comfortable note, tried keeping words clear while moving to nearby notes, sang a short original phrase, explored the difference between connected and gently separated notes, and reflected on where the melody felt most and least interrupted.",
+      ],
+      assignment: {
+        instructions: [
+          "The syllable practice on a comfortable note",
+          "Keeping words clear across nearby notes, if comfortable",
+          "The short practice phrase, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 21 (interactive) ---------- */
+  const vocalEnduranceFoundationsClass = {
+    number: 21, title: "Vocal Endurance Foundations", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner–Intermediate", estMinutes: 18,
+    // Rendered by the interactive lesson in js/lessons/vocalEnduranceFoundations.js
+    interactive: "vocal-endurance-foundations",
+    subtitle: "Comfortable coordination over slightly longer phrases — never maximum duration.",
+    description: "An interactive lesson: maintaining comfortable, consistent singing over slightly longer phrases without pushing or exhausting the voice. Builds from a short phrase to a slightly longer one, compares how the voice feels before and after a short rest, and ends with a simple two-to-three-phrase exercise, practised separately before combining.",
+    content: {
+      whatYoullLearn: "What vocal endurance means, the difference between healthy vocal effort and strain, why gradually building duration beats suddenly attempting long songs, why breaks are part of good vocal practice, and how to notice tiredness or instability without pushing through it.",
+      whyItMatters: "Endurance that comes from forcing volume, range, or duration tends to produce tension and fatigue rather than real progress. Comfortable coordination, built gradually with real rest between attempts, is what actually develops over time.",
+      theory: "Vocal endurance is about managing effort and coordination comfortably across a phrase — not about singing loudly, reaching higher notes, or singing continuously for as long as possible.",
+      guidedPractice: [
+        "Prepared gently, practised a short phrase a few times, tried a slightly longer version, compared how the voice felt before and after a short rest, and worked through a simple two-to-three-phrase exercise one phrase at a time before combining them.",
+      ],
+      assignment: {
+        instructions: [
+          "The short phrase, repeated a few times",
+          "The slightly longer phrase, if comfortable",
+          "The combined exercise, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
   const CLASSES = [
     ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
-    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass].map(c => ({ ...c, levelId: 2 })),
+    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass, articulationAndStyleClass, vocalEnduranceFoundationsClass].map(c => ({ ...c, levelId: 2 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
