@@ -167,6 +167,49 @@ const SongLessonKit = (() => {
     return notes;
   }
 
+  /**
+   * Every Tha-Ki-Ta cell in this line, in order — INCLUDING true rests (`midi: null`) —
+   * so playback can let a blank beat actually take up its own time in the rhythm instead
+   * of being silently skipped. Only available for a song with by-ear per-beat `notes`
+   * (see songs.js); returns null otherwise, so the caller can fall back to the older,
+   * rest-less sequence for a song that doesn't have this data yet.
+   */
+  function lineBeatTimeline(song, lineIndex) {
+    const rows = song.lines[lineIndex].rhythm;
+    if (!rows.some((row) => row.notes)) return null;
+    const out = [];
+    rows.forEach((row) => {
+      ["tha", "ki", "ta"].forEach((col) => {
+        const note = row.notes && row.notes[col];
+        if (!note) { out.push({ midi: null, sustain: false }); return; }
+        const text = row[col];
+        out.push({ midi: note.midi, sustain: !text || text === "–" });
+      });
+    });
+    return out;
+  }
+
+  /**
+   * Turns a lineBeatTimeline() cell list into PianoSynth.playSequence events, each `unit`
+   * long: consecutive rest cells merge into one longer rest (a real pause, not silence
+   * ticking by one beat at a time), exactly like beatsToNotes merges held notes.
+   */
+  function timelineToEvents(cells, unit) {
+    const events = [];
+    cells.forEach((c) => {
+      const prev = events[events.length - 1];
+      if (c.midi == null) {
+        if (prev && prev.rest) prev.duration += unit;
+        else events.push({ rest: true, duration: unit });
+      } else if (c.sustain && prev && !prev.rest && prev.midi === c.midi) {
+        prev.duration += unit;
+      } else {
+        events.push({ midi: c.midi, duration: unit });
+      }
+    });
+    return events;
+  }
+
   // Index of this line's first beat within allSyllables(song)'s flat list — lets
   // rhythmTableHtml wire the same data-play-syllable index pitchTableHtml/Swara
   // Practice use, without re-flattening every line on every cell.
@@ -515,12 +558,20 @@ const SongLessonKit = (() => {
       const btn = e.target.closest("[data-play-melody]");
       if (!btn) return;
       const [which, speed] = btn.dataset.playMelody.split(":");
-      // Every sounding beat, in order (held beats included) — not just the 4 broad
-      // measured segments — so playback actually traces the real melody.
-      const beats = which === "both" ? allSyllables(song) : syllablesForLine(song, Number(which));
+      const lineIndexes = which === "both" ? song.lines.map((_, i) => i) : [Number(which)];
       const unit = speed === "slow" ? 0.75 : 0.5;
       const gap = speed === "slow" ? 0.3 : 0.18;
-      PianoSynth.playSequence(beatsToNotes(beats, unit), { gap });
+      // Prefer the full per-beat timeline (every Tha-Ki-Ta cell, rests included) when the
+      // song has by-ear data, so a blank beat (e.g. the 2 rest beats after the final "na")
+      // actually takes up its own time at the chosen tempo instead of being skipped —
+      // the song flows as written, not as a flat list of only its sounding notes.
+      const timelines = lineIndexes.map((i) => lineBeatTimeline(song, i));
+      if (timelines.every(Boolean)) {
+        PianoSynth.playSequence(timelines.flatMap((cells) => timelineToEvents(cells, unit)), { gap });
+      } else {
+        const beats = which === "both" ? allSyllables(song) : syllablesForLine(song, Number(which));
+        PianoSynth.playSequence(beatsToNotes(beats, unit), { gap });
+      }
     }
     container.addEventListener("click", onPlayMelody);
     cleanups.push(() => container.removeEventListener("click", onPlayMelody));
@@ -645,7 +696,7 @@ const SongLessonKit = (() => {
 
   return {
     STAGES, header, stepper, chapter, p, narrow,
-    measured, segmentsForLine, syllablesForLine, allSyllables, beatsToNotes, rhythmTableHtml, pitchTableHtml, melodyContourHtml,
+    measured, segmentsForLine, syllablesForLine, allSyllables, beatsToNotes, lineBeatTimeline, timelineToEvents, rhythmTableHtml, pitchTableHtml, melodyContourHtml,
     milestone, renderComplete, progressStats, A, q, checklist,
     wireViewedSentinel, wireStepper,
     render, mount,

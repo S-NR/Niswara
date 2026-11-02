@@ -138,7 +138,9 @@ const PianoSynth = (() => {
 
   /**
    * Plays notes one after another. onNote(index, midi) fires as each starts (for highlighting).
-   * Returns a promise; call the returned promise's cancel() to stop early.
+   * An entry of `{ rest: true, duration }` plays silence for that long instead of a note — for
+   * a sequence that needs to represent an actual rest/pause in the rhythm, not just a gap
+   * between notes. Returns a promise; call the returned promise's cancel() to stop early.
    */
   function playSequence(notes, { duration = 0.85, gap = 0.25, velocity, onNote } = {}) {
     let cancelled = false;
@@ -146,6 +148,12 @@ const PianoSynth = (() => {
     const p = (async () => {
       for (let i = 0; i < notes.length && !cancelled; i++) {
         const n = notes[i];
+        if (n && n.rest) {
+          if (onNote) onNote(i, null);
+          await new Promise((r) => setTimeout(r, (n.duration ?? duration) * 1000));
+          if (i < notes.length - 1) await new Promise((r) => setTimeout(r, gap * 1000));
+          continue;
+        }
         const midi = typeof n === "number" ? n : n.midi;
         const vel = typeof n === "number" ? velocity : (n.velocity ?? velocity);
         const dur = typeof n === "number" ? duration : (n.duration ?? duration);

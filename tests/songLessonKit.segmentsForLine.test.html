@@ -141,6 +141,44 @@ try {
   assert.strictEqual(notes[3].midi, 67, "a held beat at a different pitch starts its own note rather than merging");
   assert.strictEqual(notes[3].duration, 0.5);
 
+  // lineBeatTimeline/timelineToEvents: a line's true rests (e.g. 2 blank beats after
+  // the final syllable) must take up their own real time when played at a given tempo,
+  // not be skipped — "the song flows as written," rests included.
+  const restSong = {
+    lines: [{
+      rhythm: [
+        { tha: "Oo", ki: "–", ta: "–", notes: {
+          tha: { midi: 70, western: "A♯4", swara: "Sa", confidence: "by ear" },
+          ki: { midi: 70, western: "A♯4", swara: "Sa", confidence: "by ear" },
+          ta: null,
+        } },
+        { tha: "na", ki: "–", ta: "–", notes: { tha: { midi: 69, western: "A4", swara: "Ni (lower)", confidence: "by ear" }, ki: null, ta: null } },
+      ],
+    }],
+  };
+  const timeline = SongLessonKit.lineBeatTimeline(restSong, 0);
+  assert.strictEqual(timeline.length, 6, `expected all 6 cells (not just the 3 sounding ones), got ${timeline.length}`);
+  assert.strictEqual(timeline[2].midi, null, "ta of row 0 is a true rest");
+  assert.strictEqual(timeline[4].midi, null, "ki of row 1 is a true rest");
+  assert.strictEqual(timeline[5].midi, null, "ta of row 1 is a true rest");
+
+  const events = SongLessonKit.timelineToEvents(timeline, 0.5);
+  // Oo(new)+held(same pitch) merge into one note; 1 true rest (row0.ta); na(new) note;
+  // then row1's 2 trailing rests merge into one longer rest — 4 events total.
+  assert.strictEqual(events.length, 4, `expected 4 events (1 note + 1 rest + 1 note + 1 merged rest), got ${events.length}`);
+  assert.strictEqual(events[0].midi, 70);
+  assert.strictEqual(events[0].duration, 1, "Oo + its held beat merge into one 1-second note");
+  assert.strictEqual(events[1].rest, true);
+  assert.strictEqual(events[1].duration, 0.5, "a single true rest beat");
+  assert.strictEqual(events[2].midi, 69);
+  assert.strictEqual(events[3].rest, true);
+  assert.strictEqual(events[3].duration, 1, "row 1's 2 trailing rest beats merge into one 1-second rest, not 2 ticks");
+
+  // A song without by-ear `notes` at all has no rest-timing data — lineBeatTimeline
+  // must say so (null) rather than guessing, so callers fall back to the older,
+  // rest-less sequence (songWithRhythm, defined above, has no `notes` field on any row).
+  assert.strictEqual(SongLessonKit.lineBeatTimeline(songWithRhythm, 0), null);
+
   console.log("songLessonKit.segmentsForLine.test.html: all assertions passed");
 } catch (e) {
   console.error("songLessonKit.segmentsForLine.test.html: FAILED -", e.message);
