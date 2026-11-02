@@ -53,7 +53,7 @@ window.SONGS = [
         transliteration: "Aagu nee anikethana",
         rhythm: [
           { tha: "Aa", ki: "–", ta: "gu", notes: byEarRow("A4", "A4", "A4") },
-          { tha: "Nee", ki: "–", ta: "a-ni", notes: byEarRow("G4", "E4", "D4") },
+          { tha: "Nee", ki: "A", ta: "ni", notes: byEarRow("G4", "E4", "D4") },
           { tha: "ke", ki: "–", ta: "ta", notes: byEarRow("E4", "D4", "A#3") },
           { tha: "na", ki: "–", ta: "–", notes: byEarRow("A#3", null, null) },
         ],
