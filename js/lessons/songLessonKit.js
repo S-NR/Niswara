@@ -47,7 +47,8 @@ const SongLessonKit = (() => {
     { bpm: 50, label: "Very Slow" }, { bpm: 60, label: "Slow" }, { bpm: 75, label: "Moderate" },
     { bpm: 90, label: "Normal" }, { bpm: 110, label: "Fast" },
   ];
-  const DEFAULT_BPM = 90;
+  const DEFAULT_BPM = 90; // "the reference tempo" shown to the learner — the Normal preset, a chosen default, not a measured fact (this song has no recorded-audio tempo to measure; see songLessonKit's melodyNote/sourceNote honesty convention)
+  const BPM_MIN = 40, BPM_MAX = 160; // sensible custom-BPM bounds
   const CLICK_MIDI = 81; // a fixed, consistent click pitch for Mode A (rhythm only) — never a melodic note
   const FLOW_MODES = [
     { key: "rhythm", label: "Mode A · Rhythm only", hint: "A click on every beat — no melody, just the Tha-Ki-Ta pattern and lyrics." },
@@ -472,10 +473,19 @@ const SongLessonKit = (() => {
           <div class="rounded-2xl border border-gold-400/20 bg-white/[0.02] p-5 mb-4">
             <p class="text-[11px] uppercase tracking-wider text-ink-500 mb-3">Step 1 — Choose a tempo</p>
             <div class="flex flex-wrap gap-3 mb-2">
-              <button type="button" data-flow-bpm="60" class="ex-chip !text-sm !py-2.5 !px-5 is-selected">Slow</button>
-              <button type="button" data-flow-bpm="90" class="ex-chip !text-sm !py-2.5 !px-5">Normal</button>
+              <button type="button" data-flow-bpm="60" class="ex-chip !text-sm !py-2.5 !px-5">Slow</button>
+              <button type="button" data-flow-bpm="${DEFAULT_BPM}" class="ex-chip !text-sm !py-2.5 !px-5 is-selected">Normal</button>
             </div>
-            <p class="text-xs text-ink-500">More tempo options: ${TEMPO_PRESETS.map((t) => `<button type="button" data-flow-bpm="${t.bpm}" class="underline hover:text-ink-300">${t.label}</button>`).join(" · ")}</p>
+            <p class="text-xs text-ink-500 mb-3">More tempo options: ${TEMPO_PRESETS.map((t) => `<button type="button" data-flow-bpm="${t.bpm}" class="underline hover:text-ink-300">${t.label}</button>`).join(" · ")}</p>
+            <div class="flex flex-wrap items-center gap-2 pt-3 border-t border-white/5">
+              <span class="text-xs text-ink-500">Custom:</span>
+              <button type="button" data-flow-bpm-step="-1" class="piano-ctl w-8" aria-label="Decrease BPM">−</button>
+              <input type="number" min="${BPM_MIN}" max="${BPM_MAX}" value="${DEFAULT_BPM}" data-flow-bpm-input class="w-20 text-center rounded-lg bg-white/5 border border-white/10 text-ink-100 py-1.5" aria-label="Custom BPM">
+              <button type="button" data-flow-bpm-step="1" class="piano-ctl w-8" aria-label="Increase BPM">+</button>
+              <span class="text-xs text-ink-500">BPM (${BPM_MIN}–${BPM_MAX})</span>
+              <button type="button" data-flow-bpm-reset class="vr-btn !text-xs ml-1">Reset to reference (${DEFAULT_BPM} BPM)</button>
+              <span class="text-sm text-gold-300 font-display tabular-nums ml-auto" data-flow-bpm-display>${DEFAULT_BPM} BPM</span>
+            </div>
           </div>
 
           <div class="rounded-2xl border border-white/10 bg-white/[0.02] p-5 mb-4">
@@ -691,6 +701,19 @@ const SongLessonKit = (() => {
       if (status) status.textContent = state === "playing" ? "Playing…" : state === "paused" ? "Paused — Play resumes from here." : "Ready — tap a beat above to play it on its own, or Play for the whole flowing sequence.";
     }
 
+    /** Clamps to [BPM_MIN, BPM_MAX], updates every tempo control in sync, and — if
+     *  something's already playing — resumes from the current beat at the new tempo
+     *  (the "next beat boundary" the spec asks for, not a restart or a lost position). */
+    function setFlowBpm(bpm) {
+      flowBpm = Math.max(BPM_MIN, Math.min(BPM_MAX, Math.round(bpm)));
+      container.querySelectorAll("[data-flow-bpm]").forEach((b) => b.classList.toggle("is-selected", Number(b.dataset.flowBpm) === flowBpm));
+      const input = $("[data-flow-bpm-input]");
+      if (input) input.value = flowBpm;
+      const display = $("[data-flow-bpm-display]");
+      if (display) display.textContent = `${flowBpm} BPM`;
+      if (flowPlayer) { const scope = flowPlayer.scope; const idx = flowPlayer.currentIndex + 1; playScope(scope, idx); }
+    }
+
     function stopFlow() {
       if (flowPlayer) { flowPlayer.cancel(); flowPlayer = null; }
       setHighlight(null);
@@ -732,13 +755,10 @@ const SongLessonKit = (() => {
         return;
       }
       const bpmBtn = e.target.closest("[data-flow-bpm]");
-      if (bpmBtn) {
-        flowBpm = Number(bpmBtn.dataset.flowBpm);
-        container.querySelectorAll("[data-flow-bpm]").forEach((b) => b.classList.toggle("is-selected", b === bpmBtn));
-        // Tempo changes take effect at the next beat boundary rather than losing position.
-        if (flowPlayer) { const scope = flowPlayer.scope; const idx = flowPlayer.currentIndex + 1; playScope(scope, idx); }
-        return;
-      }
+      if (bpmBtn) { setFlowBpm(Number(bpmBtn.dataset.flowBpm)); return; }
+      const stepBtn = e.target.closest("[data-flow-bpm-step]");
+      if (stepBtn) { setFlowBpm(flowBpm + Number(stepBtn.dataset.flowBpmStep)); return; }
+      if (e.target.closest("[data-flow-bpm-reset]")) { setFlowBpm(DEFAULT_BPM); return; }
       const phraseBtn = e.target.closest("[data-play-phrase]");
       if (phraseBtn) {
         const [line, ph] = phraseBtn.dataset.playPhrase.split(":").map(Number);
@@ -788,6 +808,14 @@ const SongLessonKit = (() => {
     }
     container.addEventListener("click", onFlowClick);
     cleanups.push(() => { stopFlow(); container.removeEventListener("click", onFlowClick); });
+
+    function onBpmInput(e) {
+      const input = e.target.closest("[data-flow-bpm-input]");
+      if (!input || input.value === "") return;
+      setFlowBpm(Number(input.value));
+    }
+    container.addEventListener("change", onBpmInput);
+    cleanups.push(() => container.removeEventListener("change", onBpmInput));
 
     /* ---- refresh the complete/progress panel + compare button availability ---- */
     function refreshLive() {
