@@ -4,91 +4,125 @@
    Rendered by ClassDetailPage for interactive: "shruti-and-finding-your-sa".
 
    Curriculum identity: Level 2, Class 3 (`number: 3`, `levelId: 2`
-   in data.js, explicit id `L2C26` — new classes get a permanent id
-   independent of their display number, so later renumbering never
-   orphans progress). First of four new "Musical Foundations"
-   classes inserted between Resonance (Class 2) and Chest Voice
-   Foundations (now Class 7), introducing Carnatic swara basics
-   alongside the vocal-technique track rather than after it.
+   in data.js, explicit id `L2C26`). Rebuilt against this class's own
+   later, more detailed "Claude Prompt" spec (5 teaching sections, a
+   5-question knowledge check, 3 named stability exercises A/B/C, and
+   a 6-item self-assessment checklist + single reflection question) —
+   supersedes the shorter version first written during the Level 2
+   Curriculum Upgrade. Still the first of four new "Musical
+   Foundations" classes inserted between Resonance (Class 2) and
+   Chest Voice Foundations (now Class 7); Classes 4-6 (`L2C27`-`29`)
+   are unaffected by this rebuild.
 
-   Core idea: shruti is the continuous reference pitch a singer tunes
-   against; Sa is simply the name for whichever pitch a singer
-   chooses as their own personal reference. Sa is never assumed to
-   be any particular Western note (never "C") — it is deliberately
-   chosen here, on the learner's own piano, and carried forward by
-   every later class's baseNote() chain exactly like Class 1-25's
-   "comfortable reference note" already was, just under its proper
-   Carnatic name from here on.
+   Core idea: shruti is the pitch reference a singer tunes against —
+   distinct from tala, which is about rhythm, not pitch — and Sa is
+   simply the name for whichever pitch a singer chooses as that
+   reference. Sa is never assumed to be any particular Western note
+   (never "C") — it is deliberately chosen here, on the learner's own
+   piano, and carried forward by every later class's baseNote() chain.
 
-   Honesty boundaries, matching every earlier class: no fabricated
-   pitch-detection or "correct Sa" scoring; completion never depends
-   on a particular pitch, a recording, or a smooth drone match.
+   Honesty boundaries this spec asks for explicitly, kept throughout:
+   the "drone" is a synthesized sustained tone (`PianoSynth.noteOn`),
+   not a recorded tanpura — labelled as such in Section 4, with a
+   plain note about what a real tanpura/drone audio asset would add
+   if one is ever recorded or licensed for the project. Exercise C
+   ("Recognise Sa") is a genuine, honestly-gradable listening exercise
+   — it plays a known, deterministic sequence of synthesized notes and
+   asks which one was Sa; it is NOT a claim that the app can detect or
+   analyse the learner's own sung pitch. No fabricated pitch-detection
+   anywhere. Completion never depends on a particular pitch, a
+   recording, or getting Exercise C right.
 
    Reuses: LessonKit (+ its automatic Warm-up card), VirtualPiano,
-   PianoSynth.noteOn (drone + release — new use of an existing synth
-   primitive, no new audio code needed), RecordingCard, SelfAssessment,
-   PersonalNotes, ClassProgress.
+   PianoSynth.noteOn (drone) / .playSequence (Exercise C), RecordingCard,
+   SelfAssessment is not needed here (plain checklist + chip quiz
+   instead, matching the spec's own "knowledge check" / "self-
+   assessment checklist" split), PersonalNotes, ClassProgress.
    ============================================================ */
 
 const ShrutiAndFindingYourSaLesson = (() => {
   const STAGES = [
-    { id: "understand", label: "Understand" },
+    { id: "understand", label: "Shruti" },
+    { id: "sa", label: "Sa" },
+    { id: "finding", label: "Finding Sa" },
     { id: "drone", label: "Drone" },
-    { id: "choose", label: "Choose Sa" },
-    { id: "sing", label: "Sing" },
-    { id: "mistakes", label: "Mistakes" },
+    { id: "stability", label: "Stability" },
+    { id: "quiz", label: "Quiz" },
     { id: "reflect", label: "Reflect" },
     { id: "complete", label: "Complete" },
   ];
 
   const RANGE = { from: 48, to: 72 };
-  const SA_MAX = RANGE.to - 12; // leave room above Sa for the upper octave later classes will use
+  const SA_MAX = RANGE.to - 12; // leave room above Sa for later classes' upper octave
 
   const KNOWLEDGE_CHECK = [
     {
       key: "shruti",
-      question: "What is shruti, in the simplest beginner sense used in this course?",
+      question: "What does Shruti refer to?",
       options: [
         { value: "volume", label: "How loudly a singer performs", correct: false },
-        { value: "drone", label: "A continuous reference pitch that singing is tuned against", correct: true },
-        { value: "speed", label: "The speed of a song", correct: false },
+        { value: "ref", label: "The pitch reference or tonal foundation a singer tunes against", correct: true },
+        { value: "tala", label: "A rhythmic cycle", correct: false },
       ],
-      explain: { volume: "Not quite — shruti isn't about loudness.", drone: "Exactly. Shruti is the steady background pitch everything else is heard in relation to.", speed: "Not quite — shruti isn't about tempo." },
+      explain: { volume: "Not quite — shruti isn't about loudness.", ref: "Exactly. Shruti is the pitch reference everything else is heard in relation to.", tala: "Not quite — that's tala, a separate, rhythm-related idea." },
+    },
+    {
+      key: "saUse",
+      question: "What is Sa used for?",
+      options: [
+        { value: "fixed", label: "As a fixed note every singer must use", correct: false },
+        { value: "ref", label: "As the singer's own reference note, with every other swara described relative to it", correct: true },
+        { value: "volume", label: "As a volume marker", correct: false },
+      ],
+      explain: { fixed: "Not quite — Sa isn't the same note for every singer.", ref: "Right — Sa is your personal reference point for everything else you'll learn.", volume: "Not quite — Sa has nothing to do with loudness." },
     },
     {
       key: "saFixed",
-      question: "Is Sa always the same pitch — for example, always the note C?",
+      question: "Is Sa always the Western note C?",
       options: [
         { value: "yes", label: "Yes, Sa is always C", correct: false },
-        { value: "no", label: "No — Sa is whichever pitch a singer personally chooses as their reference", correct: true },
-        { value: "unsure", label: "Sa is assigned by a teacher and never changes", correct: false },
+        { value: "no", label: "No — Sa is whichever pitch the singer personally chooses", correct: true },
+        { value: "beginners", label: "Only for beginners", correct: false },
       ],
-      explain: { yes: "Not quite — Sa is never fixed to one Western note like C.", no: "Exactly right. Your Sa is personal, chosen for comfort, not assigned.", unsure: "Not quite — you chose your own Sa today, and you can choose a different one later if it's more comfortable." },
+      explain: { yes: "Not quite — Sa is never fixed to one Western note like C.", no: "Exactly right.", beginners: "Not quite — this is true for every singer, not just beginners." },
     },
     {
-      key: "why",
-      question: "Why does it matter that Sa is chosen rather than fixed?",
+      key: "whyComfortable",
+      question: "Why should a singer choose a comfortable Sa?",
       options: [
         { value: "comfort", label: "Because every voice is comfortable in a different pitch range", correct: true },
-        { value: "rule", label: "It doesn't matter — any Sa works identically for everyone", correct: false },
-        { value: "louder", label: "So the singer can sing as loudly as possible", correct: false },
+        { value: "loud", label: "So the singer can sing as loudly as possible", correct: false },
+        { value: "none", label: "It doesn't matter which Sa is chosen", correct: false },
       ],
-      explain: { comfort: "Right — a personally chosen Sa means every later swara sits in a range that's comfortable for your own voice.", rule: "Not quite — a fixed Sa could sit uncomfortably high or low for a given voice.", louder: "Not quite — Sa has nothing to do with volume." },
+      explain: { comfort: "Right — a comfortable Sa keeps every later swara within an easy range for your own voice.", loud: "Not quite — Sa has nothing to do with volume.", none: "Not quite — a strained Sa makes everything built on top of it harder than it needs to be." },
+    },
+    {
+      key: "droneUse",
+      question: "What is the purpose of a tanpura-style drone?",
+      options: [
+        { value: "ref", label: "To provide a continuous reference pitch to listen and tune against", correct: true },
+        { value: "louder", label: "To make the singer sing louder", correct: false },
+        { value: "rhythm", label: "To test the singer's rhythm", correct: false },
+      ],
+      explain: { ref: "Exactly — a drone gives you something steady to check your own pitch against.", louder: "Not quite — the drone isn't about volume.", rhythm: "Not quite — a drone is a pitch reference, not a rhythm tool." },
     },
   ];
 
-  const PROGRESS_ITEMS = [
-    { key: "understood", label: "I understand what shruti and Sa mean in this course." },
-    { key: "chosenSa", label: "I chose a comfortable Sa on the piano." },
-    { key: "triedOrSkipped", label: "I hummed or sang along with the drone, or chose to skip for comfort." },
-    { key: "reflected", label: "I reflected on how it felt to choose my own Sa." },
+  const CHECKLIST_ITEMS = [
+    { key: "understoodShruti", label: "I understand what Shruti means." },
+    { key: "understoodSaReference", label: "I understand why Sa is a reference note." },
+    { key: "listenedToSa", label: "I can listen to a Sa reference." },
+    { key: "hummedSa", label: "I can hum Sa comfortably." },
+    { key: "repeatedGently", label: "I can repeat Sa without forcing my voice." },
+    { key: "understoodVariation", label: "I understand why my Sa may differ from another singer's Sa." },
   ];
+  const PROGRESS_ITEMS = CHECKLIST_ITEMS;
 
-  const opt = (value, label, tone = "neutral") => ({ value, label, tone });
-  const Q = {
-    droneFeel: { question: "How did it feel to hum along with the drone?", options: [opt("easy", "Easy and steady", "good"), opt("okay", "Okay, with some drifting", "good"), opt("hard", "Difficult to stay with", "maybe"), opt("skip", "I chose to skip this")] },
-    choosing: { question: "How did choosing your own Sa feel, compared to being given a fixed note?", options: [opt("natural", "More natural", "good"), opt("same", "About the same"), opt("unsure", "Not sure yet")] },
-  };
+  // Exercise C — Recognise Sa: a short, deterministic 3-note sequence (Sa plus two
+  // clearly different swaras) in random order. Genuinely gradable because every
+  // note played is already known — this never claims to analyse the learner's
+  // own singing.
+  const RECOGNISE_DISTRACTORS = [4, 7]; // Ga, Pa — clearly different from Sa (0)
 
   const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
   const { p, narrow } = LessonKit;
@@ -114,15 +148,27 @@ const ShrutiAndFindingYourSaLesson = (() => {
   const take = (rec, k) => A(rec, "recs")[k] || null;
   const q = (rec, k) => A(rec, "q")[k] || null;
   const skipped = (rec, k) => !!A(rec, "skip")[k];
+  const checklist = (rec) => A(rec, "checklist");
 
   function derivedCheckpoints(rec) {
     const out = {};
-    if (KNOWLEDGE_CHECK.every((k) => q(rec, `kc_${k.key}`)) && !!rec.checkpoints.lessonViewed) out.understood = true;
-    if (typeof A(rec, "setup").note === "number") out.chosenSa = true;
-    if (take(rec, "singTake") || take(rec, "droneAlongTake") || skipped(rec, "sing")) out.triedOrSkipped = true;
-    const g = A(rec, "growth");
-    if (q(rec, "choosing") && filled(g.learned)) out.reflected = true;
+    const c = checklist(rec);
+    CHECKLIST_ITEMS.forEach((item, i) => { out[item.key] = !!c[i]; });
     return out;
+  }
+
+  function shuffle3(values) {
+    const arr = [...values];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function newRecogniseRound() {
+    const entries = [{ semitone: 0, isSa: true }, ...RECOGNISE_DISTRACTORS.map((s) => ({ semitone: s, isSa: false }))];
+    return shuffle3(entries);
   }
 
   /* ---------- small views ---------- */
@@ -147,13 +193,34 @@ const ShrutiAndFindingYourSaLesson = (() => {
     </div>`;
   }
 
+  function recogniseHtml(rec) {
+    const r = A(rec, "recognise");
+    const order = r.order || newRecogniseRound();
+    const answered = typeof r.answered === "number" ? r.answered : null;
+    const correctIndex = order.findIndex((e) => e.isSa);
+    return `<div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5" data-recognise>
+      <p class="text-sm text-ink-300 mb-3">Press play, then choose which position you think was Sa.</p>
+      <div class="flex flex-wrap gap-2 mb-4" data-recognise-chips>
+        ${order.map((_, i) => `<span data-recognise-chip="${i}" class="flow-chip !text-sm">${i + 1}</span>`).join("")}
+      </div>
+      <div class="flex flex-wrap gap-3 mb-4">
+        <button type="button" data-recognise-play class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play the sequence</button>
+        <button type="button" data-recognise-new class="vr-btn">New sequence</button>
+      </div>
+      <div class="flex flex-wrap gap-2 mb-2">
+        ${order.map((_, i) => `<button type="button" data-recognise-choice="${i}" class="ex-chip ${answered === i ? "is-selected" : ""}">Position ${i + 1}</button>`).join("")}
+      </div>
+      ${answered !== null ? `<p class="text-xs mt-2 ${answered === correctIndex ? "text-emerald-300" : "text-amber-300"}">${answered === correctIndex ? "Correct — that was Sa." : `Not quite — Sa was actually position ${correctIndex + 1}.`} This is a listening exercise, not a score on your singing.</p>` : ""}
+    </div>`;
+  }
+
   function problems() {
     const items = [
       ["Assuming Sa must be C, or any specific Western note", "Sa is whichever pitch you choose — there is no universally 'correct' Sa."],
-      ["Choosing a Sa that feels strained just because it 'sounds lower/higher like a teacher's'", "Choose the pitch that feels easiest in your own voice, today."],
+      ["Choosing a Sa that feels strained just because it 'sounds right'", "Choose the pitch that feels easiest in your own voice, today."],
       ["Trying to match the drone perfectly on the first attempt", "Humming near the drone, with small drifting, is completely normal while learning."],
       ["Singing loudly to 'lock onto' the drone", "Volume doesn't help pitch-matching — a relaxed, comfortable hum works better."],
-      ["Feeling like you must get this right immediately", "You can revisit and change your chosen Sa in any later class."],
+      ["Feeling like you must get Exercise C right every time", "It's a listening exercise, not a performance test — you can always try a new sequence."],
     ];
     return `<div class="flex flex-col gap-2">${items.map(([t, a], i) => `
       <details class="group rounded-2xl border border-white/5 bg-white/[0.02] px-5 py-4">
@@ -190,7 +257,7 @@ const ShrutiAndFindingYourSaLesson = (() => {
           ${milestone()}
           <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.05] p-6 sm:p-8 text-center">
             <p class="text-[11px] tracking-[0.25em] uppercase text-emerald-300 mb-2">Class complete</p>
-            <h3 class="font-display text-2xl text-ink-50 mb-5">Shruti is the reference pitch; Sa is the name for the one you chose.</h3>
+            <h3 class="font-display text-2xl text-ink-50 mb-5">Shruti is the pitch reference; Sa is the name for the one you chose.</h3>
             <ul class="inline-flex flex-col gap-2 text-left mx-auto">${lines}</ul>
             ${preview}
             ${next ? `
@@ -228,8 +295,8 @@ const ShrutiAndFindingYourSaLesson = (() => {
     const rec = ClassActivity.get(cls.id);
     const pct = ClassProgress.percent(PROGRESS_ITEMS, rec.checkpoints);
     const b = baseNote(rec);
-    const sel = (k) => q(rec, k);
     const growth = A(rec, "growth");
+    const c = checklist(rec);
 
     return `
     <div class="pitch-lesson">
@@ -238,37 +305,33 @@ const ShrutiAndFindingYourSaLesson = (() => {
 
       <div class="max-w-5xl mx-auto px-5 lg:px-8 py-12 flex flex-col gap-20">
 
-        ${chapter("understand", 1, "Section A — A new kind of class", `
+        ${chapter("understand", 1, "Section 1 — What is Shruti?", `
           ${narrow(`
-            ${p("Classes 1 and 2 explored voice placement and resonance. The next four classes pause the vocal-technique track for a gentle introduction to how Carnatic music organises its notes — starting with the most basic idea of all: shruti and Sa.")}
-            ${p("This isn't music theory for its own sake. Everything here is practical, and everything builds directly on the comfortable-reference-pitch exploration you've already been doing.")}
+            ${p("Before learning to sing different notes, learn to recognise and maintain your own Sa.")}
+            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-4">
+              ${["Shruti is the pitch reference, or tonal foundation, a singer tunes against.", "A singer uses a chosen Sa as that reference.", "A drone (traditionally a tanpura) provides a continuous pitch reference to check against.", "Singing in tune means keeping your notes aligned with that intended pitch."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
+            </ul>
+            <p class="text-sm text-ink-300 leading-relaxed"><strong class="text-ink-100">Shruti vs. Tala:</strong> Shruti is about pitch. Tala is a separate idea, about rhythmic cycles — not covered in this class.</p>
           `)}
           ${flowStrip(["LISTEN", "CHOOSE", "SING", "REFLECT"])}
           <div data-lesson-viewed-sentinel class="h-px"></div>
         `)}
 
-        ${chapter("understand", 2, "Section B — Shruti and Sa", `
+        ${chapter("sa", 2, "Section 2 — Understanding Sa", `
           ${narrow(`
-            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-5">
-              ${["Shruti is a continuous reference pitch — a steady drone — that singing is tuned against.", "Sa is simply the name for whichever pitch a singer chooses as their own personal reference note.", "Sa is never one fixed Western note. It is not always \"C\" — it is not always any particular note.", "Every other note you'll learn is described only in relation to your own Sa, not in relation to a universal pitch.", "Choosing a comfortable Sa today is the same comfortable-reference-pitch idea from earlier classes, just under its proper name."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
+            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-4">
+              ${["Sa is the first reference swara.", "Sa is not always the Western note C.", "Different singers may select different pitches for Sa.", "Your Sa should be comfortable for your own voice — not copied from someone else's.", "Every other swara you'll learn is understood relative to this Sa."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
             </ul>
+            ${p("There's no particular pitch you're expected to sing at here — only whichever one feels comfortable to you.")}
           `)}
-          <p class="font-display text-lg text-ink-50 mb-3">A quick check</p>
-          ${knowledgeCheckHtml(rec)}
         `)}
 
-        ${chapter("drone", 3, "Section C — Listening to a drone", `
-          ${narrow(p("Press play below to hear a steady drone tone. Listen first without singing — just notice how it sounds continuous and unchanging. This is the kind of reference pitch shruti describes."))}
-          <div class="flex flex-wrap gap-3 mb-4">
-            <button type="button" data-drone-toggle class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} <span data-drone-label>Play drone</span></button>
-          </div>
+        ${chapter("finding", 3, "Section 3 — Finding your comfortable Sa", `
           ${narrow(`
-            <div class="mt-4">${SelfAssessment.render("droneFeel-q", { ...Q.droneFeel, selected: sel("droneFeel") })}</div>
+            <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-5">
+              ${["Relax the body and shoulders.", "Listen to a reference pitch.", "Hum gently without forcing the voice.", "Try a few nearby reference pitches if needed.", "Choose one that feels comfortable and natural.", "Repeat the note gently.", "Check whether the note feels stable and easy to reproduce."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
+            </ol>
           `)}
-        `)}
-
-        ${chapter("choose", 4, "Section D — Choosing your Sa", `
-          ${narrow(p("Use the piano below to explore a few comfortable, middle-range notes. Whichever one feels easiest to sing and return to — that's your Sa for this course. You can change it later if a different note ends up feeling more comfortable."))}
           <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-3">
             ${VirtualPiano.render("sa-piano", { controls: false, keyboard: true, display: true })}
           </div>
@@ -278,41 +341,70 @@ const ShrutiAndFindingYourSaLesson = (() => {
           </div>
         `, { wide: true })}
 
-        ${chapter("sing", 5, "Section E — Singing with and without the drone", `
-          ${narrow(p("First, play the drone (Section C) and hum or sing \"Sa\" gently along with it. Then try singing \"Sa\" on its own, from memory, without the drone playing. Neither attempt needs to be perfectly in tune — the point is noticing, not matching exactly."))}
-          ${recCard("droneAlongTake", "Singing \"Sa\" along with the drone", "", 12)}
-          ${recCard("singTake", "Singing \"Sa\" on your own, without the drone", "", 10)}
-          ${narrow(`<div class="mt-3">${skipBtn("sing")}</div>`)}
+        ${chapter("drone", 4, "Section 4 — Listen to the Shruti reference", `
+          ${narrow(`
+            ${p("Press play below to hear a steady reference tone standing in for a tanpura drone.")}
+            <p class="text-xs text-ink-500 mb-4">Honesty note: this is a synthesized tone (Web Audio), not a recorded tanpura — no tanpura audio asset exists in this project yet. If one is ever added, it could replace this tone without changing anything else about this lesson.</p>
+            <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed">
+              ${["Listen to the drone without singing.", "Identify the Sa in the reference.", "Hum along gently.", "Stop humming and listen again.", "Repeat the exercise."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
+            </ol>
+            <p class="text-xs text-ink-500 mt-3">The goal is becoming familiar with the pitch, not singing loudly.</p>
+          `)}
+          <div class="flex flex-wrap gap-3 mb-4 mt-2">
+            <button type="button" data-drone-toggle class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} <span data-drone-label>Play reference tone</span></button>
+          </div>
         `)}
 
-        ${chapter("mistakes", 6, "Section F — Common beginner mistakes", problems())}
+        ${chapter("stability", 5, "Section 5 — Sa stability practice", `
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2">Exercise A — Listen and hum</p>${p("Listen to Sa, then hum Sa comfortably. Repeat up to five times, with a short rest between each.")}`)}
+          ${recCard("exerciseA", "Sa, hummed a few times", "Entirely optional.", 20)}
+          ${narrow(`<div class="mt-2 mb-8">${skipBtn("exerciseA")}</div>`)}
 
-        ${chapter("reflect", 7, "Section G — Reflection", `
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2">Exercise B — Maintain Sa</p>${p("Play the reference tone from Section 4, hum along for a few seconds, then pause. Repeat a couple of times.")}`)}
+          ${recCard("exerciseB", "Humming along with the reference tone", "Entirely optional.", 20)}
+          ${narrow(`<div class="mt-2 mb-8">${skipBtn("exerciseB")}</div>`)}
+
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2">Exercise C — Recognise Sa</p>${p("A short sequence of three notes will play, in a random order — one of them is Sa. Listen, then choose which position it was.")}`)}
+          <div data-recognise-host>${recogniseHtml(rec)}</div>
+        `)}
+
+        ${chapter("quiz", 6, "Knowledge check", `
+          ${narrow(p("A quick concept check — not a vocal-performance score."))}
+          ${knowledgeCheckHtml(rec)}
+        `)}
+
+        ${chapter("reflect", 7, "Self-assessment and reflection", `
           ${narrow(`
-            <div class="flex flex-col gap-4 mb-5">
-              ${SelfAssessment.render("choosing-q", { ...Q.choosing, selected: sel("choosing") })}
+            ${p("A simple checklist — tick what's true for you.")}
+            <div class="flex flex-col gap-1 mb-6">
+              ${CHECKLIST_ITEMS.map((item, i) => `
+                <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">
+                  <input type="checkbox" data-checklist="${i}" ${c[i] ? "checked" : ""} class="mt-0.5 w-4 h-4 accent-amber-400 shrink-0">
+                  <span class="text-sm text-ink-200">${item.label}</span>
+                </label>`).join("")}
             </div>
-            <div class="flex flex-col gap-4">
-              <div><label class="block text-sm text-ink-200 mb-1.5" for="sa-learned">One thing I learned about shruti or Sa</label><textarea id="sa-learned" data-growth="learned" rows="2" class="field" placeholder="In your own words…">${Utils.escapeHtml(growth.learned || "")}</textarea></div>
-            </div>
+            <div><label class="block text-sm text-ink-200 mb-1.5" for="sa-reflection">Did you find a pitch that felt comfortable and natural to hum? Describe your experience.</label><textarea id="sa-reflection" data-growth="reflection" rows="3" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.reflection || "")}</textarea></div>
           `)}
         `)}
 
-        ${chapter("complete", 8, "My Notes", `
+        ${chapter("complete", 8, "Section — Common beginner mistakes", problems())}
+
+        ${chapter("complete", 9, "My Notes", `
           ${p("Your private notebook for this class. Only you can see it.")}
           ${PersonalNotes.render("notes-sa", { placeholder: "e.g. Which note I chose as Sa and why... How singing along with the drone felt... What I want to try next time..." })}
         `)}
 
-        ${chapter("complete", 9, "Section H — Optional practice", `
+        ${chapter("complete", 10, "Vocal safety", `
           ${narrow(`
-            ${p("A couple of comfortable minutes: play your Sa, hum it a few times, and notice whether it still feels like the easiest note to return to. It's fine if your answer changes from day to day.")}
+            ${p("Don't force a high or low pitch, and don't strain to match the reference. Gentle humming, with breaks, is enough.")}
+            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort.")}
             <div data-warmup-note></div>
           `)}
         `)}
 
-        ${chapter("complete", 10, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+        ${chapter("complete", 11, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
 
-        ${chapter("complete", 11, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
+        ${chapter("complete", 12, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
       </div>
     </div>`;
   }
@@ -335,7 +427,7 @@ const ShrutiAndFindingYourSaLesson = (() => {
     function syncCheckpoints() {
       const rec = rec0();
       Object.entries(derivedCheckpoints(rec)).forEach(([k, v]) => {
-        if (v && !rec.checkpoints[k]) ClassActivity.markCheckpoint(classId, k, true);
+        if (!!rec.checkpoints[k] !== v) ClassActivity.markCheckpoint(classId, k, v);
       });
     }
     let syncing = false;
@@ -346,6 +438,10 @@ const ShrutiAndFindingYourSaLesson = (() => {
     }));
     LessonKit.loadAndRefresh(container, classId, params);
 
+    /* ---- Exercise C: ensure a stable random order exists before any interaction,
+       so the "which position was Sa" check never changes between renders ---- */
+    if (!A(rec0(), "recognise").order) set("recognise", "order", newRecogniseRound());
+
     /* ---- knowledge check ---- */
     function onKcChoice(e) {
       const btn = e.target.closest("[data-kc-choice]");
@@ -353,35 +449,15 @@ const ShrutiAndFindingYourSaLesson = (() => {
       const itemEl = btn.closest("[data-kc-item]");
       const key = itemEl.dataset.kcItem;
       set("q", `kc_${key}`, btn.dataset.kcChoice);
-      syncCheckpoints();
       $("[data-kc]").outerHTML = knowledgeCheckHtml(rec0());
-      refreshLive();
     }
     container.addEventListener("click", onKcChoice);
     cleanups.push(() => container.removeEventListener("click", onKcChoice));
 
-    /* ---- Section C: drone toggle (held tone, released on second click) ---- */
-    let droneHandle = null;
-    function onDroneToggle(e) {
-      if (!e.target.closest("[data-drone-toggle]")) return;
-      const label = $("[data-drone-label]");
-      if (droneHandle) {
-        droneHandle.release(true);
-        droneHandle = null;
-        label.textContent = "Play drone";
-      } else {
-        droneHandle = PianoSynth.noteOn(base(), { velocity: 0.4 });
-        label.textContent = "Stop drone";
-      }
-    }
-    container.addEventListener("click", onDroneToggle);
-    cleanups.push(() => container.removeEventListener("click", onDroneToggle));
-    cleanups.push(() => { if (droneHandle) droneHandle.release(true); });
-
-    /* ---- Section D: piano + playback ---- */
+    /* ---- Section 3: piano + playback ---- */
     own(VirtualPiano.wire(container, "sa-piano", {
       range: RANGE, keyboard: true,
-      onNote: ({ midi }) => { if (midi >= RANGE.from && midi <= SA_MAX) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); syncCheckpoints(); refreshLive(); } },
+      onNote: ({ midi }) => { if (midi >= RANGE.from && midi <= SA_MAX) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
     }));
     function onPlaySa(e) {
       if (!e.target.closest("[data-play-sa]")) return;
@@ -390,50 +466,100 @@ const ShrutiAndFindingYourSaLesson = (() => {
     container.addEventListener("click", onPlaySa);
     cleanups.push(() => container.removeEventListener("click", onPlaySa));
 
-    /* ---- skip buttons ---- */
+    /* ---- Section 4: drone toggle (held tone, released on second click) ---- */
+    let droneHandle = null;
+    function onDroneToggle(e) {
+      if (!e.target.closest("[data-drone-toggle]")) return;
+      const label = $("[data-drone-label]");
+      if (droneHandle) {
+        droneHandle.release(true);
+        droneHandle = null;
+        label.textContent = "Play reference tone";
+      } else {
+        droneHandle = PianoSynth.noteOn(base(), { velocity: 0.4 });
+        label.textContent = "Stop reference tone";
+      }
+    }
+    container.addEventListener("click", onDroneToggle);
+    cleanups.push(() => container.removeEventListener("click", onDroneToggle));
+    cleanups.push(() => { if (droneHandle) droneHandle.release(true); });
+
+    /* ---- skip buttons (Exercises A/B) ---- */
     function onSkip(e) {
       const btn = e.target.closest("[data-skip-ex]");
       if (!btn) return;
       set("skip", btn.dataset.skipEx, true);
       btn.textContent = "Skipped — that's okay";
       btn.disabled = true;
-      syncCheckpoints(); refreshLive();
     }
     container.addEventListener("click", onSkip);
     cleanups.push(() => container.removeEventListener("click", onSkip));
 
-    /* ---- recordings ---- */
-    const NAMES = { droneAlongTake: "Singing Sa with the drone", singTake: "Singing Sa without the drone" };
-    const MAX_SECONDS = { droneAlongTake: 12, singTake: 10 };
+    /* ---- recordings (Exercises A/B) ---- */
+    const NAMES = { exerciseA: "Exercise A — Listen and hum", exerciseB: "Exercise B — Maintain Sa" };
     Object.keys(NAMES).forEach((k) => {
       own(RecordingCard.wire(container, `rc-${k}`, {
-        classId, take: take(rec0(), k), maxSeconds: MAX_SECONDS[k],
+        classId, take: take(rec0(), k), maxSeconds: 20,
         meta: { name: `Level 2, Class 3 — ${NAMES[k]}`, exercise: `shruti-and-finding-your-sa-${k}` },
-        onSaved: (t) => { set("recs", k, t); ClassActivity.bump(classId, "recordings"); syncCheckpoints(); refreshLive(); },
+        onSaved: (t) => { set("recs", k, t); ClassActivity.bump(classId, "recordings"); },
       }));
     });
 
-    /* ---- generic self-assess dispatcher ---- */
-    const assessMap = { "droneFeel-q": "droneFeel", "choosing-q": "choosing" };
-    function onAssess(e) {
-      const chip = e.target.closest("[data-assess-choice]");
-      if (!chip) return;
-      const group = chip.closest("[data-assess]");
-      const name = group && group.dataset.assess;
-      if (!name || !assessMap[name]) return;
-      group.querySelectorAll("[data-assess-choice]").forEach((x) => x.classList.toggle("is-selected", x === chip));
-      set("q", assessMap[name], chip.dataset.assessChoice);
-      syncCheckpoints(); refreshLive();
+    /* ---- Exercise C: recognise Sa ---- */
+    function refreshRecogniseHost() {
+      const host = $("[data-recognise-host]");
+      if (host) host.innerHTML = recogniseHtml(rec0());
     }
-    container.addEventListener("click", onAssess);
-    cleanups.push(() => container.removeEventListener("click", onAssess));
+    function onRecognisePlay(e) {
+      if (!e.target.closest("[data-recognise-play]")) return;
+      const rec = rec0();
+      const r = A(rec, "recognise");
+      const order = r.order || newRecogniseRound();
+      if (!r.order) set("recognise", "order", order);
+      const b = base();
+      PianoSynth.playSequence(order.map((entry) => b + entry.semitone), {
+        duration: 0.8, gap: 0.3,
+        onNote: (i) => {
+          container.querySelectorAll("[data-recognise-chip]").forEach((chip) => chip.classList.toggle("is-selected", Number(chip.dataset.recogniseChip) === i));
+        },
+      });
+    }
+    function onRecogniseNew(e) {
+      if (!e.target.closest("[data-recognise-new]")) return;
+      set("recognise", "order", newRecogniseRound());
+      set("recognise", "answered", null);
+      refreshRecogniseHost();
+    }
+    function onRecogniseChoice(e) {
+      const btn = e.target.closest("[data-recognise-choice]");
+      if (!btn) return;
+      const i = Number(btn.dataset.recogniseChoice);
+      set("recognise", "answered", i);
+      refreshRecogniseHost();
+    }
+    container.addEventListener("click", onRecognisePlay);
+    container.addEventListener("click", onRecogniseNew);
+    container.addEventListener("click", onRecogniseChoice);
+    cleanups.push(() => container.removeEventListener("click", onRecognisePlay));
+    cleanups.push(() => container.removeEventListener("click", onRecogniseNew));
+    cleanups.push(() => container.removeEventListener("click", onRecogniseChoice));
 
-    /* ---- growth textarea ---- */
+    /* ---- growth textarea (reflection) ---- */
     container.querySelectorAll("[data-growth]").forEach((ta) => {
       const key = ta.dataset.growth;
-      const save = Utils.debounce((v) => { set("growth", key, v); syncCheckpoints(); refreshLive(); }, 500);
+      const save = Utils.debounce((v) => set("growth", key, v), 500);
       ta.addEventListener("input", () => save(ta.value));
     });
+
+    /* ---- completion checklist ---- */
+    function onChecklist(e) {
+      const cb = e.target.closest("[data-checklist]");
+      if (!cb) return;
+      set("checklist", cb.dataset.checklist, cb.checked);
+      syncCheckpoints(); refreshLive();
+    }
+    container.addEventListener("change", onChecklist);
+    cleanups.push(() => container.removeEventListener("change", onChecklist));
 
     /* ---- Common Warm-up note (only if already unlocked) ---- */
     const warmupHost = $("[data-warmup-note]");
@@ -454,9 +580,9 @@ const ShrutiAndFindingYourSaLesson = (() => {
       Store.addJournalEntry({
         classId,
         classTitle: `Level 2, Class ${cls.number} — ${cls.title}`,
-        learned: A(rec, "growth").learned || "Shruti is a continuous reference pitch; Sa is the name for whichever note I chose as my own personal reference.",
+        learned: "Shruti is a continuous pitch reference; Sa is the name for whichever note I chose as my own personal reference.",
         struggled: "",
-        toPractice: "",
+        toPractice: A(rec, "growth").reflection || "",
         thoughts: "",
       });
       Router.softRefresh(container, ClassDetailPage, params);
@@ -464,7 +590,7 @@ const ShrutiAndFindingYourSaLesson = (() => {
     container.addEventListener("click", onComplete);
     cleanups.push(() => container.removeEventListener("click", onComplete));
 
-    cleanups.push(LessonKit.wireViewedSentinel(container, () => { ClassActivity.markCheckpoint(classId, "lessonViewed"); syncCheckpoints(); refreshLive(); }));
+    cleanups.push(LessonKit.wireViewedSentinel(container, () => ClassActivity.markCheckpoint(classId, "lessonViewed")));
     cleanups.push(LessonKit.wireStepper(container));
     syncCheckpoints();
 

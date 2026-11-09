@@ -1051,23 +1051,23 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 3 (interactive, id L2C26) ---------- */
   const shrutiAndFindingYourSaClass = {
     number: 3, id: "L2C26", section: "Musical Foundations", title: "Shruti and Finding Your Sa", category: "Carnatic Fundamentals", skillTag: "swara",
-    difficulty: "Beginner", estMinutes: 15,
+    difficulty: "Beginner", estMinutes: 22,
     // Rendered by the interactive lesson in js/lessons/shrutiAndFindingYourSa.js
     interactive: "shruti-and-finding-your-sa",
-    subtitle: "Sa isn't a fixed note — it's the comfortable pitch you choose as your own reference.",
-    description: "An interactive lesson: shruti as the continuous reference pitch singing is tuned against, and Sa as the name for whichever pitch a singer personally chooses — never assumed to be any particular Western note like C. Explores a drone, helps you choose and confirm a comfortable Sa on the piano, and carries that choice forward into every later class.",
+    subtitle: "Before learning different notes, learn to recognise and maintain your own Sa.",
+    description: "An interactive lesson: shruti as the pitch reference a singer tunes against (distinct from tala, which is about rhythm), and Sa as the name for whichever pitch a singer personally chooses — never assumed to be any particular Western note like C. Guides you to a comfortable Sa on the piano, introduces a synthesized tanpura-style reference tone, and practises listening, humming and recognising Sa before carrying that choice forward into every later class.",
     content: {
-      whatYoullLearn: "What shruti means as a continuous reference pitch, why Sa is a personal, chosen reference note rather than one fixed note, how a drone supports singing in tune, how to choose and remember a comfortable Sa using the piano, and why every swara from here on is described only relative to your own Sa.",
+      whatYoullLearn: "What shruti means as a continuous pitch reference (and how it differs from tala, which is about rhythm), what Sa represents and why it acts as a reference, why different singers may choose different Sa pitches, how to find a comfortable Sa, and how to listen to a reference drone and maintain Sa.",
       whyItMatters: "There's no universal 'correct' Sa — a chosen reference pitch that fits your own comfortable range is what makes every later swara, scale and pattern approachable rather than strained.",
-      theory: "Shruti is a continuous background pitch that singing is tuned against. Sa is the name Carnatic music gives to whichever pitch a singer chooses as that reference — it is not fixed to any particular note, and different singers comfortably choose different Sa pitches.",
+      theory: "Shruti is the pitch reference or tonal foundation a singer tunes against — traditionally a continuous drone, such as a tanpura. Sa is the name Carnatic music gives to whichever pitch a singer chooses as that reference; it is not fixed to any particular note, and different singers comfortably choose different Sa pitches. Shruti is about pitch; tala, a separate idea not covered in this class, is about rhythmic cycles.",
       guidedPractice: [
-        "Listened to a drone, chose a comfortable Sa on the piano, hummed or sang along with the drone, and tried singing Sa from memory without the drone playing.",
+        "Found a comfortable Sa on the piano, listened to a synthesized tanpura-style reference tone, hummed Sa along with and without the drone, and practised recognising Sa among a short played sequence.",
       ],
       assignment: {
         instructions: [
           "A comfortable Sa, chosen on the piano",
-          "Singing Sa along with the drone, if comfortable",
-          "Singing Sa without the drone, if comfortable",
+          "Humming Sa along with the reference tone, repeated a few times with short breaks",
+          "Recognising Sa within a short played sequence",
         ],
         questions: []
       }
