@@ -55,4 +55,5 @@ const InteractiveLessons = {
   "song-practice-workshop": SongPracticeWorkshopLesson,
   "performance-preparation": PerformancePreparationLesson,
   "level2-final-assessment": Level2FinalAssessmentLesson,
+  "introduction-to-song-mastery": IntroductionToSongMasteryLesson,
 };

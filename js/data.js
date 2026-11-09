@@ -11,7 +11,11 @@ const APP_DATA = (() => {
   const LEVELS = [
     { id: 1, title: "Foundation", role: "Beginner", skills: ["Voice awareness", "Breathing", "Pitch", "Rhythm", "Ear training", "Basic music concepts"] },
     { id: 2, title: "Singer", role: "Vocalist", skills: ["Vocal technique", "Range", "Resonance", "Dynamics", "Expression", "Performance"] },
-    { id: 3, title: "Musician", role: "Theory & Keys", skills: ["Music theory", "Keyboard", "Scales", "Intervals", "Chords", "Harmony", "Rhythm", "Melody"] },
+    // Re-pointed from the original "Musician / Theory & Keys" (music theory) plan: Level 2's own
+    // Class 25 already previewed a different real Level 3 — "Song Mastery & Performance
+    // Development" — as the user's own stated plan, and Level 3 Class 1's own spec confirmed it.
+    // See js/lessons/introductionToSongMastery.js's header comment for the full story.
+    { id: 3, title: "Song Master", role: "Mastery & Performance", skills: ["Song interpretation", "Melody & raga exploration", "Vocal coordination", "Musical styles", "Song analysis", "Live performance", "Microphone technique", "Studio recording"] },
     { id: 4, title: "Recording Artist", role: "Studio Craft", skills: ["Microphone", "Recording", "Editing", "Comping", "Pitch correction", "Vocal production"] },
     { id: 5, title: "Producer", role: "Songcraft", skills: ["Songwriting", "Arrangement", "Instrumentation", "Sound selection", "Production"] },
     { id: 6, title: "Mixing Engineer", role: "Mix Craft", skills: ["EQ", "Compression", "De-essing", "Saturation", "Reverb", "Delay", "Automation", "Bus processing", "Stereo imaging"] },
@@ -783,10 +787,18 @@ const APP_DATA = (() => {
     // Progress Recording") are all real, authored classes, and Class 25's own spec confirmed it
     // as Level 2's final class ("Do not implement Level 3"). No `2:` entry remains here — the
     // same resolution Level 1 reached once its own 25 classes were all real (Level 1 has no entry
-    // in this object either). A possible Level 3 ("Song Mastery & Performance Development") is
-    // previewed as plain text on Class 25's completion screen only — not created here.
-    3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
-      titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
+    // in this object either).
+    //
+    // Level 3 is now real, starting with Class 1 — "Introduction to Song Mastery" (see
+    // js/lessons/introductionToSongMastery.js). It replaces the ORIGINAL Level 3 plan that lived
+    // here before this session ("Music Theory Basics" and seven theory/keyboard siblings) — Class
+    // 25's own "Song Mastery & Performance Development" preview turned out to be the user's real
+    // plan, confirmed by Class 1's own spec, so `LEVELS[2]` and this entry were both re-pointed to
+    // match it rather than leaving two contradictory plans for the same level number. Class 1's
+    // own spec names the real Class 2 as "Melody Analysis and Phrase Mapping", so only that single
+    // title remains here — the same one-rename-at-a-time precedent every level since 2 has used.
+    3: { category: "Song Mastery", skillTag: "vocal", difficulty: "Intermediate", startNumber: 2,
+      titles: ["Melody Analysis and Phrase Mapping"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
       titles: ["Microphone Technique", "Recording Fundamentals", "Editing Basics", "Comping Takes", "Pitch Correction", "Vocal Production"] },
     5: { category: "Production", skillTag: "recording", difficulty: "Intermediate",
@@ -1632,9 +1644,36 @@ const APP_DATA = (() => {
     }
   };
 
+  /* ---------- Level 3, Class 1 (interactive) ---------- */
+  const introductionToSongMasteryClass = {
+    number: 1, title: "Introduction to Song Mastery", category: "Song Mastery", skillTag: "vocal",
+    difficulty: "Intermediate", estMinutes: 22,
+    // Rendered by the interactive lesson in js/lessons/introductionToSongMastery.js
+    interactive: "introduction-to-song-mastery",
+    subtitle: "Song mastery grows through listening, understanding, practice, and expression — not technique alone.",
+    description: "An interactive introduction to studying a complete song before singing it: listening before singing, understanding a song's real structure, studying how the melody moves, reading lyrics for meaning, building a simple practice plan, and a first practical attempt — all on the existing Song Learning & Application practice song.",
+    content: {
+      whatYoullLearn: "Why a song is worth studying before singing it, how to identify its sections and phrases, how melody, rhythm, lyrics, and emotion work together, how to notice which portions feel difficult, and how to build a simple, reusable song-practice plan.",
+      whyItMatters: "Treating a song as something to study, not just repeat, is what turns learning a song into genuinely understanding and expressing it.",
+      theory: "Songs are commonly described using sections like an opening, a verse, a chorus or refrain, repeated phrases, and an ending — though not every song has all of these; the real structure is whatever the song itself actually has.",
+      guidedPractice: [
+        "Listened to the complete reference song, looked at its real structure, studied how its melody moves and repeats, read its lyrics for meaning, built a simple practice plan, and attempted one phrase with its words.",
+      ],
+      assignment: {
+        instructions: [
+          "Listening to the complete reference song",
+          "Studying how the melody moves",
+          "One phrase, sung with its words",
+        ],
+        questions: []
+      }
+    }
+  };
+
   const CLASSES = [
     ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
     ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass, articulationAndStyleClass, vocalEnduranceFoundationsClass, personalVocalStyleClass, songPracticeWorkshopClass, performancePreparationClass, level2FinalAssessmentClass].map(c => ({ ...c, levelId: 2 })),
+    ...[introductionToSongMasteryClass].map(c => ({ ...c, levelId: 3 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
