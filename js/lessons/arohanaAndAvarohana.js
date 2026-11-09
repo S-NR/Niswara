@@ -4,33 +4,47 @@
    Rendered by ClassDetailPage for interactive: "arohana-and-avarohana".
 
    Curriculum identity: Level 2, Class 5 (`number: 5`, `levelId: 2`
-   in data.js, explicit id `L2C28`). Third of four new "Musical
-   Foundations" classes. Builds on Class 4's seven swaras (`L2C27`),
-   simply naming the ascending and descending direction of the same
-   swara sequence — arohana (ascending) and avarohana (descending).
+   in data.js, explicit id `L2C28`). Rebuilt against this class's own
+   later, more detailed "Claude Prompt" spec (a recap section, a
+   side-by-side Arohana/Avarohana comparison, 3 named guided-practice
+   exercises, a dedicated raga-structures section, a 6-question
+   knowledge check, and a 6-item checklist) — supersedes the shorter
+   version first written during the Level 2 Curriculum Upgrade.
+   Builds on Class 4's seven swaras (`L2C27`) and Class 3's chosen Sa
+   (`L2C26`).
 
-   Core idea: arohana and avarohana are introduced only as directional
-   names for a swara sequence, with an honest, limited note that many
-   ragas use a different set of swaras ascending versus descending —
-   a detail this class deliberately does not teach yet. No gamaka or
-   tala theory is introduced here; this stays a beginner-friendly,
-   practical listening-and-singing class, matching Classes 3 and 4.
+   Core idea: "Learn how musical notes travel upward and downward."
+   Arohana and avarohana are introduced as directional names for the
+   same swara sequence, with two honesty boundaries the spec asks for
+   explicitly: (1) the swaras are NOT equally spaced in frequency —
+   this class's own sequence already uses uneven semitone steps, never
+   presented as a simple equal-step staircase; (2) a raga has its own
+   characteristic ascending/descending structure that this basic
+   seven-swara sequence does not represent — not every raga uses all
+   seven swaras in both directions, some ragas differ between the two
+   directions, and this exercise is never implied to BE a raga. No
+   detailed raga, gamaka or tala theory is taught here.
 
-   Honesty boundaries, matching every earlier class: no fabricated
-   pitch-detection; the knowledge check is a concept check, not a
-   performance score; completion never depends on singing in tune.
+   Honesty boundaries carried over from Classes 3-4: no fabricated
+   pitch-detection; every note played is the same equal-tempered
+   `PianoSynth` tone used throughout this app, relative to the
+   learner's own chosen Sa. Highlighting during playback is genuinely
+   synchronized (via `PianoSynth.playSequence`'s own `onNote`
+   callback, which fires exactly when each note starts) — not faked.
 
-   Reuses: LessonKit, VirtualPiano, PianoSynth.playSequence,
-   RecordingCard, SelfAssessment, PersonalNotes, ClassProgress.
+   Reuses: LessonKit, VirtualPiano (visual aid only), PianoSynth
+   .playSequence, RecordingCard, PersonalNotes, ClassProgress.
    ============================================================ */
 
 const ArohanaAndAvarohanaLesson = (() => {
   const STAGES = [
-    { id: "understand", label: "Understand" },
-    { id: "listen", label: "Listen" },
-    { id: "sing", label: "Sing" },
-    { id: "combine", label: "Combine" },
-    { id: "mistakes", label: "Mistakes" },
+    { id: "recap", label: "Recap" },
+    { id: "arohana", label: "Arohana" },
+    { id: "avarohana", label: "Avarohana" },
+    { id: "compare", label: "Compare" },
+    { id: "practice", label: "Practice" },
+    { id: "raga", label: "Ragas" },
+    { id: "quiz", label: "Quiz" },
     { id: "reflect", label: "Reflect" },
     { id: "complete", label: "Complete" },
   ];
@@ -50,51 +64,83 @@ const ArohanaAndAvarohanaLesson = (() => {
   ];
   const AROHANA = SWARAS;
   const AVAROHANA = [...SWARAS].reverse();
+  const AROHANA_FIRST_HALF = SWARAS.slice(0, 4); // Sa Ri Ga Ma
+  const AROHANA_SECOND_HALF = SWARAS.slice(3); // Ma Pa Dha Ni Sa˙ (Ma repeated as the join point)
+  const AVAROHANA_FIRST_HALF = AVAROHANA.slice(0, 4); // Sa˙ Ni Dha Pa
+  const AVAROHANA_SECOND_HALF = AVAROHANA.slice(3); // Pa Ma Ga Ri Sa
 
   const KNOWLEDGE_CHECK = [
     {
-      key: "arohana",
-      question: "What is arohana?",
+      key: "arohanaMeaning",
+      question: "What does Arohana mean?",
       options: [
-        { value: "down", label: "The descending swara sequence", correct: false },
-        { value: "up", label: "The ascending swara sequence, from Sa up to the upper Sa", correct: true },
-        { value: "volume", label: "A volume marking", correct: false },
+        { value: "down", label: "Descending movement of swaras", correct: false },
+        { value: "up", label: "Ascending movement of swaras", correct: true },
+        { value: "rhythm", label: "A rhythm cycle", correct: false },
       ],
-      explain: { down: "Not quite — that's avarohana.", up: "Exactly — arohana moves upward through the swaras.", volume: "Not quite — arohana is about direction, not loudness." },
+      explain: { down: "Not quite — that's Avarohana.", up: "Exactly right.", rhythm: "Not quite — Arohana is about pitch direction, not rhythm." },
     },
     {
-      key: "avarohana",
-      question: "What is avarohana?",
+      key: "avarohanaMeaning",
+      question: "What does Avarohana mean?",
       options: [
-        { value: "up", label: "The ascending swara sequence", correct: false },
-        { value: "down", label: "The descending swara sequence, from the upper Sa back down to Sa", correct: true },
-        { value: "rhythm", label: "A rhythm pattern", correct: false },
+        { value: "up", label: "Ascending movement of swaras", correct: false },
+        { value: "down", label: "Descending movement of swaras", correct: true },
+        { value: "sa", label: "A type of Sa", correct: false },
       ],
-      explain: { up: "Not quite — that's arohana.", down: "Exactly — avarohana moves back downward through the swaras.", rhythm: "Not quite — avarohana is about pitch direction, not rhythm." },
+      explain: { up: "Not quite — that's Arohana.", down: "Exactly right.", sa: "Not quite — it's a direction, not a kind of Sa." },
     },
     {
-      key: "sameSwaras",
-      question: "Do all ragas use exactly the same swaras ascending and descending?",
+      key: "afterGa",
+      question: "Which swara follows Ga in the basic ascending sequence?",
+      options: [
+        { value: "ri", label: "Ri", correct: false },
+        { value: "ma", label: "Ma", correct: true },
+        { value: "pa", label: "Pa", correct: false },
+      ],
+      explain: { ri: "Not quite — Ri comes before Ga.", ma: "Right — Sa Ri Ga Ma Pa Dha Ni Sa˙.", pa: "Not quite — Ma comes between Ga and Pa." },
+    },
+    {
+      key: "afterNiDown",
+      question: "Which swara follows Ni when moving downward from the higher Sa?",
+      options: [
+        { value: "pa", label: "Pa", correct: false },
+        { value: "dha", label: "Dha", correct: true },
+        { value: "sa", label: "Sa", correct: false },
+      ],
+      explain: { pa: "Not quite — Dha comes between Ni and Pa going down.", dha: "Right — Sa˙ Ni Dha Pa Ma Ga Ri Sa.", sa: "Not quite — several swaras come before Sa on the way down." },
+    },
+    {
+      key: "allRagasAllSwaras",
+      question: "Do all ragas necessarily use all seven swaras in both directions?",
       options: [
         { value: "yes", label: "Yes, always", correct: false },
-        { value: "no", label: "No — many ragas use a different set of swaras in each direction; this class uses a simple scale where they match", correct: true },
+        { value: "no", label: "No — some ragas use fewer swaras, or different ones ascending versus descending", correct: true },
         { value: "unsure", label: "Ragas haven't been mentioned in this course yet", correct: false },
       ],
-      explain: { yes: "Not quite — plenty of ragas differ between their arohana and avarohana. This class's scale happens to match in both directions, which keeps things simple for now.", no: "Right. That difference is a real part of raga theory, just not something this beginner class teaches in depth yet.", unsure: "Ragas exist as a concept — just not something taught in detail at this stage." },
+      explain: { yes: "Not quite — plenty of ragas differ from the simple seven-swara pattern used here.", no: "Right.", unsure: "Ragas were introduced conceptually in Section 6, just not in full theoretical depth." },
+    },
+    {
+      key: "sufficientForRaga",
+      question: "Are Arohana and Avarohana sufficient by themselves to explain every aspect of a raga?",
+      options: [
+        { value: "yes", label: "Yes, that's all there is to a raga", correct: false },
+        { value: "no", label: "No — a raga has further characteristic rules and identity beyond just its ascending/descending sequence", correct: true },
+        { value: "notsure", label: "This class doesn't say", correct: false },
+      ],
+      explain: { yes: "Not quite — a raga is more than just its ascending and descending swara sequence.", no: "Exactly right.", notsure: "This class does say — explicitly not sufficient by themselves." },
     },
   ];
 
-  const PROGRESS_ITEMS = [
-    { key: "understood", label: "I understand what arohana and avarohana mean." },
-    { key: "heardBoth", label: "I listened to both the ascending and descending sequence." },
-    { key: "triedOrSkipped", label: "I tried singing arohana and avarohana, or chose to skip for comfort." },
-    { key: "reflected", label: "I reflected on which direction felt more natural." },
+  const CHECKLIST_ITEMS = [
+    { key: "understandArohana", label: "I understand Arohana." },
+    { key: "understandAvarohana", label: "I understand Avarohana." },
+    { key: "followAscending", label: "I can follow the ascending sequence." },
+    { key: "followDescending", label: "I can follow the descending sequence." },
+    { key: "singBothSlowly", label: "I can sing both sequences slowly." },
+    { key: "understandRagaVariation", label: "I understand that different ragas can have different swara sequences." },
   ];
-
-  const opt = (value, label, tone = "neutral") => ({ value, label, tone });
-  const Q = {
-    direction: { question: "Which direction felt more natural to sing?", options: [opt("up", "Ascending (arohana)", "good"), opt("down", "Descending (avarohana)", "good"), opt("same", "About the same", "good"), opt("unsure", "Not sure")] },
-  };
+  const PROGRESS_ITEMS = CHECKLIST_ITEMS;
 
   const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
   const { p, narrow } = LessonKit;
@@ -122,21 +168,17 @@ const ArohanaAndAvarohanaLesson = (() => {
 
   const take = (rec, k) => A(rec, "recs")[k] || null;
   const q = (rec, k) => A(rec, "q")[k] || null;
-  const skipped = (rec, k) => !!A(rec, "skip")[k];
+  const checklist = (rec) => A(rec, "checklist");
 
   function derivedCheckpoints(rec) {
     const out = {};
-    if (KNOWLEDGE_CHECK.every((k) => q(rec, `kc_${k.key}`)) && !!rec.checkpoints.lessonViewed) out.understood = true;
-    if (rec.checkpoints.heardAro && rec.checkpoints.heardAva) out.heardBoth = true;
-    if (take(rec, "aroTake") || take(rec, "avaTake") || skipped(rec, "sing")) out.triedOrSkipped = true;
-    if (q(rec, "direction")) out.reflected = true;
+    const c = checklist(rec);
+    CHECKLIST_ITEMS.forEach((item, i) => { out[item.key] = !!c[i]; });
     return out;
   }
 
   /* ---------- small views ---------- */
-  const recCard = (k, title, hint, max = 15) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
-  const flowStrip = (steps) => `<div class="flex flex-wrap items-center justify-center gap-2 my-4">${steps.map((s, i, arr) => `<span class="flow-chip !text-sm">${s}</span>${i < arr.length - 1 ? `<span class="text-ink-700 text-xs">→</span>` : ""}`).join("")}</div>`;
-  const skipBtn = (k, label = "Skip this exercise") => `<button type="button" data-skip-ex="${k}" class="text-xs text-ink-500 hover:text-ink-300 underline">${label}</button>`;
+  const recCard = (k, title, hint, max = 20) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
 
   function ladderHtml(sequence, activeIndex = -1) {
     return `<div class="flex flex-wrap items-end justify-center gap-2 my-5">
@@ -162,20 +204,6 @@ const ArohanaAndAvarohanaLesson = (() => {
       }).join("")}
       <p class="text-xs text-ink-500">This is a quick concept check, not a vocal-performance score.</p>
     </div>`;
-  }
-
-  function problems() {
-    const items = [
-      ["Assuming every raga's arohana and avarohana use identical swaras", "Many ragas genuinely differ between the two directions — a detail saved for a later, more advanced class."],
-      ["Rushing the descending direction because it 'feels less important'", "Avarohana deserves the same careful, comfortable practice as arohana."],
-      ["Pushing for a higher upper Sa than feels comfortable", "Stay within a range that feels easy — a strained upper Sa isn't the goal here."],
-      ["Treating this as advanced raga theory", "This class only names a direction — deeper raga study comes much later."],
-    ];
-    return `<div class="flex flex-col gap-2">${items.map(([t, a], i) => `
-      <details class="group rounded-2xl border border-white/5 bg-white/[0.02] px-5 py-4">
-        <summary class="cursor-pointer list-none flex items-center justify-between gap-3 text-ink-100 font-display text-lg">Mistake ${i + 1}: ${t}<span class="text-ink-500 text-sm transition-transform group-open:rotate-45">＋</span></summary>
-        <p class="text-sm text-ink-300 leading-relaxed mt-3">${a}</p>
-      </details>`).join("")}</div>`;
   }
 
   function milestone() {
@@ -243,7 +271,8 @@ const ArohanaAndAvarohanaLesson = (() => {
     const rec = ClassActivity.get(cls.id);
     const pct = ClassProgress.percent(PROGRESS_ITEMS, rec.checkpoints);
     const b = baseNote(rec);
-    const sel = (k) => q(rec, k);
+    const growth = A(rec, "growth");
+    const c = checklist(rec);
 
     return `
     <div class="pitch-lesson">
@@ -252,67 +281,153 @@ const ArohanaAndAvarohanaLesson = (() => {
 
       <div class="max-w-5xl mx-auto px-5 lg:px-8 py-12 flex flex-col gap-20">
 
-        ${chapter("understand", 1, "Section A — Up and down through the swaras", `
-          ${narrow(`
-            ${p("Class 4 introduced the seven swaras in order, going up. This class gives that direction a name — arohana — and introduces its opposite, avarohana: the same swaras, sung back down.")}
-          `)}
-          ${flowStrip(["LISTEN", "SING", "COMBINE", "REFLECT"])}
+        ${chapter("recap", 1, "Section 1 — Recap Sapta Swaras", `
+          ${narrow(p("Class 4 introduced the seven swaras, in order: Sa — Ri — Ga — Ma — Pa — Dha — Ni — Sa. A quick listen to recall their names and order, before learning what moving through them upward or downward is called."))}
+          ${ladderHtml(AROHANA)}
+          <div class="flex flex-wrap gap-3 mb-2">
+            <button type="button" data-play-dir="up" class="vr-btn">${icon("play", "w-4 h-4")} Quick listen</button>
+          </div>
           <div data-lesson-viewed-sentinel class="h-px"></div>
         `)}
 
-        ${chapter("understand", 2, "Section B — Arohana and avarohana", `
+        ${chapter("arohana", 2, "Section 2 — What is Arohana?", `
           ${narrow(`
-            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-5">
-              ${["Arohana is the ascending swara sequence, from Sa up to the upper Sa.", "Avarohana is the descending swara sequence, from the upper Sa back down to Sa.", "In this class, the same seven swaras are used in both directions — just reversed.", "Many ragas actually use a different set of swaras ascending versus descending; that detail is left for later, more advanced study.", "This class stays practical: listening and singing, not raga theory."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
-            </ul>
+            <p class="font-display text-lg text-ink-50 mb-2">Arohana = Ascending movement of swaras.</p>
+            <p class="font-display text-base text-ink-200 mb-3">Sa → Ri → Ga → Ma → Pa → Dha → Ni → Sa˙</p>
+            ${p("The sequence moves from a lower Sa towards the higher Sa.")}
           `)}
-          <p class="font-display text-lg text-ink-50 mb-3">A quick check</p>
-          ${knowledgeCheckHtml(rec)}
-        `)}
-
-        ${chapter("listen", 3, "Section C — Listening to both directions", `
-          ${narrow(p("Press each button to hear the sequence in that direction, built from your own Sa."))}
           <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-3">
             ${VirtualPiano.render("aa-piano", { controls: false, keyboard: true, display: true })}
           </div>
-          ${narrow(`<p class="text-sm text-ink-300 mb-5">Your Sa: <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong></p>`)}
-          <div data-ladder-host>${ladderHtml(AROHANA)}</div>
-          <div class="flex flex-wrap gap-3 mb-4">
+          ${narrow(`<p class="text-sm text-ink-300 mb-1">Your Sa (a visual aid only, chosen in Class 3): <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong></p>`)}
+          <div data-arohana-ladder-host>${ladderHtml(AROHANA)}</div>
+          <div class="flex flex-wrap gap-3 mb-3">
             <button type="button" data-play-dir="up" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play arohana (up)</button>
-            <button type="button" data-play-dir="down" class="vr-btn">${icon("play", "w-4 h-4")} Play avarohana (down)</button>
           </div>
+          ${narrow(`
+            <ol class="flex flex-col gap-1.5 text-sm text-ink-300 leading-relaxed">
+              ${["Listen to the complete sequence.", "Follow each swara visually as it plays.", "Repeat the names.", "Hum the sequence slowly.", "Repeat at a comfortable pace."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
+            </ol>
+          `)}
+          ${recCard("aroTake", "Singing arohana (ascending)", "Entirely optional.", 20)}
         `, { wide: true })}
 
-        ${chapter("sing", 4, "Section D — Singing each direction", `
-          ${narrow(p("Sing arohana, ascending from Sa. Then sing avarohana, descending from the upper Sa. Keep both comfortable and unhurried."))}
-          ${recCard("aroTake", "Singing arohana (ascending)", "", 15)}
-          ${recCard("avaTake", "Singing avarohana (descending)", "", 15)}
-          ${narrow(`<div class="mt-3">${skipBtn("sing")}</div>`)}
-        `)}
-
-        ${chapter("combine", 5, "Section E — Combining both directions", `
-          ${narrow(p("If comfortable, try singing arohana immediately followed by avarohana — up to the top, then straight back down — as one connected attempt."))}
-          ${recCard("combinedTake", "Arohana followed by avarohana, if comfortable", "", 20)}
-        `)}
-
-        ${chapter("mistakes", 6, "Section F — Common beginner mistakes", problems())}
-
-        ${chapter("reflect", 7, "Section G — Reflection", `
+        ${chapter("avarohana", 3, "Section 3 — What is Avarohana?", `
           ${narrow(`
-            <div class="flex flex-col gap-4">
-              ${SelfAssessment.render("direction-q", { ...Q.direction, selected: sel("direction") })}
+            <p class="font-display text-lg text-ink-50 mb-2">Avarohana = Descending movement of swaras.</p>
+            <p class="font-display text-base text-ink-200 mb-3">Sa˙ → Ni → Dha → Pa → Ma → Ga → Ri → Sa</p>
+            ${p("The sequence starts at the higher Sa and moves down to the lower Sa.")}
+          `)}
+          <div data-avarohana-ladder-host>${ladderHtml(AVAROHANA)}</div>
+          <div class="flex flex-wrap gap-3 mb-3">
+            <button type="button" data-play-dir="down" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play avarohana (down)</button>
+          </div>
+          ${narrow(`
+            <ol class="flex flex-col gap-1.5 text-sm text-ink-300 leading-relaxed">
+              ${["Listen to the complete sequence.", "Follow each swara visually as it plays.", "Repeat the names.", "Hum the sequence slowly.", "Repeat at a comfortable pace."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
+            </ol>
+          `)}
+          ${recCard("avaTake", "Singing avarohana (descending)", "Entirely optional.", 20)}
+        `)}
+
+        ${chapter("compare", 4, "Section 4 — Understand the movement", `
+          ${narrow(`
+            <table class="w-full text-sm text-ink-300 mb-4"><tbody>
+              <tr class="border-b border-white/5"><td class="py-2"></td><td class="py-2 font-display text-ink-50">Arohana</td><td class="py-2 font-display text-ink-50">Avarohana</td></tr>
+              <tr class="border-b border-white/5"><td class="py-2 text-ink-500">Direction</td><td class="py-2">Ascending</td><td class="py-2">Descending</td></tr>
+              <tr class="border-b border-white/5"><td class="py-2 text-ink-500">Movement</td><td class="py-2">Moves upward</td><td class="py-2">Moves downward</td></tr>
+              <tr><td class="py-2 text-ink-500">Sequence</td><td class="py-2">Sa Ri Ga Ma Pa Dha Ni Sa˙</td><td class="py-2">Sa˙ Ni Dha Pa Ma Ga Ri Sa</td></tr>
+            </tbody></table>
+            <div class="flex items-center justify-center gap-6 text-ink-300 text-sm mb-4">
+              <span class="flex items-center gap-1">${icon("arrowRight", "w-4 h-4 -rotate-90")} Arohana</span>
+              <span class="flex items-center gap-1">${icon("arrowRight", "w-4 h-4 rotate-90")} Avarohana</span>
             </div>
+            ${p("Important: the swaras are not equally spaced in frequency — this isn't a simple equal-step staircase. Look back at the ladders in Sections 2 and 3: the gaps between swaras already vary.")}
           `)}
         `)}
 
-        ${chapter("complete", 8, "My Notes", `
+        ${chapter("practice", 5, "Section 5 — Guided practice", `
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2">Exercise A — Arohana practice</p>`)}
+          ${narrow(`
+            <ol class="flex flex-col gap-1.5 text-sm text-ink-300 leading-relaxed mb-2">
+              <li class="flex gap-2"><span class="text-gold-400">1.</span>Listen to the reference.</li>
+              <li class="flex gap-2"><span class="text-gold-400">2.</span>Sing Sa Ri Ga Ma slowly.</li>
+              <li class="flex gap-2"><span class="text-gold-400">3.</span>Continue Pa Dha Ni Sa˙.</li>
+              <li class="flex gap-2"><span class="text-gold-400">4.</span>Repeat the complete sequence.</li>
+            </ol>
+          `)}
+          <div class="flex flex-wrap gap-3 mb-6">
+            <button type="button" data-play-part="aroFirst" class="vr-btn">${icon("play", "w-4 h-4")} Sa Ri Ga Ma</button>
+            <button type="button" data-play-part="aroSecond" class="vr-btn">${icon("play", "w-4 h-4")} Ma Pa Dha Ni Sa˙</button>
+            <button type="button" data-play-dir="up" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Complete sequence</button>
+          </div>
+
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2">Exercise B — Avarohana practice</p>`)}
+          ${narrow(`
+            <ol class="flex flex-col gap-1.5 text-sm text-ink-300 leading-relaxed mb-2">
+              <li class="flex gap-2"><span class="text-gold-400">1.</span>Listen to the descending sequence.</li>
+              <li class="flex gap-2"><span class="text-gold-400">2.</span>Sing Sa˙ Ni Dha Pa slowly.</li>
+              <li class="flex gap-2"><span class="text-gold-400">3.</span>Continue Ma Ga Ri Sa.</li>
+              <li class="flex gap-2"><span class="text-gold-400">4.</span>Repeat the complete sequence.</li>
+            </ol>
+          `)}
+          <div class="flex flex-wrap gap-3 mb-6">
+            <button type="button" data-play-part="avaFirst" class="vr-btn">${icon("play", "w-4 h-4")} Sa˙ Ni Dha Pa</button>
+            <button type="button" data-play-part="avaSecond" class="vr-btn">${icon("play", "w-4 h-4")} Pa Ma Ga Ri Sa</button>
+            <button type="button" data-play-dir="down" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Complete sequence</button>
+          </div>
+
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2">Exercise C — Connect both directions</p>${p("Practise arohana immediately followed by avarohana. Take a short break between repetitions.")}`)}
+          <div class="flex flex-wrap gap-3 mb-2">
+            <button type="button" data-play-both class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Arohana then avarohana</button>
+          </div>
+          ${recCard("combinedTake", "Arohana followed by avarohana, if comfortable", "Entirely optional.", 25)}
+        `)}
+
+        ${chapter("raga", 6, "Section 6 — Introduction to raga structures", `
+          ${narrow(`
+            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-3">
+              ${["A raga has characteristic musical rules and identity.", "Arohana and avarohana describe its ascending and descending swara movements.", "Not every raga uses all seven swaras in both directions.", "Some ragas have different ascending and descending note sequences.", "The order and treatment of swaras matter."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
+            </ul>
+            <p class="text-xs text-ink-500">This class doesn't teach detailed raga theory, and the basic seven-note sequence you practised above is not itself a specific raga.</p>
+          `)}
+        `)}
+
+        ${chapter("quiz", 7, "Knowledge check", `
+          ${narrow(p("A quick concept check — not a vocal-performance score."))}
+          ${knowledgeCheckHtml(rec)}
+        `)}
+
+        ${chapter("reflect", 8, "Self-assessment and reflection", `
+          ${narrow(`
+            ${p("A simple checklist — tick what's true for you.")}
+            <div class="flex flex-col gap-1 mb-6">
+              ${CHECKLIST_ITEMS.map((item, i) => `
+                <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">
+                  <input type="checkbox" data-checklist="${i}" ${c[i] ? "checked" : ""} class="mt-0.5 w-4 h-4 accent-amber-400 shrink-0">
+                  <span class="text-sm text-ink-200">${item.label}</span>
+                </label>`).join("")}
+            </div>
+            <div><label class="block text-sm text-ink-200 mb-1.5" for="aa-reflection">Which direction was easier for you to sing — ascending or descending? What did you find difficult?</label><textarea id="aa-reflection" data-growth="reflection" rows="3" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.reflection || "")}</textarea></div>
+          `)}
+        `)}
+
+        ${chapter("complete", 9, "My Notes", `
           ${p("Your private notebook for this class. Only you can see it.")}
           ${PersonalNotes.render("notes-aa", { placeholder: "e.g. Whether ascending or descending felt easier... How the combined attempt went... What I want to try next time..." })}
         `)}
 
-        ${chapter("complete", 9, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+        ${chapter("complete", 10, "Vocal safety", `
+          ${narrow(`
+            ${p("Use a comfortable Sa. Don't force the higher Sa, and don't push the voice while descending. Relaxed humming and short sessions are enough.")}
+            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort.")}
+            <div data-warmup-note></div>
+          `)}
+        `)}
 
-        ${chapter("complete", 10, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
+        ${chapter("complete", 11, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+
+        ${chapter("complete", 12, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
       </div>
     </div>`;
   }
@@ -335,7 +450,7 @@ const ArohanaAndAvarohanaLesson = (() => {
     function syncCheckpoints() {
       const rec = rec0();
       Object.entries(derivedCheckpoints(rec)).forEach(([k, v]) => {
-        if (v && !rec.checkpoints[k]) ClassActivity.markCheckpoint(classId, k, true);
+        if (!!rec.checkpoints[k] !== v) ClassActivity.markCheckpoint(classId, k, v);
       });
     }
     let syncing = false;
@@ -353,17 +468,15 @@ const ArohanaAndAvarohanaLesson = (() => {
       const itemEl = btn.closest("[data-kc-item]");
       const key = itemEl.dataset.kcItem;
       set("q", `kc_${key}`, btn.dataset.kcChoice);
-      syncCheckpoints();
       $("[data-kc]").outerHTML = knowledgeCheckHtml(rec0());
-      refreshLive();
     }
     container.addEventListener("click", onKcChoice);
     cleanups.push(() => container.removeEventListener("click", onKcChoice));
 
-    /* ---- Section C: piano + directional playback ---- */
+    /* ---- Section 2/3: piano (visual aid) + directional playback with synchronized highlighting ---- */
     own(VirtualPiano.wire(container, "aa-piano", {
       range: RANGE, keyboard: true,
-      onNote: ({ midi }) => { if (midi >= RANGE.from && midi <= SA_MAX) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); refreshLive(); } },
+      onNote: ({ midi }) => { if (midi >= RANGE.from && midi <= SA_MAX) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
     }));
     function onPlayDir(e) {
       const btn = e.target.closest("[data-play-dir]");
@@ -371,55 +484,66 @@ const ArohanaAndAvarohanaLesson = (() => {
       const b = base();
       const dir = btn.dataset.playDir;
       const seq = dir === "up" ? AROHANA : AVAROHANA;
-      const host = $("[data-ladder-host]");
+      const host = dir === "up" ? $("[data-arohana-ladder-host]") : $("[data-avarohana-ladder-host]");
       PianoSynth.playSequence(seq.map((s) => b + s.semitone), {
         duration: 0.6, gap: 0.12,
         onNote: (i) => { if (host) host.innerHTML = ladderHtml(seq, i); },
-      }).then(() => {
-        ClassActivity.markCheckpoint(classId, dir === "up" ? "heardAro" : "heardAva", true);
-        syncCheckpoints(); refreshLive();
       });
     }
     container.addEventListener("click", onPlayDir);
     cleanups.push(() => container.removeEventListener("click", onPlayDir));
 
-    /* ---- skip buttons ---- */
-    function onSkip(e) {
-      const btn = e.target.closest("[data-skip-ex]");
+    /* ---- Section 5: half-sequence playback + connected both-directions ---- */
+    const PARTS = { aroFirst: AROHANA_FIRST_HALF, aroSecond: AROHANA_SECOND_HALF, avaFirst: AVAROHANA_FIRST_HALF, avaSecond: AVAROHANA_SECOND_HALF };
+    function onPlayPart(e) {
+      const btn = e.target.closest("[data-play-part]");
       if (!btn) return;
-      set("skip", btn.dataset.skipEx, true);
-      btn.textContent = "Skipped — that's okay";
-      btn.disabled = true;
-      syncCheckpoints(); refreshLive();
+      const seq = PARTS[btn.dataset.playPart];
+      PianoSynth.playSequence(seq.map((s) => base() + s.semitone), { duration: 0.6, gap: 0.12 });
     }
-    container.addEventListener("click", onSkip);
-    cleanups.push(() => container.removeEventListener("click", onSkip));
+    function onPlayBoth(e) {
+      if (!e.target.closest("[data-play-both]")) return;
+      const b = base();
+      PianoSynth.playSequence([...AROHANA, ...AVAROHANA].map((s) => b + s.semitone), { duration: 0.55, gap: 0.1 });
+    }
+    container.addEventListener("click", onPlayPart);
+    container.addEventListener("click", onPlayBoth);
+    cleanups.push(() => container.removeEventListener("click", onPlayPart));
+    cleanups.push(() => container.removeEventListener("click", onPlayBoth));
 
     /* ---- recordings ---- */
     const NAMES = { aroTake: "Singing arohana", avaTake: "Singing avarohana", combinedTake: "Arohana then avarohana" };
-    const MAX_SECONDS = { aroTake: 15, avaTake: 15, combinedTake: 20 };
+    const MAX_SECONDS = { aroTake: 20, avaTake: 20, combinedTake: 25 };
     Object.keys(NAMES).forEach((k) => {
       own(RecordingCard.wire(container, `rc-${k}`, {
         classId, take: take(rec0(), k), maxSeconds: MAX_SECONDS[k],
         meta: { name: `Level 2, Class 5 — ${NAMES[k]}`, exercise: `arohana-and-avarohana-${k}` },
-        onSaved: (t) => { set("recs", k, t); ClassActivity.bump(classId, "recordings"); syncCheckpoints(); refreshLive(); },
+        onSaved: (t) => { set("recs", k, t); ClassActivity.bump(classId, "recordings"); },
       }));
     });
 
-    /* ---- generic self-assess dispatcher ---- */
-    const assessMap = { "direction-q": "direction" };
-    function onAssess(e) {
-      const chip = e.target.closest("[data-assess-choice]");
-      if (!chip) return;
-      const group = chip.closest("[data-assess]");
-      const name = group && group.dataset.assess;
-      if (!name || !assessMap[name]) return;
-      group.querySelectorAll("[data-assess-choice]").forEach((x) => x.classList.toggle("is-selected", x === chip));
-      set("q", assessMap[name], chip.dataset.assessChoice);
+    /* ---- growth textarea (reflection) ---- */
+    container.querySelectorAll("[data-growth]").forEach((ta) => {
+      const key = ta.dataset.growth;
+      const save = Utils.debounce((v) => set("growth", key, v), 500);
+      ta.addEventListener("input", () => save(ta.value));
+    });
+
+    /* ---- completion checklist ---- */
+    function onChecklist(e) {
+      const cb = e.target.closest("[data-checklist]");
+      if (!cb) return;
+      set("checklist", cb.dataset.checklist, cb.checked);
       syncCheckpoints(); refreshLive();
     }
-    container.addEventListener("click", onAssess);
-    cleanups.push(() => container.removeEventListener("click", onAssess));
+    container.addEventListener("change", onChecklist);
+    cleanups.push(() => container.removeEventListener("change", onChecklist));
+
+    /* ---- Common Warm-up note (only if already unlocked) ---- */
+    const warmupHost = $("[data-warmup-note]");
+    if (warmupHost && Warmup.isUnlocked()) {
+      warmupHost.innerHTML = `<p class="text-sm text-ink-400 mt-2">You can also use the <a href="#/warmup" class="text-gold-300 hover:text-gold-200 underline">Common Warm-up</a> before practising, if that feels useful.</p>`;
+    }
 
     /* ---- notes ---- */
     own(PersonalNotes.wire(container, "notes-aa", { classId, onSaved: (body) => { if (body.trim()) ClassActivity.markCheckpoint(classId, "notesAdded"); } }));
@@ -433,9 +557,9 @@ const ArohanaAndAvarohanaLesson = (() => {
       Store.addJournalEntry({
         classId,
         classTitle: `Level 2, Class ${cls.number} — ${cls.title}`,
-        learned: "Arohana is the ascending swara sequence and avarohana is the descending one — some ragas vary the swaras between the two, which is a detail for later.",
+        learned: "Arohana is the ascending swara sequence and avarohana is the descending one — a raga has its own characteristic structure that this basic seven-swara sequence doesn't represent.",
         struggled: "",
-        toPractice: "",
+        toPractice: A(rec0(), "growth").reflection || "",
         thoughts: "",
       });
       Router.softRefresh(container, ClassDetailPage, params);
@@ -443,7 +567,7 @@ const ArohanaAndAvarohanaLesson = (() => {
     container.addEventListener("click", onComplete);
     cleanups.push(() => container.removeEventListener("click", onComplete));
 
-    cleanups.push(LessonKit.wireViewedSentinel(container, () => { ClassActivity.markCheckpoint(classId, "lessonViewed"); syncCheckpoints(); refreshLive(); }));
+    cleanups.push(LessonKit.wireViewedSentinel(container, () => ClassActivity.markCheckpoint(classId, "lessonViewed")));
     cleanups.push(LessonKit.wireStepper(container));
     syncCheckpoints();
 

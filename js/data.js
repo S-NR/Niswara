@@ -1103,23 +1103,23 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 5 (interactive, id L2C28) ---------- */
   const arohanaAndAvarohanaClass = {
     number: 5, id: "L2C28", section: "Musical Foundations", title: "Arohana and Avarohana", category: "Carnatic Fundamentals", skillTag: "swara",
-    difficulty: "Beginner", estMinutes: 15,
+    difficulty: "Beginner", estMinutes: 27,
     // Rendered by the interactive lesson in js/lessons/arohanaAndAvarohana.js
     interactive: "arohana-and-avarohana",
-    subtitle: "Arohana rises from Sa to the upper Sa; avarohana returns back down.",
-    description: "An interactive lesson: naming the ascending (arohana) and descending (avarohana) direction of the same seven swaras from Class 4, with an honest note that many ragas vary the swaras used between the two directions — a detail left for later, more advanced study, alongside tala and gamaka.",
+    subtitle: "Learn how musical notes travel upward and downward.",
+    description: "An interactive lesson: arohana (ascending) and avarohana (descending) swara movement, with a side-by-side comparison, guided practice connecting both directions, and an honest, beginner-level introduction to how a raga's own ascending/descending structure can differ from this class's basic seven-swara sequence — without teaching detailed raga theory, and without implying this sequence IS a raga.",
     content: {
-      whatYoullLearn: "What arohana and avarohana mean, how to listen for and sing each direction separately, that this class's scale happens to use the same swaras in both directions while many ragas do not, and how to comfortably combine both directions into one attempt.",
+      whatYoullLearn: "What arohana and avarohana mean, how to recognise and sing each direction, the difference between moving higher and lower in pitch, how to follow a swara sequence without rushing, and that ragas can have their own characteristic ascending and descending structures that this simple sequence doesn't represent.",
       whyItMatters: "Recognising ascending and descending movement by name is a small but genuine step toward reading and discussing melody — without yet requiring any of the more advanced raga theory those terms eventually lead to.",
-      theory: "Arohana is the ascending swara sequence, from Sa up to the upper Sa. Avarohana is the descending swara sequence, from the upper Sa back down to Sa. Many ragas use a different set of swaras ascending versus descending; this class deliberately uses a scale where both directions match, to keep the idea simple.",
+      theory: "Arohana is the ascending swara sequence, from Sa up to the upper Sa. Avarohana is the descending swara sequence, from the upper Sa back down to Sa. The swaras are not equally spaced in frequency — this class's sequence already uses uneven steps, not a simple equal-step staircase. A raga has its own characteristic rules and identity; not every raga uses all seven swaras in both directions, and some ragas use different swaras ascending versus descending. This basic seven-swara exercise is not itself a specific raga.",
       guidedPractice: [
-        "Listened to arohana and avarohana separately, sang each direction on its own, and tried combining both into one connected attempt if comfortable.",
+        "Recapped the seven swaras, listened to and sang arohana and avarohana separately with synchronized visual highlighting, then practised connecting both directions into one attempt.",
       ],
       assignment: {
         instructions: [
           "Singing arohana (ascending)",
           "Singing avarohana (descending)",
-          "Combining both directions, if comfortable",
+          "Connecting both directions, if comfortable",
         ],
         questions: []
       }
