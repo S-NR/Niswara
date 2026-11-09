@@ -159,7 +159,7 @@ const ControlledRangeDevelopmentLesson = (() => {
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
-        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 11 milestone</p>
+        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 15 milestone</p>
         <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Gentle exploration, not a goal note.</p>
         <p class="text-sm text-ink-300">If only the starting note felt comfortable today, that's a complete, successful lesson.</p>
         <p class="text-sm text-ink-100">Range develops from gradual coordination and practice — never from forcing the voice.</p>
@@ -175,7 +175,7 @@ const ControlledRangeDevelopmentLesson = (() => {
       </li>`).join("");
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 12 — Sustained Notes and Stability</p>
+        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 16 — Sustained Notes and Stability</p>
         <p class="text-sm text-ink-300 leading-relaxed">The next lesson will build on today's comfortable notes, exploring how to hold a note steadily — gently, without straining to hold it longer than feels easy.</p>
       </div>`;
     if (status === "completed") {

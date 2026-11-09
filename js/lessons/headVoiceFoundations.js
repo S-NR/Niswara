@@ -153,7 +153,7 @@ const HeadVoiceFoundationsLesson = (() => {
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
-        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 4 milestone</p>
+        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 8 milestone</p>
         <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">A lighter sound, gently explored.</p>
         <p class="text-sm text-ink-300">Head voice isn't something to find and prove — it's a coordination you're beginning to notice.</p>
         <p class="text-sm text-ink-100">No obvious difference yet? Completely normal.</p>
@@ -169,7 +169,7 @@ const HeadVoiceFoundationsLesson = (() => {
       </li>`).join("");
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 5 — Connecting Chest & Head Voice</p>
+        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 9 — Connecting Chest & Head Voice</p>
         <p class="text-sm text-ink-300 leading-relaxed">The next lesson will explore gentle transitions between different vocal coordinations — no advanced mixing or demanding register transitions yet.</p>
       </div>`;
     if (status === "completed") {

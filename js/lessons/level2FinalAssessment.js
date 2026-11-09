@@ -1,15 +1,15 @@
 /* ============================================================
-   LEVEL 2, CLASS 25 — LEVEL 2 FINAL ASSESSMENT & PROGRESS
+   LEVEL 2, CLASS 27 — LEVEL 2 FINAL ASSESSMENT & PROGRESS
    RECORDING (interactive lesson)
 
    Rendered by ClassDetailPage for interactive: "level2-final-assessment".
 
-   Curriculum identity: Level 2, Class 25 (`number: 25`, `levelId: 2`
-   in data.js, id `L2C25`). Same mechanism Classes 1-24 already
-   proved twenty-four times over. This class's own title matched the
-   placeholder list's already-renamed entry exactly (renamed from
-   "Performance Preparation" during Class 24's turn), so nothing
-   needed renaming or adding to bring Class 25 itself onto the page.
+   Curriculum identity: Level 2, Class 27 (`number: 27`, `levelId: 2`
+   in data.js, explicit id `L2C25` — the original id from before the
+   Level 2 Curriculum Upgrade, kept stable so existing progress isn't
+   orphaned by the renumbering). This class remains Level 2's final
+   class after the Upgrade inserted 4 new Carnatic classes and merged
+   2 others, growing Level 2 from 25 to 27 classes.
 
    This spec's own Section 6 previews a possible "Level 3 — Song
    Mastery & Performance Development" as text only — explicitly "do
@@ -24,7 +24,7 @@
 
    Because completing a class requires the previous class in the same
    level to already be complete, reaching THIS class's own completion
-   means every one of Level 2's 25 classes is done — so the
+   means every one of Level 2's 27 classes is done — so the
    celebratory "Level 2 complete" screen is shown unconditionally on
    completion here, not behind a separate, possibly-false check.
    (`Store.isLevelUnlocked(3)` — "would Level 3 unlock" — is still
@@ -85,17 +85,21 @@ const Level2FinalAssessmentLesson = (() => {
   const SONG_HREF = "#/songs/oo-nanna-chetana";
   const SONG = window.SONGS && window.SONGS[0];
 
-  // Section 1's own recap list — the real 24 preceding classes, not a summary of
-  // them invented for this lesson.
+  // Section 1's own recap list — the real 26 preceding classes, not a summary of
+  // them invented for this lesson. Updated for the Level 2 Curriculum Upgrade:
+  // Shruti/Sapta Swaras/Arohana-Avarohana/Basic Swara Patterns were inserted as
+  // Classes 3-6, and Register Coordination Practice / Vocal Endurance Foundations
+  // were merged into Register Transitions and Coordination / Tone Consistency
+  // and Vocal Endurance respectively, rather than listed separately.
   const JOURNEY = [
-    "Voice Placement", "Resonance", "Chest Voice Foundations", "Head Voice Foundations",
+    "Voice Placement", "Resonance", "Shruti and Finding Your Sa", "Introduction to Sapta Swaras",
+    "Arohana and Avarohana", "Basic Swara Patterns", "Chest Voice Foundations", "Head Voice Foundations",
     "Connecting Chest & Head Voice", "Introduction to Mixed Coordination", "Vowel Modification Foundations",
-    "Resonance and Tone Colour", "Projection Without Pushing", "Register Transitions and Vocal Continuity",
+    "Resonance and Tone Colour", "Projection Without Pushing", "Register Transitions and Coordination",
     "Controlled Range Development", "Sustained Notes and Stability", "Vocal Dynamics and Control",
-    "Expressive Singing Foundations", "Applying Vocal Skills to a Song", "Phrase Shaping and Musical Interpretation",
-    "Vocal Agility Development", "Register Coordination Practice", "Tone Consistency Across Range",
-    "Articulation and Style", "Vocal Endurance Foundations", "Personal Vocal Style",
-    "Song Practice Workshop", "Performance Preparation",
+    "Vocal Agility Development", "Tone Consistency and Vocal Endurance", "Articulation and Style",
+    "Expressive Singing Foundations", "Phrase Shaping and Musical Interpretation", "Personal Vocal Style",
+    "Applying Vocal Skills to a Song", "Song Practice Workshop", "Performance Preparation",
   ];
 
   // Section 3's "small selection" of exercises — each a brief reference demo, not a
@@ -513,7 +517,7 @@ const Level2FinalAssessmentLesson = (() => {
     }
     own(RecordingCard.wire(container, "rc-finalTake", {
       classId, take: take(rec0(), "finalTake"), maxSeconds: 60,
-      meta: { name: "Level 2, Class 25 — Final progress recording", exercise: "level2-final-assessment-finalTake" },
+      meta: { name: "Level 2, Class 27 — Final progress recording", exercise: "level2-final-assessment-finalTake" },
       onSaved: (t) => { set("recs", "finalTake", t); ClassActivity.bump(classId, "recordings"); reviewFinalTake(); refreshLive(); },
     }));
     const baseline = baselineInfo();

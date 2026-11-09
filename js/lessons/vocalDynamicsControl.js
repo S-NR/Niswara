@@ -184,7 +184,7 @@ const VocalDynamicsControlLesson = (() => {
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
-        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 13 milestone</p>
+        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 17 milestone</p>
         <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Control matters more than volume.</p>
         <p class="text-sm text-ink-300">Strong singing is never the same as shouting — soft and medium singing are already enough to complete this class.</p>
         <p class="text-sm text-ink-100">Dynamics help communicate emotion and musical intention, one comfortable note at a time.</p>
@@ -200,8 +200,8 @@ const VocalDynamicsControlLesson = (() => {
       </li>`).join("");
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 14 — Expressive Singing Foundations</p>
-        <p class="text-sm text-ink-300 leading-relaxed">The next lesson will build on today's soft-to-stronger control, exploring how dynamics and phrasing together help a song feel expressive.</p>
+        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 18 — Vocal Agility Development</p>
+        <p class="text-sm text-ink-300 leading-relaxed">The next lesson moves between nearby notes with control — smooth and slow, never fast and unclear.</p>
       </div>`;
     if (status === "completed") {
       return `

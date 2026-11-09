@@ -193,7 +193,7 @@ const ExpressiveSingingFoundationsLesson = (() => {
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
-        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 14 milestone</p>
+        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 21 milestone</p>
         <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Singing is also telling.</p>
         <p class="text-sm text-ink-300">The same words and the same melody can sound completely different depending on the feeling behind them.</p>
         <p class="text-sm text-ink-100">Expression develops through listening, practice, and personal interpretation — never through forcing a dramatic effect.</p>
@@ -209,8 +209,8 @@ const ExpressiveSingingFoundationsLesson = (() => {
       </li>`).join("");
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 15 — Applying Vocal Skills to a Song</p>
-        <p class="text-sm text-ink-300 leading-relaxed">The next lesson will bring today's expressive tools together with everything practiced so far, applied to a short song.</p>
+        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 22 — Phrase Shaping and Musical Interpretation</p>
+        <p class="text-sm text-ink-300 leading-relaxed">The next lesson shapes a phrase's natural beginning, development and ending into one connected musical thought.</p>
       </div>`;
     if (status === "completed") {
       return `

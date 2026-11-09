@@ -1000,7 +1000,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 1 (interactive) ---------- */
   const voicePlacementClass = {
-    number: 1, title: "Voice Placement", category: "Vocal Technique", skillTag: "vocal",
+    number: 1, id: "L2C01", section: "Musical Foundations", title: "Voice Placement", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner–Intermediate", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/voicePlacement.js
     interactive: "voice-placement",
@@ -1025,7 +1025,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 2 (interactive) ---------- */
   const resonanceClass = {
-    number: 2, title: "Resonance", category: "Vocal Technique", skillTag: "vocal",
+    number: 2, id: "L2C02", section: "Musical Foundations", title: "Resonance", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner–Intermediate", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/resonance.js
     interactive: "resonance",
@@ -1048,9 +1048,112 @@ const APP_DATA = (() => {
     }
   };
 
-  /* ---------- Level 2, Class 3 (interactive) ---------- */
+  /* ---------- Level 2, Class 3 (interactive, id L2C26) ---------- */
+  const shrutiAndFindingYourSaClass = {
+    number: 3, id: "L2C26", section: "Musical Foundations", title: "Shruti and Finding Your Sa", category: "Carnatic Fundamentals", skillTag: "swara",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/shrutiAndFindingYourSa.js
+    interactive: "shruti-and-finding-your-sa",
+    subtitle: "Sa isn't a fixed note — it's the comfortable pitch you choose as your own reference.",
+    description: "An interactive lesson: shruti as the continuous reference pitch singing is tuned against, and Sa as the name for whichever pitch a singer personally chooses — never assumed to be any particular Western note like C. Explores a drone, helps you choose and confirm a comfortable Sa on the piano, and carries that choice forward into every later class.",
+    content: {
+      whatYoullLearn: "What shruti means as a continuous reference pitch, why Sa is a personal, chosen reference note rather than one fixed note, how a drone supports singing in tune, how to choose and remember a comfortable Sa using the piano, and why every swara from here on is described only relative to your own Sa.",
+      whyItMatters: "There's no universal 'correct' Sa — a chosen reference pitch that fits your own comfortable range is what makes every later swara, scale and pattern approachable rather than strained.",
+      theory: "Shruti is a continuous background pitch that singing is tuned against. Sa is the name Carnatic music gives to whichever pitch a singer chooses as that reference — it is not fixed to any particular note, and different singers comfortably choose different Sa pitches.",
+      guidedPractice: [
+        "Listened to a drone, chose a comfortable Sa on the piano, hummed or sang along with the drone, and tried singing Sa from memory without the drone playing.",
+      ],
+      assignment: {
+        instructions: [
+          "A comfortable Sa, chosen on the piano",
+          "Singing Sa along with the drone, if comfortable",
+          "Singing Sa without the drone, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 4 (interactive, id L2C27) ---------- */
+  const introductionToSaptaSwarasClass = {
+    number: 4, id: "L2C27", section: "Musical Foundations", title: "Introduction to Sapta Swaras", category: "Carnatic Fundamentals", skillTag: "swara",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/introductionToSaptaSwaras.js
+    interactive: "introduction-to-sapta-swaras",
+    subtitle: "Sa Ri Ga Ma Pa Dha Ni — seven named positions, all relative to your own Sa.",
+    description: "An interactive lesson: the seven swaras (sapta swaras) plus the upper Sa, introduced as named positions relative to the Sa chosen in Class 3 — using one common beginner variety, with other swara varieties mentioned only conceptually, and no raga or gamaka theory.",
+    content: {
+      whatYoullLearn: "What a swara is, the names and order of the seven swaras plus the upper Sa, why Sa and Pa have no varieties while the others do, why this class teaches only one common beginner variety for now, and how to listen for and sing each swara relative to your own Sa.",
+      whyItMatters: "Learning the swaras by their relationship to your own Sa — rather than by fixed Western note names — is what makes this vocabulary genuinely transferable, whatever pitch you choose as Sa on a given day.",
+      theory: "A swara is a named note position described relative to Sa. The basic sapta swara set is Sa, Ri, Ga, Ma, Pa, Dha, Ni, followed by an upper Sa an octave above. Ri, Ga, Ma, Dha and Ni each have more than one possible variety in Carnatic music; this class introduces that only as a concept, using a single common variety throughout.",
+      guidedPractice: [
+        "Reviewed the seven swaras and the upper Sa, listened to them played in ascending order from a personal Sa, and sang along before attempting the full sequence from memory.",
+      ],
+      assignment: {
+        instructions: [
+          "Listening to the ascending swara sequence",
+          "Singing along with the sequence",
+          "Singing the sequence from memory, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 5 (interactive, id L2C28) ---------- */
+  const arohanaAndAvarohanaClass = {
+    number: 5, id: "L2C28", section: "Musical Foundations", title: "Arohana and Avarohana", category: "Carnatic Fundamentals", skillTag: "swara",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/arohanaAndAvarohana.js
+    interactive: "arohana-and-avarohana",
+    subtitle: "Arohana rises from Sa to the upper Sa; avarohana returns back down.",
+    description: "An interactive lesson: naming the ascending (arohana) and descending (avarohana) direction of the same seven swaras from Class 4, with an honest note that many ragas vary the swaras used between the two directions — a detail left for later, more advanced study, alongside tala and gamaka.",
+    content: {
+      whatYoullLearn: "What arohana and avarohana mean, how to listen for and sing each direction separately, that this class's scale happens to use the same swaras in both directions while many ragas do not, and how to comfortably combine both directions into one attempt.",
+      whyItMatters: "Recognising ascending and descending movement by name is a small but genuine step toward reading and discussing melody — without yet requiring any of the more advanced raga theory those terms eventually lead to.",
+      theory: "Arohana is the ascending swara sequence, from Sa up to the upper Sa. Avarohana is the descending swara sequence, from the upper Sa back down to Sa. Many ragas use a different set of swaras ascending versus descending; this class deliberately uses a scale where both directions match, to keep the idea simple.",
+      guidedPractice: [
+        "Listened to arohana and avarohana separately, sang each direction on its own, and tried combining both into one connected attempt if comfortable.",
+      ],
+      assignment: {
+        instructions: [
+          "Singing arohana (ascending)",
+          "Singing avarohana (descending)",
+          "Combining both directions, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 6 (interactive, id L2C29) ---------- */
+  const basicSwaraPatternsClass = {
+    number: 6, id: "L2C29", section: "Musical Foundations", title: "Basic Swara Patterns", category: "Carnatic Fundamentals", skillTag: "swara",
+    difficulty: "Beginner", estMinutes: 15,
+    // Rendered by the interactive lesson in js/lessons/basicSwaraPatterns.js
+    interactive: "basic-swara-patterns",
+    subtitle: "A few swaras at a time — short, repeatable patterns instead of the full scale.",
+    description: "An interactive lesson: three short swara patterns, each moving a few steps up and back down, as a practical way to build comfort before attempting a full scale or song. Closes the four-class Musical Foundations arc before the curriculum returns to vocal technique at Class 7. No tala or gamaka is introduced.",
+    content: {
+      whatYoullLearn: "What a basic swara pattern is, why practising a short pattern builds comfort and accuracy before a full scale, how to listen to and sing three example patterns, and that tala and gamaka remain separate ideas for later, more advanced classes.",
+      whyItMatters: "A short, well-practised pattern is a more useful and more comfortable building block than attempting a full scale or song too soon — and completing even one pattern well is a genuine step forward.",
+      theory: "A swara pattern is a short, repeatable sequence using a few swaras, typically moving up and then back down. Working with small patterns is a common, practical way to build familiarity and accuracy gradually.",
+      guidedPractice: [
+        "Listened to three short swara patterns built from a personal Sa, chose whichever felt most comfortable, and sang it with or without the audio playing first.",
+      ],
+      assignment: {
+        instructions: [
+          "Listening to at least one pattern",
+          "Singing one pattern, with or without audio",
+        ],
+        questions: []
+      }
+    }
+  };
+
+  /* ---------- Level 2, Class 7 (interactive) ---------- */
   const chestVoiceFoundationsClass = {
-    number: 3, title: "Chest Voice Foundations", category: "Vocal Technique", skillTag: "vocal",
+    number: 7, id: "L2C03", section: "Vocal Technique Development", title: "Chest Voice Foundations", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/chestVoiceFoundations.js
     interactive: "chest-voice-foundations",
@@ -1075,7 +1178,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 4 (interactive) ---------- */
   const headVoiceFoundationsClass = {
-    number: 4, title: "Head Voice Foundations", category: "Vocal Technique", skillTag: "vocal",
+    number: 8, id: "L2C04", section: "Vocal Technique Development", title: "Head Voice Foundations", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/headVoiceFoundations.js
     interactive: "head-voice-foundations",
@@ -1101,7 +1204,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 5 (interactive) ---------- */
   const connectingChestHeadClass = {
-    number: 5, title: "Connecting Chest & Head Voice", category: "Vocal Technique", skillTag: "vocal",
+    number: 9, id: "L2C05", section: "Vocal Technique Development", title: "Connecting Chest & Head Voice", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/connectingChestHead.js
     interactive: "connecting-chest-head",
@@ -1128,7 +1231,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 6 (interactive) ---------- */
   const introMixedCoordinationClass = {
-    number: 6, title: "Introduction to Mixed Coordination", category: "Vocal Technique", skillTag: "vocal",
+    number: 10, id: "L2C06", section: "Vocal Technique Development", title: "Introduction to Mixed Coordination", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/introMixedCoordination.js
     interactive: "intro-mixed-coordination",
@@ -1155,7 +1258,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 7 (interactive) ---------- */
   const vowelModificationClass = {
-    number: 7, title: "Vowel Modification Foundations", category: "Vocal Technique", skillTag: "vocal",
+    number: 11, id: "L2C07", section: "Vocal Technique Development", title: "Vowel Modification Foundations", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/vowelModification.js
     interactive: "vowel-modification",
@@ -1180,7 +1283,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 8 (interactive) ---------- */
   const resonanceToneColourClass = {
-    number: 8, title: "Resonance and Tone Colour", category: "Vocal Technique", skillTag: "vocal",
+    number: 12, id: "L2C08", section: "Vocal Technique Development", title: "Resonance and Tone Colour", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/resonanceToneColour.js
     interactive: "resonance-tone-colour",
@@ -1206,7 +1309,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 9 (interactive) ---------- */
   const projectionWithoutPushingClass = {
-    number: 9, title: "Projection Without Pushing", category: "Vocal Technique", skillTag: "vocal",
+    number: 13, id: "L2C09", section: "Vocal Technique Development", title: "Projection Without Pushing", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/projectionWithoutPushing.js
     interactive: "projection-without-pushing",
@@ -1232,24 +1335,24 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 10 (interactive) ---------- */
   const registerTransitionsClass = {
-    number: 10, title: "Register Transitions and Vocal Continuity", category: "Vocal Technique", skillTag: "vocal",
+    number: 14, id: "L2C10", section: "Vocal Technique Development", title: "Register Transitions and Coordination", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/registerTransitions.js
     interactive: "register-transitions",
-    subtitle: "Notice changes in vocal quality and explore small, comfortable pitch movements.",
-    description: "An interactive lesson: a synthesis of Classes 3-6 and 9 — noticing vocal-quality changes as pitch changes, rather than eliminating every difference. A voice break is not automatically a failure; vocal continuity develops gradually.",
+    subtitle: "Notice changes in vocal quality, and explore how chest, head, and mixed coordination connect.",
+    description: "An interactive lesson: a synthesis of Classes 7, 8, 9, 10 and 13 — noticing vocal-quality changes as pitch changes, rather than eliminating every difference, then applying that noticing directly to the lower-area/higher-area/transition coordination chest voice, head voice and mixed coordination describe. A voice break is not automatically a failure; vocal continuity and coordination both develop gradually.",
     content: {
-      whatYoullLearn: "That vocal quality and coordination can change as pitch changes, that a noticeable transition or voice break is not automatically a failure, how to explore small pitch movements with comfortable volume, how to distinguish gentle vocal exploration from pushing or squeezing, and why vocal continuity develops gradually through practice.",
-      whyItMatters: "A noticeable transition or voice break is not automatically a failure — the amount of change varies between singers and exercises, and persistent discomfort (never a break itself) is the only thing that should never be ignored.",
-      theory: "The voice may change in quality as pitch changes. A transition may feel smooth, noticeable, or uneven. A voice break does not automatically indicate damage or incorrect technique — mixed coordination and smoother transitions develop gradually.",
+      whatYoullLearn: "That vocal quality and coordination can change as pitch changes, that a noticeable transition or voice break is not automatically a failure, how to explore small pitch movements with comfortable volume, how chest-dominant and head-dominant coordination can differ and connect through a gentle transition, how to distinguish gentle vocal exploration from pushing or squeezing, and why vocal continuity and register coordination both develop gradually through practice.",
+      whyItMatters: "A noticeable transition or voice break is not automatically a failure — the amount of change varies between singers and exercises, and persistent discomfort (never a break itself) is the only thing that should never be ignored. Register transitions are a normal part of how voices work, not a flaw to eliminate immediately.",
+      theory: "The voice may change in quality as pitch changes. A transition may feel smooth, noticeable, or uneven. A voice break does not automatically indicate damage or incorrect technique. Chest voice and head voice are terms for different patterns of vocal coordination and sensation — not places sound is literally produced — and mixed coordination describes a more balanced transition between the two; smoother transitions develop gradually.",
       guidedPractice: [
-        "Reviewed Classes 3, 4, 5, 6 and 9, explored a comfortable reference pitch, tried a small 'oo' glide, compared two separate sounds with one gentle glide, learned about voice breaks and transitions, and reflected on comfort and tension rather than forcing a perfect result.",
+        "Reviewed Classes 7, 8, 9, 10 and 13, explored a comfortable reference pitch, tried a small 'oo' glide, compared two separate sounds with one gentle glide, learned about voice breaks and transitions, explored a comfortable lower-range area and a lighter higher-range area, attempted a small gentle transition between them, optionally tried a short melodic pattern, and reflected on comfort and tension rather than forcing a perfect result.",
       ],
       assignment: {
         instructions: [
           "One short sentence, spoken naturally",
-          "One comfortable “oo”",
-          "One small glide, if comfortable",
+          "One comfortable “oo”, and one small glide, if comfortable",
+          "A comfortable lower-area hum and a lighter higher-area hum, with a gentle transition between them if comfortable",
         ],
         questions: []
       }
@@ -1258,7 +1361,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 11 (interactive) ---------- */
   const controlledRangeDevelopmentClass = {
-    number: 11, title: "Controlled Range Development", category: "Vocal Technique", skillTag: "vocal",
+    number: 15, id: "L2C11", section: "Vocal Technique Development", title: "Controlled Range Development", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/controlledRangeDevelopment.js
     interactive: "controlled-range-development",
@@ -1285,7 +1388,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 12 (interactive) ---------- */
   const sustainedNotesStabilityClass = {
-    number: 12, title: "Sustained Notes and Stability", category: "Vocal Technique", skillTag: "vocal",
+    number: 16, id: "L2C12", section: "Vocal Technique Development", title: "Sustained Notes and Stability", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/sustainedNotesStability.js
     interactive: "sustained-notes-stability",
@@ -1311,7 +1414,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 13 (interactive) ---------- */
   const vocalDynamicsControlClass = {
-    number: 13, title: "Vocal Dynamics and Control", category: "Vocal Technique", skillTag: "vocal",
+    number: 17, id: "L2C13", section: "Vocal Technique Development", title: "Vocal Dynamics and Control", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/vocalDynamicsControl.js
     interactive: "vocal-dynamics-control",
@@ -1337,7 +1440,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 14 (interactive) ---------- */
   const expressiveSingingFoundationsClass = {
-    number: 14, title: "Expressive Singing Foundations", category: "Vocal Technique", skillTag: "vocal",
+    number: 21, id: "L2C14", section: "Musical Expression and Song Application", title: "Expressive Singing Foundations", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/expressiveSingingFoundations.js
     interactive: "expressive-singing-foundations",
@@ -1363,7 +1466,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 15 (interactive) ---------- */
   const applyingVocalSkillsToSongClass = {
-    number: 15, title: "Applying Vocal Skills to a Song", category: "Vocal Technique", skillTag: "vocal",
+    number: 24, id: "L2C15", section: "Musical Expression and Song Application", title: "Applying Vocal Skills to a Song", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 18,
     // Rendered by the interactive lesson in js/lessons/applyingVocalSkillsToSong.js
     interactive: "applying-vocal-skills-to-song",
@@ -1389,7 +1492,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 16 (interactive) ---------- */
   const phraseShapingInterpretationClass = {
-    number: 16, title: "Phrase Shaping and Musical Interpretation", category: "Vocal Technique", skillTag: "vocal",
+    number: 22, id: "L2C16", section: "Musical Expression and Song Application", title: "Phrase Shaping and Musical Interpretation", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 18,
     // Rendered by the interactive lesson in js/lessons/phraseShapingInterpretation.js
     interactive: "phrase-shaping-interpretation",
@@ -1415,7 +1518,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 17 (interactive) ---------- */
   const vocalAgilityDevelopmentClass = {
-    number: 17, title: "Vocal Agility Development", category: "Vocal Technique", skillTag: "vocal",
+    number: 18, id: "L2C17", section: "Vocal Technique Development", title: "Vocal Agility Development", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/vocalAgilityDevelopment.js
     interactive: "vocal-agility-development",
@@ -1439,52 +1542,26 @@ const APP_DATA = (() => {
     }
   };
 
-  /* ---------- Level 2, Class 18 (interactive) ---------- */
-  const registerCoordinationPracticeClass = {
-    number: 18, title: "Register Coordination Practice", category: "Vocal Technique", skillTag: "vocal",
-    difficulty: "Beginner–Intermediate", estMinutes: 15,
-    // Rendered by the interactive lesson in js/lessons/registerCoordinationPractice.js
-    interactive: "register-coordination-practice",
-    subtitle: "Chest, head, and mixed voice are names for coordination patterns — not places sound is produced.",
-    description: "An interactive lesson: a gentle first look at how different vocal registers coordinate together. Explores a comfortable lower area, a lighter higher area, and a small transition between them, with an optional short melodic pattern — never requiring a smooth transition, a particular pitch, or a 'mixed voice' sound.",
-    content: {
-      whatYoullLearn: "What vocal registers mean, why the voice can feel or sound different across its range, how chest-dominant and head-dominant coordination can differ, why register transitions can feel noticeable at first, how to explore transitions gently, and why smooth coordination matters more than forcing a particular sound.",
-      whyItMatters: "Register transitions are a normal part of how voices work, not a flaw to eliminate immediately. Noticing how your own voice behaves across its range is the first step toward more comfortable coordination over time.",
-      theory: "Chest voice and head voice are terms for different patterns of vocal coordination and sensation — they do not mean sound is literally produced in the chest or the head. Mixed coordination describes a more balanced transition between the two.",
-      guidedPractice: [
-        "Prepared gently, explored a comfortable lower-range area, tried a lighter higher-range area, attempted a small gentle transition between them, optionally tried a short melodic pattern, and reflected on what felt most comfortable.",
-      ],
-      assignment: {
-        instructions: [
-          "A comfortable lower-area hum",
-          "A lighter higher-area hum",
-          "A gentle transition between the two, if comfortable",
-        ],
-        questions: []
-      }
-    }
-  };
-
   /* ---------- Level 2, Class 19 (interactive) ---------- */
   const toneConsistencyAcrossRangeClass = {
-    number: 19, title: "Tone Consistency Across Range", category: "Vocal Technique", skillTag: "vocal",
+    number: 19, id: "L2C19", section: "Vocal Technique Development", title: "Tone Consistency and Vocal Endurance", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner–Intermediate", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/toneConsistencyAcrossRange.js
     interactive: "tone-consistency-across-range",
-    subtitle: "Consistency means comfortable coordination across your range — not making every note sound identical.",
-    description: "An interactive lesson: listening to how tone changes across nearby notes, and recognising unnecessary tension versus natural variation. Compares a reference note with one nearby higher and lower note, and the same vowel across pitches, with an optional short melodic pattern.",
+    subtitle: "Consistency means comfortable coordination across your range — not making every note sound identical, and not pushing through tiredness.",
+    description: "An interactive lesson: listening to how tone changes across nearby notes, recognising unnecessary tension versus natural variation, and carrying that same comfortable coordination across a slightly longer phrase. Compares a reference note with one nearby higher and lower note, the same vowel across pitches, and a short phrase built up gradually with real rest between attempts.",
     content: {
-      whatYoullLearn: "What vocal tone means, why tone can change as pitch changes, the difference between natural register changes and unnecessary tension, how to maintain a comfortable, clear sound across nearby notes, how to listen to and compare your own tone, and why consistency does not mean making every note identical.",
-      whyItMatters: "Every voice has natural tonal variation across its range. Learning to notice that variation — rather than fighting it — is what allows comfortable coordination to develop over time.",
-      theory: "Vocal tone is the quality or character of the sound a voice produces. Tone can change naturally with pitch, vowel, register, and coordination; descriptive words like clear, breathier, brighter, darker, lighter, and fuller are listening tools, not judgments.",
+      whatYoullLearn: "What vocal tone means, why tone can change as pitch changes, the difference between natural register changes and unnecessary tension, how to maintain a comfortable, clear sound across nearby notes, what vocal endurance means and why gradually building phrase length beats suddenly attempting long songs, why breaks are part of good vocal practice, and why consistency does not mean making every note identical or singing for as long as possible.",
+      whyItMatters: "Every voice has natural tonal variation across its range. Learning to notice that variation — rather than fighting it — is what allows comfortable coordination to develop over time. Endurance that comes from forcing volume, range, or duration tends to produce tension and fatigue rather than real progress; comfortable coordination, built gradually with real rest between attempts, is what actually develops.",
+      theory: "Vocal tone is the quality or character of the sound a voice produces. Tone can change naturally with pitch, vowel, register, and coordination; descriptive words like clear, breathier, brighter, darker, lighter, and fuller are listening tools, not judgments. Vocal endurance is about managing effort and coordination comfortably across a phrase — not about singing loudly, reaching higher notes, or singing continuously for as long as possible.",
       guidedPractice: [
-        "Prepared gently, found a comfortable reference tone, explored one nearby higher and lower note, compared the same vowel across those notes, optionally tried a short melodic pattern, and reflected on where tone felt most natural versus where it felt forced.",
+        "Prepared gently, found a comfortable reference tone, explored one nearby higher and lower note, compared the same vowel across those notes, optionally tried a short melodic pattern, practised a short phrase a few times and then a slightly longer version, compared how the voice felt before and after a short rest, and reflected on where tone felt most natural versus where it felt forced or tired.",
       ],
       assignment: {
         instructions: [
-          "A comfortable reference note",
-          "One nearby higher note",
-          "One nearby lower note",
+          "A comfortable reference note, one nearby higher note, and one nearby lower note",
+          "The short phrase, repeated a few times",
+          "The slightly longer phrase, if comfortable",
         ],
         questions: []
       }
@@ -1493,7 +1570,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 20 (interactive) ---------- */
   const articulationAndStyleClass = {
-    number: 20, title: "Articulation and Style", category: "Vocal Technique", skillTag: "vocal",
+    number: 20, id: "L2C20", section: "Musical Expression and Song Application", title: "Articulation and Style", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner–Intermediate", estMinutes: 15,
     // Rendered by the interactive lesson in js/lessons/articulationAndStyle.js
     interactive: "articulation-and-style",
@@ -1517,35 +1594,9 @@ const APP_DATA = (() => {
     }
   };
 
-  /* ---------- Level 2, Class 21 (interactive) ---------- */
-  const vocalEnduranceFoundationsClass = {
-    number: 21, title: "Vocal Endurance Foundations", category: "Vocal Technique", skillTag: "vocal",
-    difficulty: "Beginner–Intermediate", estMinutes: 18,
-    // Rendered by the interactive lesson in js/lessons/vocalEnduranceFoundations.js
-    interactive: "vocal-endurance-foundations",
-    subtitle: "Comfortable coordination over slightly longer phrases — never maximum duration.",
-    description: "An interactive lesson: maintaining comfortable, consistent singing over slightly longer phrases without pushing or exhausting the voice. Builds from a short phrase to a slightly longer one, compares how the voice feels before and after a short rest, and ends with a simple two-to-three-phrase exercise, practised separately before combining.",
-    content: {
-      whatYoullLearn: "What vocal endurance means, the difference between healthy vocal effort and strain, why gradually building duration beats suddenly attempting long songs, why breaks are part of good vocal practice, and how to notice tiredness or instability without pushing through it.",
-      whyItMatters: "Endurance that comes from forcing volume, range, or duration tends to produce tension and fatigue rather than real progress. Comfortable coordination, built gradually with real rest between attempts, is what actually develops over time.",
-      theory: "Vocal endurance is about managing effort and coordination comfortably across a phrase — not about singing loudly, reaching higher notes, or singing continuously for as long as possible.",
-      guidedPractice: [
-        "Prepared gently, practised a short phrase a few times, tried a slightly longer version, compared how the voice felt before and after a short rest, and worked through a simple two-to-three-phrase exercise one phrase at a time before combining them.",
-      ],
-      assignment: {
-        instructions: [
-          "The short phrase, repeated a few times",
-          "The slightly longer phrase, if comfortable",
-          "The combined exercise, if comfortable",
-        ],
-        questions: []
-      }
-    }
-  };
-
   /* ---------- Level 2, Class 22 (interactive) ---------- */
   const personalVocalStyleClass = {
-    number: 22, title: "Personal Vocal Style", category: "Vocal Technique", skillTag: "vocal",
+    number: 23, id: "L2C22", section: "Musical Expression and Song Application", title: "Personal Vocal Style", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner–Intermediate", estMinutes: 18,
     // Rendered by the interactive lesson in js/lessons/personalVocalStyle.js
     interactive: "personal-vocal-style",
@@ -1571,7 +1622,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 23 (interactive) ---------- */
   const songPracticeWorkshopClass = {
-    number: 23, title: "Song Practice Workshop", category: "Vocal Technique", skillTag: "vocal",
+    number: 25, id: "L2C23", section: "Musical Expression and Song Application", title: "Song Practice Workshop", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner–Intermediate", estMinutes: 22,
     // Rendered by the interactive lesson in js/lessons/songPracticeWorkshop.js
     interactive: "song-practice-workshop",
@@ -1597,7 +1648,7 @@ const APP_DATA = (() => {
 
   /* ---------- Level 2, Class 24 (interactive) ---------- */
   const performancePreparationClass = {
-    number: 24, title: "Performance Preparation", category: "Vocal Technique", skillTag: "vocal",
+    number: 26, id: "L2C24", section: "Musical Expression and Song Application", title: "Performance Preparation", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner–Intermediate", estMinutes: 20,
     // Rendered by the interactive lesson in js/lessons/performancePreparation.js
     interactive: "performance-preparation",
@@ -1621,9 +1672,9 @@ const APP_DATA = (() => {
     }
   };
 
-  /* ---------- Level 2, Class 25 (interactive, final class) ---------- */
+  /* ---------- Level 2, Class 27 (interactive, final class) ---------- */
   const level2FinalAssessmentClass = {
-    number: 25, title: "Level 2 Final Assessment & Progress Recording", category: "Vocal Technique", skillTag: "vocal",
+    number: 27, id: "L2C25", section: "Musical Expression and Song Application", title: "Level 2 Final Assessment & Progress Recording", category: "Vocal Technique", skillTag: "vocal",
     difficulty: "Beginner–Intermediate", estMinutes: 28,
     // Rendered by the interactive lesson in js/lessons/level2FinalAssessment.js
     interactive: "level2-final-assessment",
@@ -1701,13 +1752,17 @@ const APP_DATA = (() => {
 
   const CLASSES = [
     ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
-    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass, articulationAndStyleClass, vocalEnduranceFoundationsClass, personalVocalStyleClass, songPracticeWorkshopClass, performancePreparationClass, level2FinalAssessmentClass].map(c => ({ ...c, levelId: 2 })),
+    ...[voicePlacementClass, resonanceClass, shrutiAndFindingYourSaClass, introductionToSaptaSwarasClass, arohanaAndAvarohanaClass, basicSwaraPatternsClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, vocalAgilityDevelopmentClass, toneConsistencyAcrossRangeClass, articulationAndStyleClass, expressiveSingingFoundationsClass, phraseShapingInterpretationClass, personalVocalStyleClass, applyingVocalSkillsToSongClass, songPracticeWorkshopClass, performancePreparationClass, level2FinalAssessmentClass].map(c => ({ ...c, levelId: 2 })),
     ...[introductionToSongMasteryClass, melodyAnalysisPhraseMappingClass].map(c => ({ ...c, levelId: 3 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
     ),
-  ].map(c => ({ ...c, id: `L${c.levelId}C${String(c.number).padStart(2, "0")}` }));
+  // `id` is now PINNED per class wherever one is explicitly set (`c.id`) — this is what
+  // lets a class's `number` (its display order) change without orphaning any progress
+  // already recorded under its original id. Only falls back to the old levelId+number
+  // formula for a class that's never had its own explicit id assigned yet.
+  ].map(c => ({ ...c, id: c.id || `L${c.levelId}C${String(c.number).padStart(2, "0")}` }));
 
   /* ---------- Resources: Mixing & Mastering learning area ---------- */
   const RESOURCE_TOPICS = [

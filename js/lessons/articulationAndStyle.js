@@ -145,8 +145,8 @@ const ArticulationAndStyleLesson = (() => {
       </li>`).join("");
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 21 — Vocal Endurance Foundations</p>
-        <p class="text-sm text-ink-300 leading-relaxed">The next lesson is about maintaining comfortable, consistent singing across slightly longer phrases — never about singing louder, higher, or longer than feels comfortable.</p>
+        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 21 — Expressive Singing Foundations</p>
+        <p class="text-sm text-ink-300 leading-relaxed">The next lesson explores how tone, dynamics, timing and intention shape the feeling behind a phrase.</p>
       </div>`;
     if (status === "completed") {
       return `

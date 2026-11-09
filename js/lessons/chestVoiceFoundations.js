@@ -157,7 +157,7 @@ const ChestVoiceFoundationsLesson = (() => {
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
-        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 3 milestone</p>
+        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 7 milestone</p>
         <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">A comfortable, speech-like sound is the whole goal.</p>
         <p class="text-sm text-ink-300">Chest voice isn't a sensation to search for — it's an easy coordination you already use when you speak.</p>
         <p class="text-sm text-ink-100">No forcing, no searching for vibration. Just comfort.</p>
@@ -173,7 +173,7 @@ const ChestVoiceFoundationsLesson = (() => {
       </li>`).join("");
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 4 — Head Voice Foundations</p>
+        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 8 — Head Voice Foundations</p>
         <p class="text-sm text-ink-300 leading-relaxed">The next lesson will explore a different vocal coordination through gentle, comfortable sounds — no advanced head-voice exercises yet.</p>
       </div>`;
     if (status === "completed") {

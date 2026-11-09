@@ -5,6 +5,10 @@
    ============================================================ */
 
 const InteractiveLessons = {
+  "shruti-and-finding-your-sa": ShrutiAndFindingYourSaLesson,
+  "introduction-to-sapta-swaras": IntroductionToSaptaSwarasLesson,
+  "arohana-and-avarohana": ArohanaAndAvarohanaLesson,
+  "basic-swara-patterns": BasicSwaraPatternsLesson,
   "meet-your-voice": MeetYourVoiceLesson,
   "comfortable-breathing": ComfortableBreathingLesson,
   "understanding-pitch": UnderstandingPitchLesson,
@@ -47,10 +51,8 @@ const InteractiveLessons = {
   "applying-vocal-skills-to-song": ApplyingVocalSkillsToSongLesson,
   "phrase-shaping-interpretation": PhraseShapingInterpretationLesson,
   "vocal-agility-development": VocalAgilityDevelopmentLesson,
-  "register-coordination-practice": RegisterCoordinationPracticeLesson,
   "tone-consistency-across-range": ToneConsistencyAcrossRangeLesson,
   "articulation-and-style": ArticulationAndStyleLesson,
-  "vocal-endurance-foundations": VocalEnduranceFoundationsLesson,
   "personal-vocal-style": PersonalVocalStyleLesson,
   "song-practice-workshop": SongPracticeWorkshopLesson,
   "performance-preparation": PerformancePreparationLesson,

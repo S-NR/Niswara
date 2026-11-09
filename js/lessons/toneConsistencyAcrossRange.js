@@ -1,48 +1,40 @@
 /* ============================================================
-   LEVEL 2, CLASS 19 — TONE CONSISTENCY ACROSS RANGE (interactive
-   lesson)
+   LEVEL 2, CLASS 19 — TONE CONSISTENCY AND VOCAL ENDURANCE
+   (interactive lesson)
 
    Rendered by ClassDetailPage for interactive: "tone-consistency-across-range".
 
    Curriculum identity: Level 2, Class 19 (`number: 19`, `levelId: 2`
-   in data.js, id `L2C19`). Same mechanism Classes 1-18 already
-   proved eighteen times over. This class's own title matched the
-   placeholder list's already-renamed entry exactly (renamed from
-   "Register Coordination Practice" during Class 18's turn), so
-   nothing needed renaming or adding to bring Class 19 itself onto
-   the page.
-
-   This spec's own "Next class preview" names the real Class 20 as
-   "Articulation and Style" — `levelClassDefs[2]` is renamed in place
-   again, the same precedent every class since 5 has followed.
+   in data.js, id `L2C19` — unchanged by the Level 2 Curriculum
+   Upgrade; both this class's number and the id stayed stable).
+   Originally "Tone Consistency Across Range"; the Curriculum Upgrade
+   merged the old, separate "Vocal Endurance Foundations" class
+   (formerly `L2C21`) into this one rather than dropping it, per the
+   same "merge, don't silently delete" principle applied to Register
+   Transitions (`L2C10`). Its short/longer-phrase and rest/recovery
+   content now lives in this file's Section G2, and its own file has
+   been deleted.
 
    Core idea: tone is the quality/character of a sound, and it can
    change naturally with pitch, vowel, register, and coordination —
    consistency means comfortable coordination across nearby notes,
-   NOT making every note sound identical. Explicitly never treats a
-   natural tonal change as a mistake; only unnecessary pressing,
-   tightness, breathiness, or weakness is framed as worth noticing.
+   NOT making every note sound identical. The same comfortable
+   coordination, carried across a slightly longer phrase, is what
+   vocal endurance means here — not singing louder, higher, or for as
+   long as possible. Neither topic treats a natural tonal change, or
+   the need for rest, as a failure.
 
    Honesty boundaries, matching every earlier class: no automated
-   tone analysis, voice-quality classification, or consistency
-   scoring (the spec explicitly forbids building one); completion
-   never depends on identical tone, a particular pitch, a specific
-   tone quality, a recording, or any optional exercise (the spec says
-   this explicitly).
-
-   Like Class 18, this spec's own Section G describes ONE short
-   recording covering the whole exploration (reference note, one
-   note above, one note below, and the optional pattern), not one per
-   part. Reflection here has its own explicit Section H (unlike Class
-   18), so this file gives it its own chapter rather than folding it
-   into the recording chapter.
+   tone analysis, voice-quality classification, fatigue measurement,
+   or consistency scoring; completion never depends on identical
+   tone, a particular pitch or duration, a recording, or any optional
+   exercise.
 
    Reuses: LessonKit (+ its automatic Warm-up card), VirtualPiano
    (Class 3) for the one comfortable reference note, PianoSynth's
-   relative-degree pattern playback (Level 1 Class 24 / Classes
-   15-18) for the higher/lower/pattern references, RecordingCard
-   (Class 5), SelfAssessment (Class 4), PersonalNotes, ClassProgress,
-   and a skip button for the one optional exercise (Classes 9-18).
+   relative-degree pattern playback for the higher/lower/pattern and
+   phrase references, RecordingCard (Class 5), SelfAssessment
+   (Class 4), PersonalNotes, ClassProgress.
    ============================================================ */
 
 const ToneConsistencyAcrossRangeLesson = (() => {
@@ -53,6 +45,7 @@ const ToneConsistencyAcrossRangeLesson = (() => {
     { id: "nearby", label: "Nearby Notes" },
     { id: "vowel", label: "Vowel" },
     { id: "pattern", label: "Pattern" },
+    { id: "phrase", label: "Phrase" },
     { id: "record", label: "Record" },
     { id: "reflect", label: "Reflect" },
     { id: "complete", label: "Complete" },
@@ -60,13 +53,14 @@ const ToneConsistencyAcrossRangeLesson = (() => {
 
   const RANGE = { from: 48, to: 72 };
   const STEP = 2;
-  const MAX_UP = 2; // the furthest this class asks for is the pattern's "3" (two steps up)
+  const MAX_UP = 3; // widened from 2 so the merged-in longer phrase (degree 3) stays within range
 
   const PATTERNS = {
     higher: [0, 1, 0],
     lower: [0, -1, 0],
     vowel: [0, 1, 0, -1, 0],
     three: [0, 1, 2, 1, 0],
+    longer: [0, 1, 2, 3, 2, 1, 0],
   };
 
   const TONE_WORDS = ["Clear", "Breathier", "Brighter", "Darker", "Lighter", "Fuller"];
@@ -76,6 +70,7 @@ const ToneConsistencyAcrossRangeLesson = (() => {
     { key: "triedReference", label: "I found a comfortable reference sound, or chose to skip it." },
     { key: "triedNearby", label: "I explored one nearby higher and lower note, or chose to skip it." },
     { key: "triedVowel", label: "I compared the same vowel across notes, or chose to skip it." },
+    { key: "triedEnduranceOrSkipped", label: "I tried the short/longer phrase practice, or chose to skip it." },
     { key: "reflected", label: "I reflected on the exercise, or chose not to." },
   ];
   const PROGRESS_ITEMS = CHECKLIST_ITEMS;
@@ -87,6 +82,8 @@ const ToneConsistencyAcrossRangeLesson = (() => {
     soundComfortable: { question: "Was my sound comfortable?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
     forcedSameSound: { question: "Did I try to force the same sound everywhere?", options: [opt("no", "No", "good"), opt("alittle", "A little"), opt("yes", "Yes"), opt("unsure", "Not sure")] },
     mostNaturalNotes: { question: "Which notes felt most natural?", options: [opt("reference", "My reference note"), opt("higher", "The higher note"), opt("lower", "The lower note"), opt("unsure", "Not sure")] },
+    noticedTiredness: { question: "Did I notice any tiredness or discomfort during the longer phrase?", options: [opt("no", "No", "good"), opt("alittle", "A little"), opt("yes", "Yes"), opt("unsure", "Not sure")] },
+    restHelped: { question: "Did taking a short rest help?", options: [opt("yes", "Yes", "good"), opt("somewhat", "Somewhat", "good"), opt("no", "Not really"), opt("unsure", "Didn't rest")] },
   };
 
   const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
@@ -99,7 +96,7 @@ const ToneConsistencyAcrossRangeLesson = (() => {
     const ok = (n) => typeof n === "number" && n - STEP >= RANGE.from && n + MAX_UP * STEP <= RANGE.to;
     const own = A(rec, "setup").note;
     if (ok(own)) return own;
-    for (const id of ["L2C18", "L2C17", "L2C16", "L2C15", "L2C14", "L2C13", "L2C12", "L2C11", "L2C10", "L2C09", "L2C08", "L2C07", "L2C06", "L2C05", "L2C04", "L2C03", "L2C02", "L2C01", "L1C25", "L1C02"]) {
+    for (const id of ["L2C17", "L2C16", "L2C15", "L2C14", "L2C13", "L2C12", "L2C11", "L2C10", "L2C09", "L2C08", "L2C07", "L2C06", "L2C05", "L2C04", "L2C03", "L2C02", "L2C01", "L1C25", "L1C02"]) {
       const n = (ClassActivity.get(id).answers.setup || {}).note;
       if (ok(n)) return n;
     }
@@ -126,8 +123,8 @@ const ToneConsistencyAcrossRangeLesson = (() => {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
         <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 19 milestone</p>
-        <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Consistency is comfortable coordination, not identical sound.</p>
-        <p class="text-sm text-ink-300">Every voice has natural tonal variation across its range — today was about listening to that variation, not erasing it.</p>
+        <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Consistency is comfortable coordination, not identical sound — and endurance means the same thing over a longer phrase.</p>
+        <p class="text-sm text-ink-300">Every voice has natural tonal variation across its range, and rest is part of good practice — today was about listening to both, not erasing or rushing past them.</p>
       </div>`;
   }
 
@@ -149,7 +146,7 @@ const ToneConsistencyAcrossRangeLesson = (() => {
           ${milestone()}
           <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.05] p-6 sm:p-8 text-center">
             <p class="text-[11px] tracking-[0.25em] uppercase text-emerald-300 mb-2">Class complete</p>
-            <h3 class="font-display text-2xl text-ink-50 mb-5">A first listen for how your own tone moves across your range.</h3>
+            <h3 class="font-display text-2xl text-ink-50 mb-5">A first listen for how your own tone moves across your range, and how it holds up over a longer phrase.</h3>
             <ul class="inline-flex flex-col gap-2 text-left mx-auto">${lines}</ul>
             ${preview}
             ${next ? `
@@ -251,7 +248,27 @@ const ToneConsistencyAcrossRangeLesson = (() => {
           </div>
         `)}
 
-        ${chapter("record", 7, "Part G — Listen and compare", `
+        ${chapter("phrase", 7, "Part F2 — Short and longer phrase, and rest", `
+          ${narrow(`
+            ${p("Vocal endurance here doesn't mean singing loudly, reaching higher notes, or singing for as long as possible — it means carrying the same comfortable coordination you've been practising across a slightly longer phrase. Gradually building duration beats suddenly attempting a long song, and breaks are part of good practice, not a sign something went wrong.")}
+          `)}
+          <div class="flex flex-wrap gap-3 mb-2">
+            <button type="button" data-play-pattern="three" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen — short phrase</button>
+          </div>
+          ${narrow(p("Once that feels easy, here's a slightly longer version — only continue if it still feels comfortable."))}
+          <button type="button" data-play-pattern="longer" class="vr-btn">${icon("play", "w-4 h-4")} Listen — slightly longer</button>
+          ${RecordingCard.render("rc-enduranceTake", { title: "The short phrase, repeated a few times, then the longer version", hint: "Entirely optional.", maxSeconds: 25, section: false })}
+          ${narrow(`<div class="mt-3">${skipBtn("endurance")}</div>`)}
+          ${narrow(`
+            ${p("Resting between attempts matters — take a short, comfortable rest now, then notice how your voice feels afterward compared to before. If it feels tired, that's a sign to stop for today, not to push through.")}
+            <div class="flex flex-col gap-4 mt-3">
+              ${SelfAssessment.render("noticedTiredness-q", { ...Q.noticedTiredness, selected: sel("noticedTiredness") })}
+              ${SelfAssessment.render("restHelped-q", { ...Q.restHelped, selected: sel("restHelped") })}
+            </div>
+          `)}
+        `)}
+
+        ${chapter("record", 8, "Part G — Listen and compare", `
           ${narrow(p("If you'd like, record a short exercise containing your reference note, one nearby higher note, one nearby lower note, and the pattern if you tried it. If you'd rather not record, the questions below work just as well as a self-reflection."))}
           ${RecordingCard.render("rc-practiceTake", { title: "A short tone comparison", hint: "Entirely optional — your reference note, a higher note, a lower note, and the pattern if you tried it.", maxSeconds: 25, section: false })}
           <div data-review-host class="mt-3"></div>
@@ -266,7 +283,7 @@ const ToneConsistencyAcrossRangeLesson = (() => {
           `)}
         `)}
 
-        ${chapter("reflect", 8, "Part H — Reflection", `
+        ${chapter("reflect", 9, "Part H — Reflection", `
           ${narrow(`
             ${p("A few short prompts to close today's exploration:")}
             <div class="flex flex-col gap-3 mt-2">
@@ -279,14 +296,14 @@ const ToneConsistencyAcrossRangeLesson = (() => {
           `)}
         `)}
 
-        ${chapter("complete", 9, "My Notes", `
+        ${chapter("complete", 10, "My Notes", `
           ${p("Your private notebook for this class. Only you can see it.")}
-          ${PersonalNotes.render("notes-l2c19", { placeholder: "e.g. Which pitch area felt most comfortable... Where my tone changed... What I want to try next time..." })}
+          ${PersonalNotes.render("notes-l2c19", { placeholder: "e.g. Which pitch area felt most comfortable... Where my tone changed... How the longer phrase felt... What I want to try next time..." })}
         `)}
 
-        ${chapter("complete", 10, "Reflection and completion", `
+        ${chapter("complete", 11, "Reflection and completion", `
           ${narrow(`
-            ${p("A simple checklist — tick what's true for you. Completion doesn't depend on producing identical tone across every note, reaching a particular pitch, achieving a specific tone quality, a recording, or any optional exercise.")}
+            ${p("A simple checklist — tick what's true for you. Completion doesn't depend on producing identical tone across every note, singing for a particular duration, reaching a particular pitch, a recording, or any optional exercise.")}
             <div class="flex flex-col gap-1 mb-5">
               ${CHECKLIST_ITEMS.map((item, i) => `
                 <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">
@@ -294,13 +311,13 @@ const ToneConsistencyAcrossRangeLesson = (() => {
                   <span class="text-sm text-ink-200">${item.label}</span>
                 </label>`).join("")}
             </div>
-            ${p("A reminder: don't force the same tone across every pitch, don't squeeze the throat to sound fuller, don't force a brighter or darker sound, and don't push high or low notes. Keep attempts short, rest between them, and stop if there's pain, dizziness, unusual breathlessness, or persistent throat discomfort. Natural tonal differences across your range are normal.")}
+            ${p("A reminder: don't force the same tone across every pitch, don't squeeze the throat to sound fuller, don't force a brighter or darker sound, don't push high or low notes, and never sing through fatigue. Keep attempts short, rest between them, and stop if there's pain, dizziness, unusual breathlessness, or persistent throat discomfort. Natural tonal differences across your range are normal, and so is needing a rest.")}
           `)}
         `)}
 
-        ${chapter("complete", 11, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+        ${chapter("complete", 12, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
 
-        ${chapter("complete", 12, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
+        ${chapter("complete", 13, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
       </div>
     </div>`;
   }
@@ -369,6 +386,13 @@ const ToneConsistencyAcrossRangeLesson = (() => {
     container.addEventListener("click", onSkip);
     cleanups.push(() => container.removeEventListener("click", onSkip));
 
+    /* ---- Part F2: short/longer phrase recording ---- */
+    own(RecordingCard.wire(container, "rc-enduranceTake", {
+      classId, take: take(rec0(), "enduranceTake"), maxSeconds: 25,
+      meta: { name: "Level 2, Class 19 — Short/longer phrase", exercise: "tone-consistency-across-range-enduranceTake" },
+      onSaved: (t) => { set("recs", "enduranceTake", t); ClassActivity.bump(classId, "recordings"); },
+    }));
+
     /* ---- Part G: recording ---- */
     function reviewHtml(rec) {
       const t = take(rec, "practiceTake");
@@ -398,6 +422,7 @@ const ToneConsistencyAcrossRangeLesson = (() => {
     const assessMap = {
       "toneChangedNaturally-q": "toneChangedNaturally", "anyNoteTight-q": "anyNoteTight", "soundComfortable-q": "soundComfortable",
       "forcedSameSound-q": "forcedSameSound", "mostNaturalNotes-q": "mostNaturalNotes",
+      "noticedTiredness-q": "noticedTiredness", "restHelped-q": "restHelped",
     };
     function onAssess(e) {
       const chip = e.target.closest("[data-assess-choice]");
@@ -447,7 +472,7 @@ const ToneConsistencyAcrossRangeLesson = (() => {
       Store.addJournalEntry({
         classId,
         classTitle: `Level 2, Class ${cls.number} — ${cls.title}`,
-        learned: "Vocal tone naturally varies with pitch, vowel, register, and coordination — consistency means comfortable coordination, not making every note sound identical.",
+        learned: "Vocal tone naturally varies with pitch, vowel, register, and coordination — consistency means comfortable coordination, not making every note sound identical, and endurance means carrying that same coordination over a longer phrase, not singing louder, higher, or for as long as possible.",
         struggled: q(rec, "anyNoteTight") && q(rec, "anyNoteTight") !== "no" ? "Noticed some unnecessary tightness at certain notes." : "",
         toPractice: A(rec, "growth").next || "",
         thoughts: "",

@@ -181,7 +181,7 @@ const ResonanceToneColourLesson = (() => {
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
-        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 8 milestone</p>
+        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 12 milestone</p>
         <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Noticing tone colour is enough for today.</p>
         <p class="text-sm text-ink-300">“Bright,” “warm,” “dark” and “light” are listening words, not rigid categories.</p>
         <p class="text-sm text-ink-100">A comfortable, healthy sound matters more than imitating anyone else's tone.</p>
@@ -197,7 +197,7 @@ const ResonanceToneColourLesson = (() => {
       </li>`).join("");
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 9 — Projection Without Pushing</p>
+        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 13 — Projection Without Pushing</p>
         <p class="text-sm text-ink-300 leading-relaxed">The next lesson will introduce the difference between comfortable vocal clarity and simply singing louder — no forceful projection or belting yet.</p>
       </div>`;
     if (status === "completed") {

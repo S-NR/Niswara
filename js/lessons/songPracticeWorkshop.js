@@ -122,7 +122,7 @@ const SongPracticeWorkshopLesson = (() => {
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
-        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 23 milestone</p>
+        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 25 milestone</p>
         <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Everything you've learned, put together.</p>
         <p class="text-sm text-ink-300">A complete song is just many small, already-familiar pieces — breathing, pitch, rhythm, words, and feeling — practised one phrase at a time, then gently connected.</p>
       </div>`;
@@ -137,7 +137,7 @@ const SongPracticeWorkshopLesson = (() => {
       </li>`).join("");
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 24 — Performance Preparation</p>
+        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 26 — Performance Preparation</p>
         <p class="text-sm text-ink-300 leading-relaxed">The next lesson is about preparing mentally and technically before presenting a song to an audience.</p>
       </div>`;
     if (status === "completed") {
@@ -266,7 +266,7 @@ const SongPracticeWorkshopLesson = (() => {
               <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Breathing:</strong> breathe comfortably between phrases, using the breathing habits from Foundation.</li>
               <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Pitch:</strong> listen carefully and follow the melody, as in Register Transitions and Controlled Range Development.</li>
               <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Resonance:</strong> keep a relaxed, comfortable tone, as in Resonance and Resonance &amp; Tone Colour.</li>
-              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Transitions:</strong> connect nearby notes smoothly, as in Register Coordination Practice.</li>
+              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Transitions:</strong> connect nearby notes smoothly, as in Register Transitions and Coordination.</li>
               <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Articulation:</strong> pronounce words clearly without interrupting the melody, as in Articulation and Style.</li>
               <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Dynamics:</strong> not every phrase needs the same intensity, as in Vocal Dynamics Control.</li>
               <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Expression:</strong> think about what the words mean, as in Expressive Singing Foundations and Personal Vocal Style.</li>

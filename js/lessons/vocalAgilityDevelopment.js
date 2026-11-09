@@ -187,7 +187,7 @@ const VocalAgilityDevelopmentLesson = (() => {
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
-        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 17 milestone</p>
+        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 18 milestone</p>
         <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Smooth and slow beats fast and unclear.</p>
         <p class="text-sm text-ink-300">Agility is about moving between notes comfortably and accurately — speed comes later, once coordination feels easy.</p>
         <p class="text-sm text-ink-100">A two-note movement, practised comfortably, is already real progress.</p>
@@ -203,8 +203,8 @@ const VocalAgilityDevelopmentLesson = (() => {
       </li>`).join("");
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 18 — Register Coordination Practice</p>
-        <p class="text-sm text-ink-300 leading-relaxed">The next lesson will build on today's note-to-note movement, coordinating smoother transitions between registers.</p>
+        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 19 — Tone Consistency and Vocal Endurance</p>
+        <p class="text-sm text-ink-300 leading-relaxed">The next lesson listens to how tone changes across nearby notes, and carries that same comfortable coordination across a slightly longer phrase.</p>
       </div>`;
     if (status === "completed") {
       return `

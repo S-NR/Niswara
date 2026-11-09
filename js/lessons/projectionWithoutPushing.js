@@ -172,7 +172,7 @@ const ProjectionWithoutPushingLesson = (() => {
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
-        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 9 milestone</p>
+        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 13 milestone</p>
         <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Clarity, not volume.</p>
         <p class="text-sm text-ink-300">Projection means being heard clearly for the situation — it isn't the same as shouting.</p>
         <p class="text-sm text-ink-100">A louder sound is not automatically a better sound.</p>
@@ -188,7 +188,7 @@ const ProjectionWithoutPushingLesson = (() => {
       </li>`).join("");
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 10 — Register Transitions and Vocal Continuity</p>
+        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 14 — Register Transitions and Coordination</p>
         <p class="text-sm text-ink-300 leading-relaxed">The next lesson will continue exploring comfortable changes in vocal quality — no promise of a perfectly seamless transition, and no demanding range exercises yet.</p>
       </div>`;
     if (status === "completed") {

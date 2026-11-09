@@ -18,15 +18,34 @@ const ClassesPage = {
         ${(() => {
           const blocks = APP_DATA.LEVELS.map(level => {
             const classes = APP_DATA.CLASSES.filter(c => c.levelId === level.id).sort((a, b) => a.number - b.number);
+            // When every class in a level carries an explicit `section` (currently just Level 2,
+            // from the Level 2 Curriculum Upgrade's 3 named sections), group the grid under those
+            // section sub-headings instead of one flat grid. A level with no `section` fields
+            // (Level 1, Level 3) renders exactly as before.
+            const sections = [];
+            classes.forEach(c => {
+              const key = c.section || null;
+              let bucket = sections.find(s => s.key === key);
+              if (!bucket) { bucket = { key, items: [] }; sections.push(bucket); }
+              bucket.items.push(c);
+            });
+            const grouped = sections.length > 1 || (sections.length === 1 && sections[0].key);
+            const grid = grouped
+              ? sections.map(s => `
+                <div class="mb-8 last:mb-0">
+                  ${s.key ? `<h4 class="text-sm font-medium text-ink-300 mb-3">${s.key}</h4>` : ""}
+                  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    ${s.items.map(c => Components.ClassCard(c, Store.classStatus(c))).join("")}
+                  </div>
+                </div>`).join("")
+              : `<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${classes.map(c => Components.ClassCard(c, Store.classStatus(c))).join("")}</div>`;
             return `
             <div>
               <div class="flex items-baseline gap-3 mb-5">
                 <h3 class="font-display text-xl text-ink-50">Level ${level.id} — ${level.title}</h3>
                 <span class="text-xs text-ink-500 uppercase tracking-wide">${level.role}</span>
               </div>
-              <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                ${classes.map(c => Components.ClassCard(c, Store.classStatus(c))).join("")}
-              </div>
+              ${grid}
             </div>`;
           });
           // Song Learning & Application: optional, non-numbered — shown between Foundation and

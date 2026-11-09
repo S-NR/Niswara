@@ -167,8 +167,8 @@ const ResonanceLesson = (() => {
       </li>`).join("");
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Next: Level 2, Class 3 — Chest Voice Foundations</p>
-        <p class="text-sm text-ink-300 leading-relaxed">In the next lesson, we will explore comfortable, speech-like lower and middle vocal sounds. We will learn to recognize easy vocal production without pushing the voice higher or trying to make it artificially heavy.</p>
+        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Next: Level 2, Class 3 — Shruti and Finding Your Sa</p>
+        <p class="text-sm text-ink-300 leading-relaxed">The next few lessons introduce shruti and the seven swaras — Sa, Ri, Ga, Ma, Pa, Dha, Ni — all built from a comfortable reference pitch you choose yourself, before the vocal-technique track continues.</p>
       </div>`;
     if (status === "completed") {
       return `

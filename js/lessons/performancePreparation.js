@@ -153,7 +153,7 @@ const PerformancePreparationLesson = (() => {
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
-        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 24 milestone</p>
+        <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 26 milestone</p>
         <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Confidence comes from familiarity, not perfection.</p>
         <p class="text-sm text-ink-300">A short, gentle preparation routine — your body, the song, a comfortable pitch, and a calmer mind — is what makes a performance feel ready, not flawless execution.</p>
       </div>`;
@@ -168,7 +168,7 @@ const PerformancePreparationLesson = (() => {
       </li>`).join("");
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 25 — Level 2 Final Assessment &amp; Progress Recording</p>
+        <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 27 — Level 2 Final Assessment &amp; Progress Recording</p>
         <p class="text-sm text-ink-300 leading-relaxed">The final opportunity in Level 2 to bring everything learned together and compare progress against earlier recordings.</p>
       </div>`;
     if (status === "completed") {
