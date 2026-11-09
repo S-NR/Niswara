@@ -779,13 +779,13 @@ const APP_DATA = (() => {
   }
 
   const levelClassDefs = {
-    // Classes 1-22 ("Voice Placement" ... "Personal Vocal Style") are now real, authored classes.
-    // Class 22's own spec names the real Class 23 as "Song Practice Workshop", so this entry is
+    // Classes 1-23 ("Voice Placement" ... "Song Practice Workshop") are now real, authored classes.
+    // Class 23's own spec names the real Class 24 as "Performance Preparation", so this entry is
     // renamed in place again, the same precedent every class since 5 has followed (apart from
-    // Class 11's one-off addition). Whether Level 2 keeps growing after Class 23 is for that
+    // Class 11's one-off addition). Whether Level 2 keeps growing after Class 24 is for that
     // class's own spec to reveal — not guessed here.
-    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 23,
-      titles: ["Song Practice Workshop"] },
+    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 24,
+      titles: ["Performance Preparation"] },
     3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
       titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
@@ -1555,9 +1555,35 @@ const APP_DATA = (() => {
     }
   };
 
+  /* ---------- Level 2, Class 23 (interactive) ---------- */
+  const songPracticeWorkshopClass = {
+    number: 23, title: "Song Practice Workshop", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner–Intermediate", estMinutes: 22,
+    // Rendered by the interactive lesson in js/lessons/songPracticeWorkshop.js
+    interactive: "song-practice-workshop",
+    subtitle: "Putting breathing, pitch, rhythm, words, and feeling together into one complete song.",
+    description: "An interactive workshop: learning a complete song phrase by phrase, using the existing Song Learning & Application practice song. Covers listening before singing, understanding song structure, phrase-by-phrase practice, rhythm practice, applying earlier Level 2 skills, connecting phrases, and a hand-off to the full tempo/highlighting/recording experience for complete-song practice.",
+    content: {
+      whatYoullLearn: "How to listen to and understand a song before singing it, how to identify its melody and rhythm, how to break a song into manageable phrases and practise them individually before connecting them, and how to bring breathing, pitch, rhythm, articulation, and expression together into one complete song.",
+      whyItMatters: "A complete song can feel overwhelming all at once. Breaking it into short, familiar phrases — practised one at a time and then gently connected — is what actually makes a whole song approachable.",
+      theory: "A song is built from lines, and each line from a small number of short phrases; some melodic shapes repeat, and each line usually ends with a natural place to breathe.",
+      guidedPractice: [
+        "Listened to the complete reference song, explored its structure, practised individual phrases, tried rhythm practice on the real beat grid, reviewed how earlier Level 2 skills apply to a complete song, connected phrases into full lines, and used the existing Song Learning page for complete-song practice with tempo and recording.",
+      ],
+      assignment: {
+        instructions: [
+          "At least one phrase, practised on its own",
+          "The rhythm practice, if comfortable",
+          "Connecting two or more phrases, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
   const CLASSES = [
     ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
-    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass, articulationAndStyleClass, vocalEnduranceFoundationsClass, personalVocalStyleClass].map(c => ({ ...c, levelId: 2 })),
+    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass, articulationAndStyleClass, vocalEnduranceFoundationsClass, personalVocalStyleClass, songPracticeWorkshopClass].map(c => ({ ...c, levelId: 2 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
