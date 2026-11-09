@@ -1077,23 +1077,23 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 4 (interactive, id L2C27) ---------- */
   const introductionToSaptaSwarasClass = {
     number: 4, id: "L2C27", section: "Musical Foundations", title: "Introduction to Sapta Swaras", category: "Carnatic Fundamentals", skillTag: "swara",
-    difficulty: "Beginner", estMinutes: 15,
+    difficulty: "Beginner", estMinutes: 27,
     // Rendered by the interactive lesson in js/lessons/introductionToSaptaSwaras.js
     interactive: "introduction-to-sapta-swaras",
-    subtitle: "Sa Ri Ga Ma Pa Dha Ni — seven named positions, all relative to your own Sa.",
-    description: "An interactive lesson: the seven swaras (sapta swaras) plus the upper Sa, introduced as named positions relative to the Sa chosen in Class 3 — using one common beginner variety, with other swara varieties mentioned only conceptually, and no raga or gamaka theory.",
+    subtitle: "Music is built from notes. Let's learn to recognise and sing those notes one by one.",
+    description: "An interactive lesson: the seven sapta swara names (Sa Ri Ga Ma Pa Dha Ni), their order, and their relationship to the Sa chosen in Class 3 — individual swara cards to listen to one at a time, a guided ascending (arohana) and descending (avarohana) sequence, and a listen-and-identify exercise. This is an introduction, not a complete swara theory course: varieties and raga formation are named as later topics, not taught here.",
     content: {
-      whatYoullLearn: "What a swara is, the names and order of the seven swaras plus the upper Sa, why Sa and Pa have no varieties while the others do, why this class teaches only one common beginner variety for now, and how to listen for and sing each swara relative to your own Sa.",
+      whatYoullLearn: "The seven basic swara names and their order, how each swara's position is relative to your own chosen Sa, how to listen to and sing a simple ascending sequence (arohana) and descending sequence (avarohana), and how to recognise basic movement between swaras.",
       whyItMatters: "Learning the swaras by their relationship to your own Sa — rather than by fixed Western note names — is what makes this vocabulary genuinely transferable, whatever pitch you choose as Sa on a given day.",
-      theory: "A swara is a named note position described relative to Sa. The basic sapta swara set is Sa, Ri, Ga, Ma, Pa, Dha, Ni, followed by an upper Sa an octave above. Ri, Ga, Ma, Dha and Ni each have more than one possible variety in Carnatic music; this class introduces that only as a concept, using a single common variety throughout.",
+      theory: "Sapta Swaras refers to the seven basic swara names: Sa, Ri, Ga, Ma, Pa, Dha, Ni. Sa and Pa are generally treated as fixed positions relative to the chosen Sa; Ri, Ga, Ma, Dha and Ni each have different varieties, learned gradually in later lessons. Different combinations and positions of swaras matter for raga formation — a simple ascending or descending sequence is not automatically a complete raga. These names are not the same as fixed Western notes like C, D, E, F, G, A and B.",
       guidedPractice: [
-        "Reviewed the seven swaras and the upper Sa, listened to them played in ascending order from a personal Sa, and sang along before attempting the full sequence from memory.",
+        "Met the seven swara names and their order, listened to and sang the ascending sequence (arohana) and the descending sequence (avarohana), listened to each individual swara card, and practised a listen-and-identify exercise.",
       ],
       assignment: {
         instructions: [
-          "Listening to the ascending swara sequence",
-          "Singing along with the sequence",
-          "Singing the sequence from memory, if comfortable",
+          "Listening to the ascending and descending sequences",
+          "Singing along with at least one of the two sequences",
+          "Listening to at least one individual swara card",
         ],
         questions: []
       }

@@ -4,36 +4,49 @@
    Rendered by ClassDetailPage for interactive: "introduction-to-sapta-swaras".
 
    Curriculum identity: Level 2, Class 4 (`number: 4`, `levelId: 2`
-   in data.js, explicit id `L2C27`). Second of four new "Musical
-   Foundations" classes. Builds directly on Class 3's chosen Sa
+   in data.js, explicit id `L2C27`). Rebuilt against this class's own
+   later, more detailed "Claude Prompt" spec (individual swara cards,
+   a named arohana/avarohana section each, a listen-and-identify
+   exercise, a 6-question knowledge check, and a 6-item checklist) —
+   supersedes the shorter version first written during the Level 2
+   Curriculum Upgrade. Builds directly on Class 3's chosen Sa
    (`L2C26`'s `setup.note`) — every swara here is just an interval
    above that one personal reference pitch, never a fixed note.
 
-   Core idea: the seven swaras (Sa Ri Ga Ma Pa Dha Ni) plus the
-   upper Sa are introduced as named positions relative to the
-   learner's own Sa, using the single most common beginner variety
-   (the "Shankarabharanam" interval set, which matches a Western
-   major scale) — explicitly noted as one of several varieties that
-   exist, without teaching those other varieties in any detail, per
-   this class's own scope. No raga or gamaka theory is introduced.
+   Core idea: "Music is built from notes. Let's learn to recognise
+   and sing those notes one by one." The seven swaras (Sa Ri Ga Ma Pa
+   Dha Ni) are introduced by name and order, using the single most
+   common beginner variety (the "Shankarabharanam" interval set), with
+   an explicit, honest note that this is an introduction, not a
+   complete swara theory course: Ri/Ga/Ma/Dha/Ni's other varieties and
+   raga formation are named as later topics, not taught here, and a
+   simple sequence is not automatically a complete raga.
 
-   Honesty boundaries, matching every earlier class: no fabricated
-   pitch-detection; the knowledge check is a concept check, not a
-   performance score; completion never depends on singing every
-   swara in tune.
+   Honesty boundaries this spec asks for explicitly: no generated
+   frequency is presented as some other, more "accurate" Carnatic
+   tuning than what this app's equal-tempered synth actually plays —
+   every swara card and sequence plays the same synthesized
+   `PianoSynth` tone used everywhere else in this app, relative to the
+   learner's own chosen Sa, and the lesson says so rather than
+   implying a specially-sourced Carnatic audio sample. The Section 5
+   "listen and identify" exercise only ever grades a sequence this
+   app itself generated and played — never a claim about the
+   learner's own singing.
 
-   Reuses: LessonKit, VirtualPiano, PianoSynth.playSequence (with
-   onNote for highlighting — new use of an existing primitive),
-   RecordingCard, SelfAssessment, PersonalNotes, ClassProgress.
+   Reuses: LessonKit, VirtualPiano (Section 1, as a visual aid only —
+   the lesson text clarifies the chosen Sa, not a fixed Western note,
+   sets the reference pitch), PianoSynth.playSequence/.play,
+   RecordingCard, PersonalNotes, ClassProgress.
    ============================================================ */
 
 const IntroductionToSaptaSwarasLesson = (() => {
   const STAGES = [
-    { id: "understand", label: "Understand" },
-    { id: "swaras", label: "Swaras" },
-    { id: "listen", label: "Listen" },
-    { id: "sing", label: "Sing" },
-    { id: "mistakes", label: "Mistakes" },
+    { id: "understand", label: "Swaras" },
+    { id: "arohana", label: "Arohana" },
+    { id: "avarohana", label: "Avarohana" },
+    { id: "cards", label: "Cards" },
+    { id: "practice", label: "Practice" },
+    { id: "quiz", label: "Quiz" },
     { id: "reflect", label: "Reflect" },
     { id: "complete", label: "Complete" },
   ];
@@ -42,66 +55,94 @@ const IntroductionToSaptaSwarasLesson = (() => {
   const SA_MAX = RANGE.to - 12;
 
   const SWARAS = [
-    { key: "sa", label: "Sa", full: "Shadja", semitone: 0 },
-    { key: "ri", label: "Ri", full: "Rishabha", semitone: 2 },
-    { key: "ga", label: "Ga", full: "Gandhara", semitone: 4 },
-    { key: "ma", label: "Ma", full: "Madhyama", semitone: 5 },
-    { key: "pa", label: "Pa", full: "Panchama", semitone: 7 },
-    { key: "dha", label: "Dha", full: "Dhaivata", semitone: 9 },
-    { key: "ni", label: "Ni", full: "Nishada", semitone: 11 },
-    { key: "sa2", label: "Sa˙", full: "Shadja (upper)", semitone: 12 },
+    { key: "sa", label: "Sa", full: "Shadja", semitone: 0, say: "sah" },
+    { key: "ri", label: "Ri", full: "Rishabha", semitone: 2, say: "ree" },
+    { key: "ga", label: "Ga", full: "Gandhara", semitone: 4, say: "gah" },
+    { key: "ma", label: "Ma", full: "Madhyama", semitone: 5, say: "mah" },
+    { key: "pa", label: "Pa", full: "Panchama", semitone: 7, say: "pah" },
+    { key: "dha", label: "Dha", full: "Dhaivata", semitone: 9, say: "dhah" },
+    { key: "ni", label: "Ni", full: "Nishada", semitone: 11, say: "nee" },
   ];
+  const UPPER_SA = { key: "sa2", label: "Sa˙", full: "Shadja (upper)", semitone: 12, say: "sah" };
+  const AROHANA = [...SWARAS, UPPER_SA];
+  const AVAROHANA = [UPPER_SA, ...[...SWARAS].reverse()];
 
   const KNOWLEDGE_CHECK = [
     {
-      key: "swara",
-      question: "What is a swara?",
-      options: [
-        { value: "volume", label: "A specific volume level", correct: false },
-        { value: "note", label: "A named note position, described relative to your own Sa", correct: true },
-        { value: "rhythm", label: "A rhythm pattern", correct: false },
-      ],
-      explain: { volume: "Not quite — a swara isn't about loudness.", note: "Exactly. Each swara is a position relative to your personal Sa, not a fixed pitch.", rhythm: "Not quite — rhythm is a separate idea from swara." },
-    },
-    {
       key: "count",
-      question: "How many swaras make up the basic sapta swara set, not counting the upper Sa?",
+      question: "How many basic swaras are introduced in Sapta Swaras?",
       options: [
         { value: "five", label: "Five", correct: false },
-        { value: "seven", label: "Seven — Sa Ri Ga Ma Pa Dha Ni", correct: true },
+        { value: "seven", label: "Seven", correct: true },
         { value: "twelve", label: "Twelve", correct: false },
       ],
       explain: { five: "Not quite — there are seven.", seven: "Exactly right — \"sapta\" means seven.", twelve: "Not quite — twelve would include every variety of every swara, which this class doesn't teach yet." },
     },
     {
-      key: "varieties",
-      question: "Does this class teach every variety of every swara (for example, every version of Ri)?",
+      key: "afterGa",
+      question: "What comes after Ga?",
       options: [
-        { value: "yes", label: "Yes, all varieties are taught now", correct: false },
-        { value: "no", label: "No — only one common beginner variety is used here; other varieties exist but come later", correct: true },
-        { value: "none", label: "No varieties exist at all", correct: false },
+        { value: "ri", label: "Ri", correct: false },
+        { value: "ma", label: "Ma", correct: true },
+        { value: "pa", label: "Pa", correct: false },
       ],
-      explain: { yes: "Not quite — this class deliberately uses just one variety for now.", no: "Right. Varieties are mentioned conceptually, not taught in depth yet.", none: "Not quite — several varieties genuinely exist; they're just not this class's focus." },
+      explain: { ri: "Not quite — Ri comes before Ga.", ma: "Right — the order is Sa, Ri, Ga, Ma, Pa, Dha, Ni.", pa: "Not quite — Ma comes between Ga and Pa." },
+    },
+    {
+      key: "maFullName",
+      question: "What is the full name of Ma?",
+      options: [
+        { value: "madhyama", label: "Madhyama", correct: true },
+        { value: "gandhara", label: "Gandhara", correct: false },
+        { value: "panchama", label: "Panchama", correct: false },
+      ],
+      explain: { madhyama: "Exactly right.", gandhara: "Not quite — Gandhara is the full name of Ga.", panchama: "Not quite — Panchama is the full name of Pa." },
+    },
+    {
+      key: "arohana",
+      question: "What is Arohana?",
+      options: [
+        { value: "down", label: "The descending sequence", correct: false },
+        { value: "up", label: "The ascending sequence, from Sa up to the upper Sa", correct: true },
+        { value: "rhythm", label: "A rhythm cycle", correct: false },
+      ],
+      explain: { down: "Not quite — that's Avarohana.", up: "Exactly — Arohana moves upward through the swaras.", rhythm: "Not quite — Arohana is about pitch direction, not rhythm." },
+    },
+    {
+      key: "avarohana",
+      question: "What is Avarohana?",
+      options: [
+        { value: "up", label: "The ascending sequence", correct: false },
+        { value: "down", label: "The descending sequence, from the upper Sa back down to Sa", correct: true },
+        { value: "sa", label: "A type of Sa", correct: false },
+      ],
+      explain: { up: "Not quite — that's Arohana.", down: "Exactly — Avarohana moves back downward through the swaras.", sa: "Not quite — Avarohana is a direction, not a kind of Sa." },
+    },
+    {
+      key: "saFixed",
+      question: "Is Sa always the Western note C?",
+      options: [
+        { value: "yes", label: "Yes", correct: false },
+        { value: "no", label: "No — Sa is the singer's own chosen reference, from Class 3", correct: true },
+        { value: "carnatic", label: "Only in Carnatic music", correct: false },
+      ],
+      explain: { yes: "Not quite — Sa is never fixed to one Western note like C.", no: "Exactly right.", carnatic: "Not quite — Sa is personal in every case, not just within Carnatic music." },
     },
   ];
 
-  const PROGRESS_ITEMS = [
-    { key: "understood", label: "I understand what a swara is and that Sa is my own reference." },
-    { key: "heardScale", label: "I listened to the ascending swara sequence." },
-    { key: "triedOrSkipped", label: "I tried singing along with the swaras, or chose to skip for comfort." },
-    { key: "reflected", label: "I reflected on which swaras felt easiest and hardest." },
+  const CHECKLIST_ITEMS = [
+    { key: "canName", label: "I can name all seven basic swaras." },
+    { key: "knowOrder", label: "I know their correct order." },
+    { key: "recogniseAscending", label: "I can recognise the ascending sequence." },
+    { key: "recogniseDescending", label: "I can recognise the descending sequence." },
+    { key: "followIndividual", label: "I can listen to and follow individual swaras." },
+    { key: "comfortablePace", label: "I can attempt the sequence at a comfortable pace." },
   ];
-
-  const opt = (value, label, tone = "neutral") => ({ value, label, tone });
-  const Q = {
-    easiest: { question: "Which swara felt easiest to sing?", options: SWARAS.map((s) => opt(s.key, s.label)) },
-    hardest: { question: "Which swara felt hardest to sing?", options: SWARAS.map((s) => opt(s.key, s.label)) },
-  };
+  const PROGRESS_ITEMS = CHECKLIST_ITEMS;
 
   const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
   const { p, narrow } = LessonKit;
   const A = (rec, g) => rec.answers[g] || {};
-  const filled = (v) => v && String(v).trim();
   const N = (m) => NoteUtils.name(m);
 
   function baseNote(rec) {
@@ -123,29 +164,75 @@ const IntroductionToSaptaSwarasLesson = (() => {
 
   const take = (rec, k) => A(rec, "recs")[k] || null;
   const q = (rec, k) => A(rec, "q")[k] || null;
-  const skipped = (rec, k) => !!A(rec, "skip")[k];
+  const checklist = (rec) => A(rec, "checklist");
 
   function derivedCheckpoints(rec) {
     const out = {};
-    if (KNOWLEDGE_CHECK.every((k) => q(rec, `kc_${k.key}`)) && !!rec.checkpoints.lessonViewed) out.understood = true;
-    if (rec.checkpoints.heardScaleFlag) out.heardScale = true;
-    if (take(rec, "scaleTake") || skipped(rec, "sing")) out.triedOrSkipped = true;
-    if (q(rec, "easiest") && q(rec, "hardest")) out.reflected = true;
+    const c = checklist(rec);
+    CHECKLIST_ITEMS.forEach((item, i) => { out[item.key] = !!c[i]; });
     return out;
+  }
+
+  function shuffle(values) {
+    const arr = [...values];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
   }
 
   /* ---------- small views ---------- */
   const recCard = (k, title, hint, max = 20) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
-  const flowStrip = (steps) => `<div class="flex flex-wrap items-center justify-center gap-2 my-4">${steps.map((s, i, arr) => `<span class="flow-chip !text-sm">${s}</span>${i < arr.length - 1 ? `<span class="text-ink-700 text-xs">→</span>` : ""}`).join("")}</div>`;
-  const skipBtn = (k, label = "Skip this exercise") => `<button type="button" data-skip-ex="${k}" class="text-xs text-ink-500 hover:text-ink-300 underline">${label}</button>`;
 
-  function swaraLadderHtml(activeIndex = -1) {
-    return `<div class="flex flex-wrap items-end justify-center gap-2 my-5" data-swara-ladder>
-      ${SWARAS.map((s, i) => `
-        <div data-swara-chip="${i}" class="flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border transition-colors ${activeIndex === i ? "border-gold-400/50 bg-gold-500/15" : "border-white/10 bg-white/[0.02]"}">
+  function sequenceLadderHtml(sequence, activeIndex = -1) {
+    return `<div class="flex flex-wrap items-end justify-center gap-2 my-5">
+      ${sequence.map((s, i) => `
+        <div class="flex flex-col items-center gap-1 px-3 py-2.5 rounded-xl border transition-colors ${activeIndex === i ? "border-gold-400/50 bg-gold-500/15" : "border-white/10 bg-white/[0.02]"}">
           <span class="font-display text-lg ${activeIndex === i ? "text-gold-300" : "text-ink-100"}">${s.label}</span>
-          <span class="text-[10px] uppercase tracking-wide text-ink-500">${s.full}</span>
         </div>`).join("")}
+    </div>`;
+  }
+
+  function cardsHtml(rec) {
+    const selected = A(rec, "cards").selected;
+    return `<div class="grid grid-cols-2 sm:grid-cols-4 gap-3" data-swara-cards>
+      ${SWARAS.map((s) => `
+        <button type="button" data-swara-card="${s.key}" class="text-left rounded-2xl border p-4 transition-colors ${selected === s.key ? "border-gold-400/50 bg-gold-500/10" : "border-white/10 bg-white/[0.02] hover:bg-white/[0.04]"}">
+          <p class="font-display text-2xl text-ink-50 mb-1">${s.label}</p>
+          <p class="text-[11px] uppercase tracking-wide text-ink-500">${s.full}</p>
+          <p class="text-xs text-ink-400 mt-1">say "${s.say}"</p>
+        </button>`).join("")}
+    </div>`;
+  }
+
+  function cardDetailHtml(rec) {
+    const selected = A(rec, "cards").selected;
+    const s = SWARAS.find((x) => x.key === selected);
+    if (!s) return `<p class="text-sm text-ink-500">Select a card above to listen to that swara.</p>`;
+    return `
+      <p class="font-display text-xl text-ink-50 mb-1">${s.label} <span class="text-ink-500 text-sm">(${s.full})</span></p>
+      <p class="text-sm text-ink-300 mb-3">Position ${SWARAS.indexOf(s) + 1} of 7 in the sequence, ${s.semitone} semitones above your Sa.</p>
+      <div class="flex flex-wrap gap-3">
+        <button type="button" data-card-listen class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen</button>
+        <button type="button" data-card-repeat class="vr-btn">${icon("play", "w-4 h-4")} Repeat</button>
+      </div>`;
+  }
+
+  function identifyHtml(rec) {
+    const idf = A(rec, "identify");
+    const targetKey = idf.targetKey || SWARAS[Math.floor(Math.random() * SWARAS.length)].key;
+    const answered = idf.answered || null;
+    return `<div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5" data-identify>
+      <p class="text-sm text-ink-300 mb-3">Press play, then choose which swara you heard.</p>
+      <div class="flex flex-wrap gap-3 mb-4">
+        <button type="button" data-identify-play class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play a swara</button>
+        <button type="button" data-identify-new class="vr-btn">New swara</button>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        ${SWARAS.map((s) => `<button type="button" data-identify-choice="${s.key}" class="ex-chip ${answered === s.key ? "is-selected" : ""}">${s.label}</button>`).join("")}
+      </div>
+      ${answered ? `<p class="text-xs mt-2.5 ${answered === targetKey ? "text-emerald-300" : "text-amber-300"}">${answered === targetKey ? "Correct!" : `Not quite — that was ${SWARAS.find((x) => x.key === targetKey).label}.`} This is a listening exercise, not a score on your singing.</p>` : ""}
     </div>`;
   }
 
@@ -164,21 +251,6 @@ const IntroductionToSaptaSwarasLesson = (() => {
       }).join("")}
       <p class="text-xs text-ink-500">This is a quick concept check, not a vocal-performance score.</p>
     </div>`;
-  }
-
-  function problems() {
-    const items = [
-      ["Assuming Sa must match a Western 'do' or the note C", "Sa is your own chosen reference from Class 3 — every swara here is relative to it."],
-      ["Trying to learn every variety of Ri, Ga, Ma, Dha and Ni right away", "This class deliberately teaches just one common variety. Others come later, gradually."],
-      ["Singing the swaras loudly to 'get them right'", "Accuracy of the interval matters far more than volume."],
-      ["Rushing through all eight swaras quickly", "A slow, comfortable pace makes the intervals easier to hear and internalise."],
-      ["Feeling discouraged if some swaras feel less natural than others", "That's completely normal at this stage — it's awareness, not a test."],
-    ];
-    return `<div class="flex flex-col gap-2">${items.map(([t, a], i) => `
-      <details class="group rounded-2xl border border-white/5 bg-white/[0.02] px-5 py-4">
-        <summary class="cursor-pointer list-none flex items-center justify-between gap-3 text-ink-100 font-display text-lg">Mistake ${i + 1}: ${t}<span class="text-ink-500 text-sm transition-transform group-open:rotate-45">＋</span></summary>
-        <p class="text-sm text-ink-300 leading-relaxed mt-3">${a}</p>
-      </details>`).join("")}</div>`;
   }
 
   function milestone() {
@@ -200,7 +272,7 @@ const IntroductionToSaptaSwarasLesson = (() => {
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
         <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 5 — Arohana and Avarohana</p>
-        <p class="text-sm text-ink-300 leading-relaxed">The next lesson explores the same seven swaras moving upward (arohana) and back downward (avarohana).</p>
+        <p class="text-sm text-ink-300 leading-relaxed">The next lesson names today's ascending and descending movement properly and explores it further.</p>
       </div>`;
     if (status === "completed") {
       return `
@@ -246,7 +318,8 @@ const IntroductionToSaptaSwarasLesson = (() => {
     const rec = ClassActivity.get(cls.id);
     const pct = ClassProgress.percent(PROGRESS_ITEMS, rec.checkpoints);
     const b = baseNote(rec);
-    const sel = (k) => q(rec, k);
+    const growth = A(rec, "growth");
+    const c = checklist(rec);
 
     return `
     <div class="pitch-lesson">
@@ -255,63 +328,104 @@ const IntroductionToSaptaSwarasLesson = (() => {
 
       <div class="max-w-5xl mx-auto px-5 lg:px-8 py-12 flex flex-col gap-20">
 
-        ${chapter("understand", 1, "Section A — From Sa to seven swaras", `
+        ${chapter("understand", 1, "Section 1 — Meet the Sapta Swaras", `
           ${narrow(`
-            ${p("Class 3 introduced Sa — your own chosen reference pitch. This class introduces the other six named positions that, together with Sa, make up the sapta swara (\"seven swaras\") set: Sa Ri Ga Ma Pa Dha Ni, plus an upper Sa an octave above.")}
-            ${p("Every one of these is described only as a distance from your Sa — never as a fixed note like C or D.")}
+            ${p("Music is built from notes. Let's learn to recognise and sing those notes one by one.")}
+            <table class="w-full text-sm text-ink-300 mb-4"><tbody>
+              ${SWARAS.map((s) => `<tr class="border-b border-white/5"><td class="py-1.5 font-display text-ink-50">${s.label}</td><td class="py-1.5">${s.full}</td><td class="py-1.5 text-ink-500">say "${s.say}"</td></tr>`).join("")}
+            </tbody></table>
+            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-4">
+              ${["These are the seven basic swara names used in Carnatic music.", "Sa and Pa are generally treated as fixed positions relative to your chosen Sa.", "Ri, Ga, Ma, Dha and Ni each have different varieties — learned gradually in later lessons, not here.", "Different combinations and positions of swaras matter for raga formation, a later topic.", "A simple ascending or descending sequence is not automatically a complete raga.", "These names are not the same as fixed Western notes like C, D, E, F, G, A and B."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
+            </ul>
           `)}
-          ${flowStrip(["LEARN", "LISTEN", "SING", "REFLECT"])}
+          ${sequenceLadderHtml(AROHANA)}
           <div data-lesson-viewed-sentinel class="h-px"></div>
         `)}
 
-        ${chapter("swaras", 2, "Section B — The seven swaras", `
+        ${chapter("arohana", 2, "Section 2 — Understand the ascending sequence", `
           ${narrow(`
-            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-5">
-              ${["A swara is a named note position, described relative to your own Sa.", "The basic set is Sa, Ri, Ga, Ma, Pa, Dha, Ni — seven swaras — followed by an upper Sa, one octave above.", "Sa and Pa always sit in the same position relative to Sa; they have no varieties.", "Ri, Ga, Ma, Dha and Ni each have more than one possible variety in Carnatic music — mentioned here only as a concept, not taught in detail yet.", "This class uses one common beginner variety for all seven swaras, matching a familiar major-scale pattern."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
-            </ul>
+            <p class="font-display text-lg text-ink-50 mb-2">Arohana: Sa Ri Ga Ma Pa Dha Ni Sa˙</p>
+            ${p("The notes move upward from the lower Sa to the higher Sa.")}
           `)}
-          ${swaraLadderHtml()}
-          <p class="font-display text-lg text-ink-50 mb-3">A quick check</p>
-          ${knowledgeCheckHtml(rec)}
-        `)}
-
-        ${chapter("listen", 3, "Section C — Listening to the ascending swaras", `
-          ${narrow(p("Press play to hear Sa through the upper Sa, one swara at a time, built from your own reference pitch. Watch the names highlight as each one plays."))}
           <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-3">
             ${VirtualPiano.render("sw-piano", { controls: false, keyboard: true, display: true })}
           </div>
-          ${narrow(`<p class="text-sm text-ink-300 mb-5">Your Sa: <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong></p>`)}
-          <div data-swara-ladder-host>${swaraLadderHtml()}</div>
-          <div class="flex flex-wrap gap-3 mb-4">
-            <button type="button" data-play-scale class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play Sa to Sa˙</button>
+          ${narrow(`<p class="text-sm text-ink-300 mb-1">Your Sa (a visual aid only — this is the reference pitch you chose in Class 3, never a fixed Western note): <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong></p>`)}
+          <div data-arohana-ladder-host>${sequenceLadderHtml(AROHANA)}</div>
+          <div class="flex flex-wrap gap-3 mb-2">
+            <button type="button" data-play-dir="up" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play arohana</button>
           </div>
+          ${narrow(`
+            <ol class="flex flex-col gap-1.5 text-sm text-ink-300 leading-relaxed mt-3">
+              ${["Listen to the complete sequence.", "Listen again while following each swara.", "Repeat the names slowly.", "Hum the sequence using your chosen Sa as the reference.", "Repeat comfortably."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
+            </ol>
+          `)}
+          ${recCard("aroTake", "Singing arohana (ascending)", "Entirely optional.", 20)}
         `, { wide: true })}
 
-        ${chapter("sing", 4, "Section D — Singing along", `
-          ${narrow(p("Listen to the ascending swaras again, this time humming or singing along softly. Then try singing the full sequence once from memory, without the audio playing."))}
-          ${recCard("scaleTake", "Singing Sa Ri Ga Ma Pa Dha Ni Sa˙, from memory", "", 20)}
-          ${narrow(`<div class="mt-3">${skipBtn("sing")}</div>`)}
+        ${chapter("avarohana", 3, "Section 3 — Understand the descending sequence", `
+          ${narrow(`
+            <p class="font-display text-lg text-ink-50 mb-2">Avarohana: Sa˙ Ni Dha Pa Ma Ga Ri Sa</p>
+            ${p("The notes move downward from the higher Sa to the lower Sa.")}
+          `)}
+          <div data-avarohana-ladder-host>${sequenceLadderHtml(AVAROHANA)}</div>
+          <div class="flex flex-wrap gap-3 mb-2">
+            <button type="button" data-play-dir="down" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play avarohana</button>
+          </div>
+          ${narrow(p("Listen first, then try singing it slowly — there's no need to rush the descent."))}
+          ${recCard("avaTake", "Singing avarohana (descending)", "Entirely optional.", 20)}
         `)}
 
-        ${chapter("mistakes", 5, "Section E — Common beginner mistakes", problems())}
+        ${chapter("cards", 4, "Section 4 — Listen to individual swaras", `
+          ${narrow(p("Select a card to hear that swara on its own, built from your own Sa."))}
+          <div data-cards-host>${cardsHtml(rec)}</div>
+          <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 mt-4" data-card-detail-host>${cardDetailHtml(rec)}</div>
+          ${recCard("cardPractice", "Practice singing whichever swara you selected above", "Entirely optional — one shared recording slot for this section.", 15)}
+        `)}
 
-        ${chapter("reflect", 6, "Section F — Reflection", `
+        ${chapter("practice", 5, "Section 5 — Guided singing practice", `
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2">Exercise A — Sing ascending swaras</p>${p("Sa Ri Ga Ma Pa Dha Ni Sa˙ — start slowly, listen first, sing along, repeat comfortably.")}`)}
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2 mt-6">Exercise B — Sing descending swaras</p>${p("Sa˙ Ni Dha Pa Ma Ga Ri Sa — listen first, sing along, and focus on the downward movement.")}`)}
+          ${narrow(p("Both exercises reuse the arohana/avarohana playback and recordings from Sections 2 and 3 above — no need to record them twice."))}
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2 mt-6">Exercise C — Listen and identify</p>${p("A single swara will play — choose which one you heard.")}`)}
+          <div data-identify-host>${identifyHtml(rec)}</div>
+        `)}
+
+        ${chapter("quiz", 6, "Knowledge check", `
+          ${narrow(p("A quick concept check — not a vocal-performance score."))}
+          ${knowledgeCheckHtml(rec)}
+        `)}
+
+        ${chapter("reflect", 7, "Self-assessment and reflection", `
           ${narrow(`
-            <div class="flex flex-col gap-4">
-              ${SelfAssessment.render("easiest-q", { ...Q.easiest, selected: sel("easiest") })}
-              ${SelfAssessment.render("hardest-q", { ...Q.hardest, selected: sel("hardest") })}
+            ${p("A simple checklist — tick what's true for you.")}
+            <div class="flex flex-col gap-1 mb-6">
+              ${CHECKLIST_ITEMS.map((item, i) => `
+                <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">
+                  <input type="checkbox" data-checklist="${i}" ${c[i] ? "checked" : ""} class="mt-0.5 w-4 h-4 accent-amber-400 shrink-0">
+                  <span class="text-sm text-ink-200">${item.label}</span>
+                </label>`).join("")}
             </div>
+            <div><label class="block text-sm text-ink-200 mb-1.5" for="sw-reflection">Which swara was easiest for you to recognise? Which one needs more practice?</label><textarea id="sw-reflection" data-growth="reflection" rows="3" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.reflection || "")}</textarea></div>
           `)}
         `)}
 
-        ${chapter("complete", 7, "My Notes", `
+        ${chapter("complete", 8, "My Notes", `
           ${p("Your private notebook for this class. Only you can see it.")}
           ${PersonalNotes.render("notes-sw", { placeholder: "e.g. Which swaras felt easiest... Whether the upper Sa felt comfortable... What I want to try next time..." })}
         `)}
 
-        ${chapter("complete", 8, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+        ${chapter("complete", 9, "Vocal safety", `
+          ${narrow(`
+            ${p("Choose a comfortable pitch — don't force reaching a higher or lower Sa. Keep sessions short, and take breaks.")}
+            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort.")}
+            <div data-warmup-note></div>
+          `)}
+        `)}
 
-        ${chapter("complete", 9, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
+        ${chapter("complete", 10, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+
+        ${chapter("complete", 11, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
       </div>
     </div>`;
   }
@@ -334,7 +448,7 @@ const IntroductionToSaptaSwarasLesson = (() => {
     function syncCheckpoints() {
       const rec = rec0();
       Object.entries(derivedCheckpoints(rec)).forEach(([k, v]) => {
-        if (v && !rec.checkpoints[k]) ClassActivity.markCheckpoint(classId, k, true);
+        if (!!rec.checkpoints[k] !== v) ClassActivity.markCheckpoint(classId, k, v);
       });
     }
     let syncing = false;
@@ -345,6 +459,9 @@ const IntroductionToSaptaSwarasLesson = (() => {
     }));
     LessonKit.loadAndRefresh(container, classId, params);
 
+    /* ---- Exercise C: ensure a stable target exists before any interaction ---- */
+    if (!A(rec0(), "identify").targetKey) set("identify", "targetKey", SWARAS[Math.floor(Math.random() * SWARAS.length)].key);
+
     /* ---- knowledge check ---- */
     function onKcChoice(e) {
       const btn = e.target.closest("[data-kc-choice]");
@@ -352,63 +469,117 @@ const IntroductionToSaptaSwarasLesson = (() => {
       const itemEl = btn.closest("[data-kc-item]");
       const key = itemEl.dataset.kcItem;
       set("q", `kc_${key}`, btn.dataset.kcChoice);
-      syncCheckpoints();
       $("[data-kc]").outerHTML = knowledgeCheckHtml(rec0());
-      refreshLive();
     }
     container.addEventListener("click", onKcChoice);
     cleanups.push(() => container.removeEventListener("click", onKcChoice));
 
-    /* ---- Section C: piano + ascending playback ---- */
+    /* ---- Section 2: piano (visual aid) + arohana/avarohana playback ---- */
     own(VirtualPiano.wire(container, "sw-piano", {
       range: RANGE, keyboard: true,
-      onNote: ({ midi }) => { if (midi >= RANGE.from && midi <= SA_MAX) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); refreshLive(); } },
+      onNote: ({ midi }) => { if (midi >= RANGE.from && midi <= SA_MAX) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
     }));
-    function onPlayScale(e) {
-      if (!e.target.closest("[data-play-scale]")) return;
-      const b = base();
-      const host = $("[data-swara-ladder-host]");
-      PianoSynth.playSequence(SWARAS.map((s) => b + s.semitone), {
-        duration: 0.7, gap: 0.15,
-        onNote: (i) => { if (host) host.innerHTML = swaraLadderHtml(i); },
-      }).then(() => { ClassActivity.markCheckpoint(classId, "heardScaleFlag", true); syncCheckpoints(); refreshLive(); });
-    }
-    container.addEventListener("click", onPlayScale);
-    cleanups.push(() => container.removeEventListener("click", onPlayScale));
-
-    /* ---- skip buttons ---- */
-    function onSkip(e) {
-      const btn = e.target.closest("[data-skip-ex]");
+    function onPlayDir(e) {
+      const btn = e.target.closest("[data-play-dir]");
       if (!btn) return;
-      set("skip", btn.dataset.skipEx, true);
-      btn.textContent = "Skipped — that's okay";
-      btn.disabled = true;
+      const b = base();
+      const dir = btn.dataset.playDir;
+      const seq = dir === "up" ? AROHANA : AVAROHANA;
+      const host = dir === "up" ? $("[data-arohana-ladder-host]") : $("[data-avarohana-ladder-host]");
+      PianoSynth.playSequence(seq.map((s) => b + s.semitone), {
+        duration: 0.6, gap: 0.12,
+        onNote: (i) => { if (host) host.innerHTML = sequenceLadderHtml(seq, i); },
+      });
+    }
+    container.addEventListener("click", onPlayDir);
+    cleanups.push(() => container.removeEventListener("click", onPlayDir));
+
+    /* ---- recordings: arohana / avarohana / card practice ---- */
+    const NAMES = { aroTake: "Singing arohana", avaTake: "Singing avarohana", cardPractice: "Individual swara practice" };
+    const MAX_SECONDS = { aroTake: 20, avaTake: 20, cardPractice: 15 };
+    Object.keys(NAMES).forEach((k) => {
+      own(RecordingCard.wire(container, `rc-${k}`, {
+        classId, take: take(rec0(), k), maxSeconds: MAX_SECONDS[k],
+        meta: { name: `Level 2, Class 4 — ${NAMES[k]}`, exercise: `introduction-to-sapta-swaras-${k}` },
+        onSaved: (t) => { set("recs", k, t); ClassActivity.bump(classId, "recordings"); },
+      }));
+    });
+
+    /* ---- Section 4: swara cards ---- */
+    function refreshCardsHost() {
+      const host = $("[data-cards-host]");
+      if (host) host.innerHTML = cardsHtml(rec0());
+      const detail = $("[data-card-detail-host]");
+      if (detail) detail.innerHTML = cardDetailHtml(rec0());
+    }
+    function onCardSelect(e) {
+      const btn = e.target.closest("[data-swara-card]");
+      if (!btn) return;
+      set("cards", "selected", btn.dataset.swaraCard);
+      refreshCardsHost();
+    }
+    function onCardPlay(e) {
+      if (!e.target.closest("[data-card-listen]") && !e.target.closest("[data-card-repeat]")) return;
+      const selected = A(rec0(), "cards").selected;
+      const s = SWARAS.find((x) => x.key === selected);
+      if (s) PianoSynth.play(base() + s.semitone, { duration: 1.1, velocity: 0.5 });
+    }
+    container.addEventListener("click", onCardSelect);
+    container.addEventListener("click", onCardPlay);
+    cleanups.push(() => container.removeEventListener("click", onCardSelect));
+    cleanups.push(() => container.removeEventListener("click", onCardPlay));
+
+    /* ---- Exercise C: listen and identify ---- */
+    function refreshIdentifyHost() {
+      const host = $("[data-identify-host]");
+      if (host) host.innerHTML = identifyHtml(rec0());
+    }
+    function onIdentifyPlay(e) {
+      if (!e.target.closest("[data-identify-play]")) return;
+      const s = SWARAS.find((x) => x.key === A(rec0(), "identify").targetKey);
+      if (s) PianoSynth.play(base() + s.semitone, { duration: 1.1, velocity: 0.5 });
+    }
+    function onIdentifyNew(e) {
+      if (!e.target.closest("[data-identify-new]")) return;
+      set("identify", "targetKey", SWARAS[Math.floor(Math.random() * SWARAS.length)].key);
+      set("identify", "answered", null);
+      refreshIdentifyHost();
+    }
+    function onIdentifyChoice(e) {
+      const btn = e.target.closest("[data-identify-choice]");
+      if (!btn) return;
+      set("identify", "answered", btn.dataset.identifyChoice);
+      refreshIdentifyHost();
+    }
+    container.addEventListener("click", onIdentifyPlay);
+    container.addEventListener("click", onIdentifyNew);
+    container.addEventListener("click", onIdentifyChoice);
+    cleanups.push(() => container.removeEventListener("click", onIdentifyPlay));
+    cleanups.push(() => container.removeEventListener("click", onIdentifyNew));
+    cleanups.push(() => container.removeEventListener("click", onIdentifyChoice));
+
+    /* ---- growth textarea (reflection) ---- */
+    container.querySelectorAll("[data-growth]").forEach((ta) => {
+      const key = ta.dataset.growth;
+      const save = Utils.debounce((v) => set("growth", key, v), 500);
+      ta.addEventListener("input", () => save(ta.value));
+    });
+
+    /* ---- completion checklist ---- */
+    function onChecklist(e) {
+      const cb = e.target.closest("[data-checklist]");
+      if (!cb) return;
+      set("checklist", cb.dataset.checklist, cb.checked);
       syncCheckpoints(); refreshLive();
     }
-    container.addEventListener("click", onSkip);
-    cleanups.push(() => container.removeEventListener("click", onSkip));
+    container.addEventListener("change", onChecklist);
+    cleanups.push(() => container.removeEventListener("change", onChecklist));
 
-    /* ---- recordings ---- */
-    own(RecordingCard.wire(container, "rc-scaleTake", {
-      classId, take: take(rec0(), "scaleTake"), maxSeconds: 20,
-      meta: { name: "Level 2, Class 4 — Singing the swaras", exercise: "introduction-to-sapta-swaras-scaleTake" },
-      onSaved: (t) => { set("recs", "scaleTake", t); ClassActivity.bump(classId, "recordings"); syncCheckpoints(); refreshLive(); },
-    }));
-
-    /* ---- generic self-assess dispatcher ---- */
-    const assessMap = { "easiest-q": "easiest", "hardest-q": "hardest" };
-    function onAssess(e) {
-      const chip = e.target.closest("[data-assess-choice]");
-      if (!chip) return;
-      const group = chip.closest("[data-assess]");
-      const name = group && group.dataset.assess;
-      if (!name || !assessMap[name]) return;
-      group.querySelectorAll("[data-assess-choice]").forEach((x) => x.classList.toggle("is-selected", x === chip));
-      set("q", assessMap[name], chip.dataset.assessChoice);
-      syncCheckpoints(); refreshLive();
+    /* ---- Common Warm-up note (only if already unlocked) ---- */
+    const warmupHost = $("[data-warmup-note]");
+    if (warmupHost && Warmup.isUnlocked()) {
+      warmupHost.innerHTML = `<p class="text-sm text-ink-400 mt-2">You can also use the <a href="#/warmup" class="text-gold-300 hover:text-gold-200 underline">Common Warm-up</a> before practising, if that feels useful.</p>`;
     }
-    container.addEventListener("click", onAssess);
-    cleanups.push(() => container.removeEventListener("click", onAssess));
 
     /* ---- notes ---- */
     own(PersonalNotes.wire(container, "notes-sw", { classId, onSaved: (body) => { if (body.trim()) ClassActivity.markCheckpoint(classId, "notesAdded"); } }));
@@ -423,8 +594,8 @@ const IntroductionToSaptaSwarasLesson = (() => {
         classId,
         classTitle: `Level 2, Class ${cls.number} — ${cls.title}`,
         learned: "The seven swaras — Sa Ri Ga Ma Pa Dha Ni — are named positions relative to my own chosen Sa, not fixed pitches.",
-        struggled: q(rec0(), "hardest") || "",
-        toPractice: "",
+        struggled: "",
+        toPractice: A(rec0(), "growth").reflection || "",
         thoughts: "",
       });
       Router.softRefresh(container, ClassDetailPage, params);
@@ -432,7 +603,7 @@ const IntroductionToSaptaSwarasLesson = (() => {
     container.addEventListener("click", onComplete);
     cleanups.push(() => container.removeEventListener("click", onComplete));
 
-    cleanups.push(LessonKit.wireViewedSentinel(container, () => { ClassActivity.markCheckpoint(classId, "lessonViewed"); syncCheckpoints(); refreshLive(); }));
+    cleanups.push(LessonKit.wireViewedSentinel(container, () => ClassActivity.markCheckpoint(classId, "lessonViewed")));
     cleanups.push(LessonKit.wireStepper(container));
     syncCheckpoints();
 
