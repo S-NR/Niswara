@@ -51,4 +51,5 @@ const InteractiveLessons = {
   "tone-consistency-across-range": ToneConsistencyAcrossRangeLesson,
   "articulation-and-style": ArticulationAndStyleLesson,
   "vocal-endurance-foundations": VocalEnduranceFoundationsLesson,
+  "personal-vocal-style": PersonalVocalStyleLesson,
 };

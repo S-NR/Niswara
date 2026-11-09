@@ -779,13 +779,13 @@ const APP_DATA = (() => {
   }
 
   const levelClassDefs = {
-    // Classes 1-21 ("Voice Placement" ... "Vocal Endurance Foundations") are now real, authored
-    // classes. Class 21's own spec names the real Class 22 as "Personal Vocal Style", so this
-    // entry is renamed in place again, the same precedent every class since 5 has followed (apart
-    // from Class 11's one-off addition). Whether Level 2 keeps growing after Class 22 is for that
+    // Classes 1-22 ("Voice Placement" ... "Personal Vocal Style") are now real, authored classes.
+    // Class 22's own spec names the real Class 23 as "Song Practice Workshop", so this entry is
+    // renamed in place again, the same precedent every class since 5 has followed (apart from
+    // Class 11's one-off addition). Whether Level 2 keeps growing after Class 23 is for that
     // class's own spec to reveal — not guessed here.
-    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 22,
-      titles: ["Personal Vocal Style"] },
+    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 23,
+      titles: ["Song Practice Workshop"] },
     3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
       titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
@@ -1529,9 +1529,35 @@ const APP_DATA = (() => {
     }
   };
 
+  /* ---------- Level 2, Class 22 (interactive) ---------- */
+  const personalVocalStyleClass = {
+    number: 22, title: "Personal Vocal Style", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner–Intermediate", estMinutes: 18,
+    // Rendered by the interactive lesson in js/lessons/personalVocalStyle.js
+    interactive: "personal-vocal-style",
+    subtitle: "Your voice already has a style — this lesson is about noticing it, not imitating anyone else's.",
+    description: "An interactive lesson: a gentle first exploration of personal singing style. Compares the same short melody played two expressive ways, explores a natural reference tone, experiments with Gentle/Bright/Expressive approaches to a short phrase, and ends with an optional recording of a short connected-phrase exercise.",
+    content: {
+      whatYoullLearn: "That every voice has its own natural characteristics, how tone, pronunciation, phrasing, and expression contribute to singing style, that a song can be expressed many ways without changing its melody, why imitating other singers isn't the goal, and why personal style develops gradually through listening, practice, and experimentation.",
+      whyItMatters: "There's no single correct voice. Noticing your own natural tone and expressive choices — rather than measuring them against someone else's — is what lets a personal style actually develop over time.",
+      theory: "Personal vocal style is shaped by tone, pronunciation, phrasing, dynamics, and emotional expression working together, not by any one of them alone.",
+      guidedPractice: [
+        "Compared two expressive versions of the same melody, explored a natural reference tone, tried Gentle, Bright, and Expressive approaches to a short phrase, chose whichever felt most natural, and optionally recorded a short connected-phrase exercise.",
+      ],
+      assignment: {
+        instructions: [
+          "The natural-tone exploration on a comfortable note",
+          "At least one expressive version of the short phrase",
+          "The Personal Style Practice exercise, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
   const CLASSES = [
     ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
-    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass, articulationAndStyleClass, vocalEnduranceFoundationsClass].map(c => ({ ...c, levelId: 2 })),
+    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass, articulationAndStyleClass, vocalEnduranceFoundationsClass, personalVocalStyleClass].map(c => ({ ...c, levelId: 2 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
