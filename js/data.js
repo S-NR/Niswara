@@ -779,13 +779,13 @@ const APP_DATA = (() => {
   }
 
   const levelClassDefs = {
-    // Classes 1-23 ("Voice Placement" ... "Song Practice Workshop") are now real, authored classes.
-    // Class 23's own spec names the real Class 24 as "Performance Preparation", so this entry is
-    // renamed in place again, the same precedent every class since 5 has followed (apart from
-    // Class 11's one-off addition). Whether Level 2 keeps growing after Class 24 is for that
-    // class's own spec to reveal — not guessed here.
-    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 24,
-      titles: ["Performance Preparation"] },
+    // Classes 1-24 ("Voice Placement" ... "Performance Preparation") are now real, authored classes.
+    // Class 24's own spec names the real Class 25 as "Level 2 Final Assessment & Progress
+    // Recording" — previewed as Level 2's final class, though that's for Class 25's own spec to
+    // confirm, not guessed here — so this entry is renamed in place again, the same precedent
+    // every class since 5 has followed (apart from Class 11's one-off addition).
+    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 25,
+      titles: ["Level 2 Final Assessment & Progress Recording"] },
     3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
       titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
@@ -1581,9 +1581,35 @@ const APP_DATA = (() => {
     }
   };
 
+  /* ---------- Level 2, Class 24 (interactive) ---------- */
+  const performancePreparationClass = {
+    number: 24, title: "Performance Preparation", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner–Intermediate", estMinutes: 20,
+    // Rendered by the interactive lesson in js/lessons/performancePreparation.js
+    interactive: "performance-preparation",
+    subtitle: "Confidence comes from familiarity and practice, not perfection.",
+    description: "An interactive lesson: a gentle, practical preparation routine before singing a complete song or presenting it to others. Covers a body/voice warm-up, preparing the song itself, finding a comfortable starting pitch, managing nervousness, a practical run-through, and a reusable pre-performance checklist.",
+    content: {
+      whatYoullLearn: "How to prepare your voice and body before singing, how to organise a short pre-performance warm-up, how to find a comfortable starting pitch, how to prepare lyrics and musical phrases, how to manage nervousness, how to practise a complete song with confidence, and how to review a performance constructively.",
+      whyItMatters: "A short, gentle preparation routine reduces uncertainty and builds the kind of confidence that actually helps — the familiarity of having already warmed up, reviewed the song, and settled a nervous mind, not the pressure of trying to be flawless.",
+      theory: "Preparation differs from casual practice because a performance is meant to be carried through from beginning to end, so reviewing the song's structure, a comfortable starting pitch, and one's own state of mind beforehand all genuinely help.",
+      guidedPractice: [
+        "Prepared the body and voice gently, reviewed the song's structure and starting note, explored a comfortable starting pitch, practised a short mental-preparation exercise for nervousness, ran through the song with the reference, and reflected using a reusable pre-performance checklist.",
+      ],
+      assignment: {
+        instructions: [
+          "The gentle warm-up routine",
+          "A comfortable starting pitch, if comfortable",
+          "The pre-performance checklist",
+        ],
+        questions: []
+      }
+    }
+  };
+
   const CLASSES = [
     ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
-    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass, articulationAndStyleClass, vocalEnduranceFoundationsClass, personalVocalStyleClass, songPracticeWorkshopClass].map(c => ({ ...c, levelId: 2 })),
+    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass, articulationAndStyleClass, vocalEnduranceFoundationsClass, personalVocalStyleClass, songPracticeWorkshopClass, performancePreparationClass].map(c => ({ ...c, levelId: 2 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
