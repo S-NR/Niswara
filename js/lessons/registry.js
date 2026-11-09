@@ -54,4 +54,5 @@ const InteractiveLessons = {
   "personal-vocal-style": PersonalVocalStyleLesson,
   "song-practice-workshop": SongPracticeWorkshopLesson,
   "performance-preparation": PerformancePreparationLesson,
+  "level2-final-assessment": Level2FinalAssessmentLesson,
 };

@@ -779,13 +779,12 @@ const APP_DATA = (() => {
   }
 
   const levelClassDefs = {
-    // Classes 1-24 ("Voice Placement" ... "Performance Preparation") are now real, authored classes.
-    // Class 24's own spec names the real Class 25 as "Level 2 Final Assessment & Progress
-    // Recording" — previewed as Level 2's final class, though that's for Class 25's own spec to
-    // confirm, not guessed here — so this entry is renamed in place again, the same precedent
-    // every class since 5 has followed (apart from Class 11's one-off addition).
-    2: { category: "Vocal Technique", skillTag: "vocal", difficulty: "Beginner–Intermediate", startNumber: 25,
-      titles: ["Level 2 Final Assessment & Progress Recording"] },
+    // Level 2 is now complete: Classes 1-25 ("Voice Placement" ... "Level 2 Final Assessment &
+    // Progress Recording") are all real, authored classes, and Class 25's own spec confirmed it
+    // as Level 2's final class ("Do not implement Level 3"). No `2:` entry remains here — the
+    // same resolution Level 1 reached once its own 25 classes were all real (Level 1 has no entry
+    // in this object either). A possible Level 3 ("Song Mastery & Performance Development") is
+    // previewed as plain text on Class 25's completion screen only — not created here.
     3: { category: "Music Theory", skillTag: "theory", difficulty: "Intermediate",
       titles: ["Music Theory Basics", "Keyboard Fundamentals", "Scales", "Intervals", "Chords", "Harmony", "Rhythm for Musicians", "Melody Writing"] },
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
@@ -1607,9 +1606,35 @@ const APP_DATA = (() => {
     }
   };
 
+  /* ---------- Level 2, Class 25 (interactive, final class) ---------- */
+  const level2FinalAssessmentClass = {
+    number: 25, title: "Level 2 Final Assessment & Progress Recording", category: "Vocal Technique", skillTag: "vocal",
+    difficulty: "Beginner–Intermediate", estMinutes: 28,
+    // Rendered by the interactive lesson in js/lessons/level2FinalAssessment.js
+    interactive: "level2-final-assessment",
+    subtitle: "Review, practise, record a new progress sample, and reflect on the whole Level 2 journey.",
+    description: "An interactive final assessment: a concise recap of all 24 preceding classes, a short technique review, practice on the existing Song Learning song, a new Level 2 final progress recording (compared with Level 1's own final recording, if available), a gentle 12-skill self-assessment, and a celebratory Level 2 completion screen.",
+    content: {
+      whatYoullLearn: "A concise review of the techniques developed throughout Level 2, how to practise a short selection of familiar exercises, how to sing a complete familiar song, how to record and reflect on a new progress sample, how to compare it honestly with an earlier recording, and how to identify personal strengths and areas for future practice.",
+      whyItMatters: "A final progress recording — especially one that can be compared with where a learner started — makes gradual, otherwise invisible progress genuinely visible, without needing any automated scoring or analysis.",
+      theory: "Progress across a wide set of vocal skills is rarely even — some techniques become comfortable faster than others, and that unevenness is normal, not a sign of a flawed approach.",
+      guidedPractice: [
+        "Reviewed the Level 2 journey, warmed up gently, tried a short selection of technique-review exercises, practised the song from the Song Practice Workshop, recorded a new Level 2 final progress recording, compared it with Level 1's own final recording where available, completed a gentle 12-skill self-assessment, and reflected on the whole journey.",
+      ],
+      assignment: {
+        instructions: [
+          "The technique review, or as much of it as feels comfortable",
+          "At least one phrase of the practice song",
+          "The Level 2 final progress recording, if comfortable",
+        ],
+        questions: []
+      }
+    }
+  };
+
   const CLASSES = [
     ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
-    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass, articulationAndStyleClass, vocalEnduranceFoundationsClass, personalVocalStyleClass, songPracticeWorkshopClass, performancePreparationClass].map(c => ({ ...c, levelId: 2 })),
+    ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass, articulationAndStyleClass, vocalEnduranceFoundationsClass, personalVocalStyleClass, songPracticeWorkshopClass, performancePreparationClass, level2FinalAssessmentClass].map(c => ({ ...c, levelId: 2 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))
