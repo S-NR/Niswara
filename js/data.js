@@ -797,8 +797,11 @@ const APP_DATA = (() => {
     // match it rather than leaving two contradictory plans for the same level number. Class 1's
     // own spec names the real Class 2 as "Melody Analysis and Phrase Mapping", so only that single
     // title remains here — the same one-rename-at-a-time precedent every level since 2 has used.
-    3: { category: "Song Mastery", skillTag: "vocal", difficulty: "Intermediate", startNumber: 2,
-      titles: ["Melody Analysis and Phrase Mapping"] },
+    //
+    // Class 2's own spec names no next class at all (unlike every spec since Level 2 Class 5) —
+    // so there's nothing to rename this `3:` entry to yet, and it's removed entirely rather than
+    // guessed. Level 3 shows exactly its two real classes with no "Coming Soon" tile for now; a
+    // `3:` entry reappears here once a future spec actually names what Class 3 is.
     4: { category: "Recording", skillTag: "recording", difficulty: "Intermediate",
       titles: ["Microphone Technique", "Recording Fundamentals", "Editing Basics", "Comping Takes", "Pitch Correction", "Vocal Production"] },
     5: { category: "Production", skillTag: "recording", difficulty: "Intermediate",
@@ -1670,10 +1673,36 @@ const APP_DATA = (() => {
     }
   };
 
+  /* ---------- Level 3, Class 2 (interactive) ---------- */
+  const melodyAnalysisPhraseMappingClass = {
+    number: 2, title: "Melody Analysis and Phrase Mapping", category: "Song Mastery", skillTag: "vocal",
+    difficulty: "Intermediate", estMinutes: 22,
+    // Rendered by the interactive lesson in js/lessons/melodyAnalysisPhraseMapping.js
+    interactive: "melody-analysis-phrase-mapping",
+    subtitle: "Don't try to sing the entire song immediately — first understand how its melody is organised.",
+    description: "An interactive lesson: breaking a song's melody into smaller phrases before singing it. Covers what a musical phrase is, ascending/descending/repeated melody movement, listening for rhythm separately from melody, a real computed phrase-mapping table for the practice song, a guided exercise, and a short beginner-friendly knowledge check.",
+    content: {
+      whatYoullLearn: "What a musical phrase is, how to identify where a phrase begins and ends, how to recognise repeated musical patterns, how to hear whether a melody moves upward, downward, or stays on the same note, how to notice long notes, short notes, and pauses, and how to break a song into smaller sections before practising it.",
+      whyItMatters: "Trying to sing an entire song at once, without first understanding how it's organised, makes an approachable song feel much harder than it actually is.",
+      theory: "A melody phrase is a short musical idea, similar to a sentence in speech. Melody describes which notes move higher or lower; rhythm describes when and for how long those notes are sung — two separate things worth noticing on their own.",
+      guidedPractice: [
+        "Listened to short melody phrases, practised identifying ascending, descending, and repeated movement, tapped rhythm separately from melody, built a phrase-mapping table for the practice song, worked through a guided phrase-by-phrase exercise, and completed a short knowledge check.",
+      ],
+      assignment: {
+        instructions: [
+          "Identifying a few phrase boundaries by listening",
+          "Guessing a phrase's melodic movement before checking it",
+          "Tapping the rhythm of one phrase separately from its melody",
+        ],
+        questions: []
+      }
+    }
+  };
+
   const CLASSES = [
     ...[...level1, breathPhraseClass, pitchStabilityClass, smoothTransitionsClass, basicDynamicsClass, dictionClass, singingPhrasesClass, connectingPhrasesClass, musicalPhrasingClass, melodicPatternsClass, melodicMovementClass, vocalCoordinationClass, vocalAgilityClass, registerAwarenessClass, singingCompleteSongClass, foundationFinalAssessmentClass].map(c => ({ ...c, levelId: 1 })),
     ...[voicePlacementClass, resonanceClass, chestVoiceFoundationsClass, headVoiceFoundationsClass, connectingChestHeadClass, introMixedCoordinationClass, vowelModificationClass, resonanceToneColourClass, projectionWithoutPushingClass, registerTransitionsClass, controlledRangeDevelopmentClass, sustainedNotesStabilityClass, vocalDynamicsControlClass, expressiveSingingFoundationsClass, applyingVocalSkillsToSongClass, phraseShapingInterpretationClass, vocalAgilityDevelopmentClass, registerCoordinationPracticeClass, toneConsistencyAcrossRangeClass, articulationAndStyleClass, vocalEnduranceFoundationsClass, personalVocalStyleClass, songPracticeWorkshopClass, performancePreparationClass, level2FinalAssessmentClass].map(c => ({ ...c, levelId: 2 })),
-    ...[introductionToSongMasteryClass].map(c => ({ ...c, levelId: 3 })),
+    ...[introductionToSongMasteryClass, melodyAnalysisPhraseMappingClass].map(c => ({ ...c, levelId: 3 })),
     ...Object.entries(levelClassDefs).flatMap(([levelId, def]) =>
       placeholderLevel(Number(levelId), def.category, def.skillTag, def.titles, def.difficulty, def.startNumber || 1)
         .map(c => ({ ...c, levelId: Number(levelId) }))

@@ -56,4 +56,5 @@ const InteractiveLessons = {
   "performance-preparation": PerformancePreparationLesson,
   "level2-final-assessment": Level2FinalAssessmentLesson,
   "introduction-to-song-mastery": IntroductionToSongMasteryLesson,
+  "melody-analysis-phrase-mapping": MelodyAnalysisPhraseMappingLesson,
 };
