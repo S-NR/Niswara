@@ -1,60 +1,48 @@
 /* ============================================================
-   LEVEL 2, CLASS 3 — CHEST VOICE FOUNDATIONS (interactive lesson)
+   LEVEL 2, CLASS 7 — CHEST VOICE FOUNDATIONS (interactive lesson)
 
    Rendered by ClassDetailPage for interactive: "chest-voice-foundations".
 
-   Curriculum identity: Level 2, Class 3 (`number: 3`, `levelId: 2`
-   in data.js, id `L2C03`). Same mechanism Classes 1 and 2 (Voice
-   Placement, Resonance) already proved twice over — `LessonKit
-   .header()` renders "LEVEL {levelId} · CLASS {number}" directly,
-   no special-casing. Its 7 remaining "Vocal Technique" siblings
-   (Head Voice through First Performance Assessment) remain
-   untouched `comingSoon` placeholders, renumbered 4-10.
+   Curriculum identity: Level 2, Class 7 (`number: 7`, `levelId: 2`
+   in data.js, explicit id `L2C03` — unchanged since the Level 2
+   Curriculum Upgrade, which moved this class from old number 3 to
+   new number 7 without touching its id). Rebuilt against this
+   class's own later, more detailed "Claude Prompt" spec (a dedicated
+   speaking-voice recognition section, three named gentle exercises
+   A/B/C, a 4-row chest-voice-vs-shouting table, a separate listen-
+   and-observe section, a 6-step self-practice routine, a 5-question
+   knowledge check, and a 6-item checklist) — supersedes the shorter
+   version first written earlier in the project.
 
-   Core idea: "Chest voice is a commonly used term for a vocal
-   coordination often associated with comfortable speaking and
-   lower-to-middle singing pitches... The name does not mean that
-   sound is produced only in the chest. There is no need to search
-   for a particular physical sensation or force the voice to feel a
-   certain way." Same gentle, 10-15 minute pacing as Classes 1-2 —
-   no chest/head/mixed classification claims, no forced low notes.
+   Core idea: "Chest voice should feel natural and comfortable, not
+   pushed or shouted." Chest voice is a name for a vocal coordination
+   commonly associated with comfortable speaking and lower-to-middle
+   pitches — not a sensation to search for, not the same as shouting,
+   and not something every singer feels identically.
 
-   Honesty boundaries, matching every earlier class: no fabricated
-   vocal analysis; completion never depends on recording quality,
-   pitch accuracy, or finishing every optional exercise (the spec
-   says this explicitly, in those words).
-
-   Unlike Classes 1 and 2, this spec's Section I is phrased as plain,
-   literal first-person self-attestations ("I understand...", "I
-   explored...", "I tried...", "I avoided...", "I recorded... or
-   chose not to") rather than exercise-derived checkpoints. Rather
-   than infer these from deep exercise-completion logic (Class 1 and
-   2's approach), this file takes the spec at its word: Section I is
-   five plain checkboxes the learner ticks themselves — the same
-   manual self-report pattern Class 10's `PRE_CHECK_ITEMS` already
-   established — which is also the most literal reading of "Keep
-   recording optional... Completion must not depend on... completing
-   every optional exercise." The six lettered exercise sections
-   (A-F) are still fully built per the spec; they just don't gate
-   completion the way Classes 1-2's exercises did.
+   Honesty boundaries this spec asks for explicitly: no fabricated
+   vocal analysis or automatic register identification; Section 5
+   ("Listen and observe") never asks the learner to diagnose their
+   own register solely by listening — it only asks them to notice
+   tone, comfort, loudness and pressed-ness, framed as awareness, not
+   diagnosis. No professionally-recorded comparison audio exists in
+   this project, so Section 5 reuses the learner's OWN Section 3
+   recordings rather than fabricating or implying a studio reference
+   demonstration.
 
    Reuses: LessonKit (+ its automatic Warm-up card), VirtualPiano
-   (Class 3), RecordingCard (Class 5), SelfAssessment (Class 4),
-   PersonalNotes, ClassProgress. The "skip this exercise" button and
-   the Section G "reuse earlier recordings instead of asking again"
-   pattern are both reused exactly as Classes 1-2 established them.
+   (Class 3), RecordingCard (Class 5), PersonalNotes, ClassProgress.
    ============================================================ */
 
 const ChestVoiceFoundationsLesson = (() => {
   const STAGES = [
     { id: "understand", label: "Understand" },
-    { id: "listen", label: "Listen" },
-    { id: "hum", label: "Hum" },
-    { id: "vowel", label: "Vowel" },
-    { id: "pitch", label: "Pitch" },
+    { id: "recognise", label: "Recognise" },
+    { id: "exercises", label: "Exercises" },
     { id: "compare", label: "Compare" },
-    { id: "record", label: "Record" },
-    { id: "mistakes", label: "Mistakes" },
+    { id: "listen", label: "Listen" },
+    { id: "practice", label: "Practice" },
+    { id: "quiz", label: "Quiz" },
     { id: "reflect", label: "Reflect" },
     { id: "complete", label: "Complete" },
   ];
@@ -63,27 +51,72 @@ const ChestVoiceFoundationsLesson = (() => {
   const STEP = 2;
   const GREETING = "Hello, how are you?";
 
+  const KNOWLEDGE_CHECK = [
+    {
+      key: "associated",
+      question: "What is chest voice commonly associated with?",
+      options: [
+        { value: "shout", label: "Shouting as loudly as possible", correct: false },
+        { value: "speaking", label: "Comfortable speaking and lower-to-middle singing pitches", correct: true },
+        { value: "highest", label: "The highest notes in your range", correct: false },
+      ],
+      explain: { shout: "Not quite — chest voice has nothing to do with shouting.", speaking: "Exactly right.", highest: "Not quite — that's a different part of the range." },
+    },
+    {
+      key: "literalChest",
+      question: "Does chest voice mean the sound physically originates in the chest?",
+      options: [
+        { value: "yes", label: "Yes, exactly in the chest", correct: false },
+        { value: "no", label: "No — it's a name for a coordination, not a literal location", correct: true },
+        { value: "some", label: "Only for some singers", correct: false },
+      ],
+      explain: { yes: "Not quite — the name doesn't describe a literal sound source.", no: "Right.", some: "Not quite — this is true for every singer, not just some." },
+    },
+    {
+      key: "shoutingSame",
+      question: "Is shouting the same as chest voice?",
+      options: [
+        { value: "yes", label: "Yes, they're identical", correct: false },
+        { value: "no", label: "No — shouting is forceful and strained; chest voice is relaxed and controlled", correct: true },
+        { value: "louder", label: "Shouting is just a louder version of it", correct: false },
+      ],
+      explain: { yes: "Not quite — they're quite different.", no: "Exactly right.", louder: "Not quite — the difference is comfort and control, not just volume." },
+    },
+    {
+      key: "forced",
+      question: "Should chest voice exercises feel forced?",
+      options: [
+        { value: "yes", label: "Yes, a little forcing helps develop it", correct: false },
+        { value: "no", label: "No — they should feel natural and comfortable", correct: true },
+        { value: "sometimes", label: "Only on lower notes", correct: false },
+      ],
+      explain: { yes: "Not quite — forcing works against comfortable coordination.", no: "Right.", sometimes: "Not quite — comfort matters at every pitch." },
+    },
+    {
+      key: "vibrationReliable",
+      question: "Can vibration sensations alone reliably identify a vocal register?",
+      options: [
+        { value: "yes", label: "Yes, vibration always confirms the register", correct: false },
+        { value: "no", label: "No — sensations vary between people and aren't a reliable test", correct: true },
+        { value: "unsure", label: "This hasn't been mentioned in this course", correct: false },
+      ],
+      explain: { yes: "Not quite — sensations genuinely differ between singers.", no: "Exactly right.", unsure: "It has — Section 1 says this explicitly." },
+    },
+  ];
+
   const CHECKLIST_ITEMS = [
-    { key: "understood", label: "I understand the basic idea of chest voice." },
-    { key: "speakingExplored", label: "I explored a comfortable speaking voice." },
-    { key: "hummed", label: "I tried a gentle voiced sound, or chose to skip it." },
-    { key: "avoidedForcing", label: "I avoided forcing loudness and low pitches." },
-    { key: "recorded", label: "I recorded a sample, or chose not to record." },
+    { key: "understood", label: "I understand what chest voice means." },
+    { key: "recogniseSpeaking", label: "I can recognise my comfortable speaking voice." },
+    { key: "humGently", label: "I can hum gently." },
+    { key: "speechLikeWithoutPushing", label: "I can explore speech-like singing without pushing." },
+    { key: "understandShoutingDiff", label: "I understand the difference between chest-dominant singing and shouting." },
+    { key: "recogniseRestNeeded", label: "I can recognise when my voice needs rest." },
   ];
   const PROGRESS_ITEMS = CHECKLIST_ITEMS;
-
-  const opt = (value, label, tone = "neutral") => ({ value, label, tone });
-  const Q = {
-    speakingCheck: { question: "How did that feel?", options: [opt("comfortable", "Comfortable", "good"), opt("effortful", "Slightly effortful", "maybe"), opt("unsure", "Not sure")] },
-    mostComfortableSound: { question: "Which sound felt most comfortable?", options: [opt("speak", "Speaking"), opt("hum", "Gentle “mmm”"), opt("mmmah", "“mmm-ah”"), opt("notsure", "Not sure")] },
-    tensionNoticed: { question: "Did I notice any throat, jaw, or neck tension?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
-    triedLouderDeeper: { question: "Did I try to make my voice louder or deeper?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
-  };
 
   const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
   const { p, narrow } = LessonKit;
   const A = (rec, g) => rec.answers[g] || {};
-  const filled = (v) => v && String(v).trim();
   const N = (m) => NoteUtils.name(m);
 
   function baseNote(rec) {
@@ -119,17 +152,35 @@ const ChestVoiceFoundationsLesson = (() => {
   const skipBtn = (k, label = "Skip this exercise") => `<button type="button" data-skip-ex="${k}" class="text-xs text-ink-500 hover:text-ink-300 underline">${label}</button>`;
 
   function compareHtml() {
-    return `<div class="grid sm:grid-cols-2 gap-4">
-      <div class="rounded-2xl border border-emerald-400/15 bg-emerald-500/[0.04] p-5">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-emerald-300 mb-3">Comfortable chest-voice exploration</p>
-        <ul class="flex flex-col gap-2 text-sm text-ink-200">${["Easy, speech-like sound", "Relaxed jaw and throat", "Comfortable breathing", "No need for extra loudness"].map((t) => `<li class="flex gap-2"><span class="text-emerald-300">✓</span>${t}</li>`).join("")}</ul>
-      </div>
-      <div class="rounded-2xl border border-amber-400/15 bg-amber-500/[0.04] p-5">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-amber-300 mb-3">What to avoid</p>
-        <ul class="flex flex-col gap-2 text-sm text-ink-200">${["Shouting to make the voice sound stronger", "Pushing the voice down to sound deeper", "Tightening the neck or jaw", "Holding the breath", "Continuing through pain or discomfort"].map((t) => `<li class="flex gap-2"><span class="text-amber-300">✕</span>${t}</li>`).join("")}</ul>
-      </div>
-    </div>
-    <p class="text-xs text-ink-500 mt-3">These are beginner observations, not a diagnosis of your vocal technique.</p>`;
+    const rows = [
+      ["Relaxed and controlled", "Often forceful"],
+      ["Comfortable volume", "Excessive loudness"],
+      ["Clear sound", "Can sound strained"],
+      ["Easy to repeat", "May cause fatigue"],
+    ];
+    return `
+      <table class="w-full text-sm text-ink-300 mb-3"><tbody>
+        <tr class="border-b border-white/5"><td class="py-2"></td><td class="py-2 font-display text-emerald-300">Comfortable chest-dominant singing</td><td class="py-2 font-display text-amber-300">Shouting</td></tr>
+        ${rows.map(([a, b]) => `<tr class="border-b border-white/5"><td class="py-2 text-ink-500"></td><td class="py-2">${a}</td><td class="py-2">${b}</td></tr>`).join("")}
+      </tbody></table>
+      <p class="text-xs text-ink-500">Loudness alone does not identify chest voice. These are beginner observations, not a diagnosis of your vocal technique.</p>`;
+  }
+
+  function knowledgeCheckHtml(rec) {
+    return `<div class="flex flex-col gap-5" data-kc>
+      ${KNOWLEDGE_CHECK.map((item) => {
+        const selected = q(rec, `kc_${item.key}`);
+        return `
+        <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-4" data-kc-item="${item.key}">
+          <p class="text-sm text-ink-200 mb-2.5">${item.question}</p>
+          <div class="flex flex-wrap gap-2">
+            ${item.options.map((o) => `<button type="button" data-kc-choice="${o.value}" class="ex-chip ${selected === o.value ? "is-selected" : ""}">${o.label}</button>`).join("")}
+          </div>
+          ${selected ? `<p class="text-xs mt-2.5 ${item.options.find((o) => o.value === selected).correct ? "text-emerald-300" : "text-amber-300"}">${item.explain[selected]}</p>` : ""}
+        </div>`;
+      }).join("")}
+      <p class="text-xs text-ink-500">This is a quick concept check, not a vocal-performance score.</p>
+    </div>`;
   }
 
   function problems() {
@@ -147,10 +198,10 @@ const ChestVoiceFoundationsLesson = (() => {
       </details>`).join("")}</div>`;
   }
 
-  function recordReviewHtml(rec) {
-    const sources = [["speakGreeting", "Greeting"], ["humTake", "Gentle “mmm”"], ["mmmAhTake", "“mmm-ah”"]];
+  function reviewHtml(rec) {
+    const sources = [["speakGreeting", "Speaking the greeting"], ["humTake", "Comfortable humming"], ["speechToSongTake", "Speech-to-song"], ["gentleNotesTake", "Gentle short notes"]];
     const present = sources.filter(([k]) => take(rec, k));
-    if (!present.length) return `<p class="text-sm text-ink-500">Record the greeting, hum or “mmm-ah” above — then come back here to listen and reflect.</p>`;
+    if (!present.length) return `<p class="text-sm text-ink-500">Record any of the Section 3 exercises above, then come back here to listen and notice.</p>`;
     return `<div class="flex flex-wrap gap-2">${present.map(([k, label]) => `<button type="button" data-play-review="${k}" class="vr-btn">${icon("play", "w-3.5 h-3.5")} ${label}</button>`).join("")}</div>`;
   }
 
@@ -182,7 +233,7 @@ const ChestVoiceFoundationsLesson = (() => {
           ${milestone()}
           <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.05] p-6 sm:p-8 text-center">
             <p class="text-[11px] tracking-[0.25em] uppercase text-emerald-300 mb-2">Class complete</p>
-            <h3 class="font-display text-2xl text-ink-50 mb-5">A comfortable, speech-like vocal quality — no forcing, no searching for a sensation.</h3>
+            <h3 class="font-display text-2xl text-ink-50 mb-5">Chest voice should feel natural and comfortable, not pushed or shouted.</h3>
             <ul class="inline-flex flex-col gap-2 text-left mx-auto">${lines}</ul>
             ${preview}
             ${next ? `
@@ -220,7 +271,6 @@ const ChestVoiceFoundationsLesson = (() => {
     const rec = ClassActivity.get(cls.id);
     const pct = ClassProgress.percent(PROGRESS_ITEMS, rec.checkpoints);
     const b = baseNote(rec);
-    const sel = (k) => q(rec, k);
     const growth = A(rec, "growth");
     const c = checklist(rec);
 
@@ -231,95 +281,103 @@ const ChestVoiceFoundationsLesson = (() => {
 
       <div class="max-w-5xl mx-auto px-5 lg:px-8 py-12 flex flex-col gap-20">
 
-        ${chapter("understand", 1, "Section A — Welcome and preparation", `
+        ${chapter("understand", 1, "Section 1 — What is chest voice?", `
           ${narrow(`
-            ${p("Chest voice is a commonly used term for a vocal coordination often associated with comfortable speaking and lower-to-middle singing pitches.")}
-            ${p("Some singers notice vibration or resonance sensations around the chest, but these sensations differ between people. The name does not mean sound is produced only in the chest.")}
-            ${p("There is no need to search for a particular physical sensation or force the voice to feel a certain way. Sit or stand comfortably, relax your jaw and shoulders, and use your normal speaking volume.")}
+            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-4">
+              ${["Chest voice is commonly used in speaking and in many lower-to-middle singing notes.", "It often produces a fuller, speech-like sound.", "The term describes a vocal register or coordination — not sound physically originating in the chest.", "Some singers feel vibration around the chest, but this sensation is not a reliable test of register."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
+            </ul>
+            ${p("There's a real difference between comfortable chest-dominant singing, shouting, and pressing or forcing the voice — this class explores the first, and avoids the other two.")}
           `)}
-          ${flowStrip(["LISTEN", "EXPLORE", "COMPARE", "REFLECT"])}
+          ${flowStrip(["RECOGNISE", "EXPLORE", "COMPARE", "REFLECT"])}
           <div data-lesson-viewed-sentinel class="h-px"></div>
         `)}
 
-        ${chapter("listen", 2, "Section B — Listen to your speaking voice", `
+        ${chapter("recognise", 2, "Section 2 — Recognising your comfortable speaking voice", `
           ${narrow(`
+            <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-4">
+              ${["Relax the shoulders and jaw.", "Speak a short, comfortable sentence.", "Notice the natural pitch and tone.", "Repeat the sentence gently.", "Transition into a soft, comfortable hum."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
+            </ol>
             <p class="dc-lyric font-display text-2xl sm:text-3xl text-ink-50 my-3">“${GREETING}”</p>
-            ${p("Say it in a comfortable speaking voice, then repeat it naturally without deliberately making the voice deeper or louder. Notice whether the sound feels easy, strained, breathy or pressed. Rest briefly.")}
+            <p class="text-xs text-ink-500 mb-4">This is an awareness exercise, not a test of vocal range.</p>
           `)}
-          ${recCard("speakGreeting", "Say the greeting", "", 10)}
-          ${narrow(`<div class="mt-4">${SelfAssessment.render("speakingCheck-q", { ...Q.speakingCheck, selected: sel("speakingCheck") })}</div>`)}
+          ${recCard("speakGreeting", "Say the greeting, then a soft hum", "", 15)}
         `)}
 
-        ${chapter("hum", 3, "Section C — Gentle voiced sound", `
-          ${narrow(`
-            ${p("An ordinary, comfortable breath. Say “mmm” as if naturally acknowledging something pleasant — quiet and easy for about 2–3 seconds. Rest and repeat up to three times if comfortable.")}
-            <p class="text-xs text-ink-500 mb-4">The purpose is to explore an easy voiced sound — not to make it louder, deeper or more resonant. Stop if the throat feels tight.</p>
-          `)}
-          ${recCard("humTake", "Gentle “mmm”", "", 15)}
-          ${narrow(`<div class="mt-3">${skipBtn("hum")}</div>`)}
-        `)}
-
-        ${chapter("vowel", 4, "Section D — Speaking into a simple vowel", `
-          ${narrow(`
-            ${p("Say “mmm,” then gently open into “ah” — “mmm-ah.” Keep the pitch near your comfortable speaking range. Repeat only two or three times, resting between attempts, and compare the transition with ordinary speech.")}
-            <p class="text-xs text-ink-500 mb-4">Don't push the sound downward or hold the vowel for as long as possible. If “ah” feels uncomfortable, return to normal speech or skip this exercise.</p>
-          `)}
-          ${recCard("mmmAhTake", "“mmm-ah”", "", 12)}
-          ${narrow(`<div class="mt-3">${skipBtn("vowel")}</div>`)}
-        `)}
-
-        ${chapter("pitch", 5, "Section E — Gentle pitch exploration", `
-          ${narrow(p("One comfortable reference note at a time — listen before attempting to imitate it. Matching the note is optional, and comfortable pitches differ between voices, so explore only a small, comfortable range. Never force a low note or imitate one that feels uncomfortable."))}
+        ${chapter("exercises", 3, "Section 3 — Gentle chest-dominant exercises", `
+          ${narrow(p("Exercises B and C use the same comfortable mid-range pitch — choose one on the piano below."))}
           <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-3">
             ${VirtualPiano.render("cv-piano", { controls: false, keyboard: true, display: true })}
           </div>
           ${narrow(`<p class="text-sm text-ink-300 mb-5">Your note: <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong></p>`)}
-          <div class="flex flex-wrap gap-3 mb-4">
+          <div class="flex flex-wrap gap-3 mb-6">
             <button type="button" data-play-pitch="base" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Reference note</button>
           </div>
-          ${recCard("pitchTake", "Hum or imitate the note, if comfortable", "Entirely optional.", 12)}
-          ${narrow(`<div class="mt-3">${skipBtn("pitch")}</div>`)}
+
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2">Exercise A — Comfortable humming</p>${p("Hum gently at a comfortable pitch. Keep the jaw and throat relaxed. Stop before any feeling of pressure develops.")}`)}
+          ${recCard("humTake", "Gentle humming", "", 15)}
+          ${narrow(`<div class="mt-2 mb-8">${skipBtn("hum")}</div>`)}
+
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2">Exercise B — Speech-to-song</p>${p("Speak the greeting naturally, then repeat it on your comfortable single pitch. Avoid making the sound louder or heavier.")}`)}
+          ${recCard("speechToSongTake", "The greeting, spoken then sung on one pitch", "", 15)}
+          ${narrow(`<div class="mt-2 mb-8">${skipBtn("speechToSong")}</div>`)}
+
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2">Exercise C — Gentle short notes</p>${p("On your comfortable mid-range pitch, sing a short “ma” or “mum” sound gently. Repeat only a few times.")}`)}
+          ${recCard("gentleNotesTake", "A gentle “ma” or “mum”", "", 12)}
+          ${narrow(`<div class="mt-2">${skipBtn("gentleNotes")}</div>`)}
         `, { wide: true })}
 
-        ${chapter("compare", 6, "Section F — Understand the difference", compareHtml())}
+        ${chapter("compare", 4, "Section 4 — Chest voice versus shouting", compareHtml())}
 
-        ${chapter("record", 7, "Section G — Listen back and reflect", `
-          ${narrow(p("Listen back to your greeting, hum and “mmm-ah” from above, and reflect honestly. Recording is optional throughout — nothing here is automatically analyzed."))}
-          <div data-review-host>${recordReviewHtml(rec)}</div>
+        ${chapter("listen", 5, "Section 5 — Listen and observe", `
+          ${narrow(p("No studio comparison recording exists in this app — instead, listen back to your own Section 3 exercises above and simply notice:"))}
+          <div data-review-host>${reviewHtml(rec)}</div>
           ${narrow(`
-            <div class="flex flex-col gap-4 mt-5">
-              ${SelfAssessment.render("mostComfortableSound-q", { ...Q.mostComfortableSound, selected: sel("mostComfortableSound") })}
-              ${SelfAssessment.render("tensionNoticed-q", { ...Q.tensionNoticed, selected: sel("tensionNoticed") })}
-              ${SelfAssessment.render("triedLouderDeeper-q", { ...Q.triedLouderDeeper, selected: sel("triedLouderDeeper") })}
-              <div><label class="block text-sm text-ink-200 mb-1.5" for="cv-again">What would I like to explore again?</label><textarea id="cv-again" data-growth="exploreAgain" rows="2" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.exploreAgain || "")}</textarea></div>
-            </div>
+            <ul class="flex flex-col gap-1.5 text-sm text-ink-300 leading-relaxed mt-4 mb-3">
+              ${["Tone quality.", "Comfort.", "Loudness.", "Whether the sound feels pressed."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
+            </ul>
+            <p class="text-xs text-ink-500">This is awareness, not diagnosis — this class never asks you to determine your own vocal register just by listening.</p>
           `)}
         `)}
 
-        ${chapter("mistakes", 8, "Section H — Common beginner mistakes", problems())}
-
-        ${chapter("reflect", 9, "Section I — Personal reflection and completion", `
+        ${chapter("practice", 6, "Section 6 — Practical self-practice", `
           ${narrow(`
-            ${p("A simple end-of-class checklist — tick what's true for you. Completion doesn't depend on perfect pitch, a successful recording, or finishing every optional exercise.")}
-            <div class="flex flex-col gap-1 mb-5">
+            <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-4">
+              ${["Relax the body.", "Speak naturally.", "Hum gently.", "Try a comfortable speech-like sung phrase.", "Rest.", "Reflect on whether the sound remained easy and comfortable."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
+            </ol>
+          `)}
+          ${recCard("practiceRoutineTake", "The self-practice routine", "Entirely optional.", 20)}
+        `)}
+
+        ${chapter("quiz", 7, "Knowledge check", `
+          ${narrow(p("A quick concept check — not a vocal-performance score."))}
+          ${knowledgeCheckHtml(rec)}
+        `)}
+
+        ${chapter("reflect", 8, "Self-assessment and reflection", `
+          ${narrow(`
+            ${p("A simple checklist — tick what's true for you. Completion doesn't depend on perfect pitch, a successful recording, or finishing every optional exercise.")}
+            <div class="flex flex-col gap-1 mb-6">
               ${CHECKLIST_ITEMS.map((item, i) => `
                 <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">
                   <input type="checkbox" data-checklist="${i}" ${c[i] ? "checked" : ""} class="mt-0.5 w-4 h-4 accent-amber-400 shrink-0">
                   <span class="text-sm text-ink-200">${item.label}</span>
                 </label>`).join("")}
             </div>
+            <div><label class="block text-sm text-ink-200 mb-1.5" for="cv-reflection">Did your comfortable speech-like singing feel different from your usual speaking voice? Did you notice any tension or pressure?</label><textarea id="cv-reflection" data-growth="reflection" rows="3" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.reflection || "")}</textarea></div>
           `)}
         `)}
 
+        ${chapter("complete", 9, "Common beginner mistakes", problems())}
+
         ${chapter("complete", 10, "My Notes", `
           ${p("Your private notebook for this class. Only you can see it.")}
-          ${PersonalNotes.render("notes-cv", { placeholder: "e.g. How the greeting felt compared to “mmm”... Any tension I noticed... What I want to try next time..." })}
+          ${PersonalNotes.render("notes-cv", { placeholder: "e.g. How the greeting felt compared to humming... Any tension I noticed... What I want to try next time..." })}
         `)}
 
-        ${chapter("complete", 11, "Section J — Optional home practice", `
+        ${chapter("complete", 11, "Vocal safety", `
           ${narrow(`
-            ${p("About 2–3 optional minutes: say one short sentence naturally, try two comfortable “mmm-ah” repetitions, rest, and write down one observation. No need to practise daily or through discomfort.")}
-            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort.")}
+            ${p("Never shout. Don't force low notes, and don't increase volume to imitate anything. Encourage gentle practice and breaks.")}
+            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort. If discomfort continues, seek advice from a qualified voice professional or healthcare professional.")}
             <div data-warmup-note></div>
           `)}
         `)}
@@ -360,7 +418,19 @@ const ChestVoiceFoundationsLesson = (() => {
     }));
     LessonKit.loadAndRefresh(container, classId, params);
 
-    /* ---- Section E: piano + playback ---- */
+    /* ---- knowledge check ---- */
+    function onKcChoice(e) {
+      const btn = e.target.closest("[data-kc-choice]");
+      if (!btn) return;
+      const itemEl = btn.closest("[data-kc-item]");
+      const key = itemEl.dataset.kcItem;
+      set("q", `kc_${key}`, btn.dataset.kcChoice);
+      $("[data-kc]").outerHTML = knowledgeCheckHtml(rec0());
+    }
+    container.addEventListener("click", onKcChoice);
+    cleanups.push(() => container.removeEventListener("click", onKcChoice));
+
+    /* ---- Section 3: piano + playback ---- */
     own(VirtualPiano.wire(container, "cv-piano", {
       range: RANGE, keyboard: true,
       onNote: ({ midi }) => { if (midi + STEP <= RANGE.to) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
@@ -386,15 +456,15 @@ const ChestVoiceFoundationsLesson = (() => {
     /* ---- recordings ---- */
     function refreshReviewHost() {
       const host = $("[data-review-host]");
-      if (host) host.innerHTML = recordReviewHtml(rec0());
+      if (host) host.innerHTML = reviewHtml(rec0());
     }
-    const NAMES = { speakGreeting: "Greeting", humTake: "Gentle “mmm”", mmmAhTake: "“mmm-ah”", pitchTake: "Pitch exploration" };
-    const MAX_SECONDS = { speakGreeting: 10, humTake: 15, mmmAhTake: 12, pitchTake: 12 };
-    const REVIEW_SOURCE_KEYS = ["speakGreeting", "humTake", "mmmAhTake"];
+    const NAMES = { speakGreeting: "Greeting and hum", humTake: "Comfortable humming", speechToSongTake: "Speech-to-song", gentleNotesTake: "Gentle short notes", practiceRoutineTake: "Self-practice routine" };
+    const MAX_SECONDS = { speakGreeting: 15, humTake: 15, speechToSongTake: 15, gentleNotesTake: 12, practiceRoutineTake: 20 };
+    const REVIEW_SOURCE_KEYS = ["speakGreeting", "humTake", "speechToSongTake", "gentleNotesTake"];
     Object.keys(NAMES).forEach((k) => {
       own(RecordingCard.wire(container, `rc-${k}`, {
         classId, take: take(rec0(), k), maxSeconds: MAX_SECONDS[k],
-        meta: { name: `Level 2, Class 3 — ${NAMES[k]}`, exercise: `chest-voice-${k}` },
+        meta: { name: `Level 2, Class 7 — ${NAMES[k]}`, exercise: `chest-voice-${k}` },
         onSaved: (t) => {
           set("recs", k, t); ClassActivity.bump(classId, "recordings");
           if (REVIEW_SOURCE_KEYS.includes(k)) refreshReviewHost();
@@ -402,7 +472,7 @@ const ChestVoiceFoundationsLesson = (() => {
       }));
     });
 
-    /* ---- Section G: play-to-review ---- */
+    /* ---- Section 5: play-to-review ---- */
     function onPlayReview(e) {
       const btn = e.target.closest("[data-play-review]");
       if (!btn) return;
@@ -412,33 +482,17 @@ const ChestVoiceFoundationsLesson = (() => {
     container.addEventListener("click", onPlayReview);
     cleanups.push(() => container.removeEventListener("click", onPlayReview));
 
-    /* ---- generic self-assess dispatcher ---- */
-    const assessMap = { "speakingCheck-q": "speakingCheck", "mostComfortableSound-q": "mostComfortableSound", "tensionNoticed-q": "tensionNoticed", "triedLouderDeeper-q": "triedLouderDeeper" };
-    function onAssess(e) {
-      const chip = e.target.closest("[data-assess-choice]");
-      if (!chip) return;
-      const group = chip.closest("[data-assess]");
-      const name = group && group.dataset.assess;
-      if (!name || !assessMap[name]) return;
-      group.querySelectorAll("[data-assess-choice]").forEach((x) => x.classList.toggle("is-selected", x === chip));
-      set("q", assessMap[name], chip.dataset.assessChoice);
-    }
-    container.addEventListener("click", onAssess);
-    cleanups.push(() => container.removeEventListener("click", onAssess));
-
-    /* ---- growth textarea ---- */
+    /* ---- growth textarea (reflection) ---- */
     container.querySelectorAll("[data-growth]").forEach((ta) => {
       const key = ta.dataset.growth;
       const save = Utils.debounce((v) => set("growth", key, v), 500);
       ta.addEventListener("input", () => save(ta.value));
     });
 
-    /* ---- Section I: completion checklist ---- */
+    /* ---- completion checklist ---- */
     function onChecklist(e) {
       const cb = e.target.closest("[data-checklist]");
       if (!cb) return;
-      const list = { ...checklist(rec0()) };
-      list[cb.dataset.checklist] = cb.checked;
       set("checklist", cb.dataset.checklist, cb.checked);
       syncCheckpoints(); refreshLive();
     }
@@ -458,15 +512,14 @@ const ChestVoiceFoundationsLesson = (() => {
     function onComplete(e) {
       const btn = e.target.closest("[data-complete-class]");
       if (!btn || btn.disabled) return;
-      const rec = rec0();
       Store.completeClass(classId);
       ClassActivity.markCompleted(classId);
       Store.addJournalEntry({
         classId,
         classTitle: `Level 2, Class ${cls.number} — ${cls.title}`,
         learned: "Chest voice is just a comfortable, speech-like coordination — not a sensation to chase or a reason to force volume or low pitches.",
-        struggled: q(rec, "tensionNoticed") === "yes" || q(rec, "tensionNoticed") === "alittle" ? "Some throat/jaw/neck tension noticed." : "",
-        toPractice: A(rec, "growth").exploreAgain || "",
+        struggled: "",
+        toPractice: A(rec0(), "growth").reflection || "",
         thoughts: "",
       });
       Router.softRefresh(container, ClassDetailPage, params);

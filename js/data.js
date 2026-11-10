@@ -1155,22 +1155,23 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 7 (interactive) ---------- */
   const chestVoiceFoundationsClass = {
     number: 7, id: "L2C03", section: "Vocal Technique Development", title: "Chest Voice Foundations", category: "Vocal Technique", skillTag: "vocal",
-    difficulty: "Beginner", estMinutes: 15,
+    difficulty: "Beginner", estMinutes: 27,
     // Rendered by the interactive lesson in js/lessons/chestVoiceFoundations.js
     interactive: "chest-voice-foundations",
-    subtitle: "Explore a comfortable, speech-like vocal quality — no forcing, no searching for a sensation.",
-    description: "An interactive lesson: chest voice as a comfortable, speech-like vocal coordination — not a sensation to find, and not the same as shouting, speaking loudly, or forcing low notes. Gentle humming, a simple vowel, and optional pitch exploration.",
+    subtitle: "Chest voice should feel natural and comfortable, not pushed or shouted.",
+    description: "An interactive lesson: chest voice as a comfortable, speech-like vocal coordination — not a sensation to find, and not the same as shouting, speaking loudly, or forcing low notes. A speaking-voice awareness exercise, three gentle chest-dominant exercises, a chest-voice-vs-shouting comparison, a listen-and-observe section, and a short self-practice routine.",
     content: {
-      whatYoullLearn: "How to explain chest voice in beginner-friendly language, explore a comfortable speech-like sound at an easy pitch, notice the difference between speaking and gently sustaining a voiced sound, and understand that chest voice is not the same as shouting, speaking loudly, or forcing low notes.",
-      whyItMatters: "Comfort and consistency matter more than whether a voice sounds professional yet. Chest voice is a coordination you already use when you speak comfortably — not a sensation to search for or force.",
-      theory: "Chest voice is a commonly used term for a vocal coordination often associated with comfortable speaking and lower-to-middle singing pitches. Some singers notice vibration around the chest, but sensations differ between people, and the name doesn't mean sound is produced only in the chest.",
+      whatYoullLearn: "What chest voice means in beginner-friendly language, how to recognise your own comfortable speaking voice, the difference between comfortable chest-dominant singing and shouting or pressing, how to explore gentle chest-dominant sounds, and why not every singer experiences register sensations the same way.",
+      whyItMatters: "Comfort and consistency matter more than whether a voice sounds professional yet. Chest voice is a coordination you already use when you speak comfortably — not a sensation to search for or force, and loudness alone never identifies it.",
+      theory: "Chest voice is a commonly used term for a vocal coordination often associated with comfortable speaking and lower-to-middle singing pitches, producing a fuller, speech-like sound. Some singers notice vibration around the chest, but this sensation is not a reliable test of register, and sensations differ between people — the name doesn't mean sound is produced only in the chest.",
       guidedPractice: [
-        "Listened to my speaking voice, explored a gentle voiced “mmm” sound, tried “mmm-ah,” explored one comfortable reference note, compared comfortable exploration with what to avoid, and reflected on comfort and tension rather than judging my voice.",
+        "Recognised my comfortable speaking voice, explored gentle humming, a speech-to-song exercise, and gentle short notes, compared chest-dominant singing with shouting, listened back to notice tone and comfort, and practised a short self-practice routine.",
       ],
       assignment: {
         instructions: [
-          "One short sentence, spoken naturally",
-          "Two comfortable “mmm-ah” repetitions",
+          "The comfortable-speaking-voice awareness exercise",
+          "At least one of the three gentle chest-dominant exercises",
+          "The self-practice routine, if comfortable",
         ],
         questions: []
       }
