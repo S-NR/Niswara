@@ -1181,23 +1181,23 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 4 (interactive) ---------- */
   const headVoiceFoundationsClass = {
     number: 8, id: "L2C04", section: "Vocal Technique Development", title: "Head Voice Foundations", category: "Vocal Technique", skillTag: "vocal",
-    difficulty: "Beginner", estMinutes: 15,
+    difficulty: "Beginner", estMinutes: 27,
     // Rendered by the interactive lesson in js/lessons/headVoiceFoundations.js
     interactive: "head-voice-foundations",
-    subtitle: "Explore a lighter vocal quality — gently, without forcing a sound or a sensation.",
-    description: "An interactive lesson: head voice as a lighter vocal coordination, not proof that sound is produced in the head. A gentle 'oo', a small pitch movement, an optional tiny glide, and a non-judging comparison with Class 3's chest-voice exploration.",
+    subtitle: "Higher notes should become lighter and easier, not louder and harder.",
+    description: "An interactive lesson: head voice as a lighter vocal coordination for higher notes, not proof that sound is produced in the head. Three gentle exercises (humming, a light 'oo', and a gentle siren glide), a chest-vs-head comparison, a brief, honest introduction to falsetto, a listen-and-observe section, and a short self-practice routine.",
     content: {
-      whatYoullLearn: "What singers generally mean by 'head voice', that it's a term for vocal coordination rather than a literal sound source, how to explore a gentle, lighter sound without forcing pitch or volume, and how to reflect on comfort and effort instead of judging vocal quality.",
-      whyItMatters: "Not everyone experiences an obvious difference immediately, and that's normal. Comparing sensations honestly — without needing a 'right' answer — matters more than identifying a register correctly on the first try.",
-      theory: "Chest voice and head voice are terms for vocal coordination, not two completely separate physical sound sources. Some singers notice sensations around the face or head; others don't. The goal is exploration, not achieving a particular sound.",
+      whatYoullLearn: "What head voice means, how to recognise a lighter, higher vocal coordination, how to explore gentle humming and comfortable higher notes, the basic difference between head voice and falsetto, why higher notes shouldn't be pushed or forced, and how this prepares for connecting chest and head voice next class.",
+      whyItMatters: "Not everyone experiences an obvious difference immediately, and that's normal. Higher notes becoming lighter and easier — not louder and harder — is the whole goal; comparing sensations honestly, without needing a 'right' answer, matters more than identifying a register correctly on the first try.",
+      theory: "Head voice is a vocal register or coordination commonly used for higher singing notes, often feeling lighter than chest-dominant singing. Some singers notice vibration or resonance sensations around the face or head, but these sensations are subjective and don't mean sound physically originates there. Falsetto is a related but distinct production pattern, often breathier or lighter than some forms of head voice — the distinction can vary across vocal traditions and teaching approaches, and this class doesn't require mastering it.",
       guidedPractice: [
-        "Relaxed and listened to my speaking voice, explored a gentle 'oo' sound, tried a small pitch movement, optionally explored a tiny glide, compared the 'oo' with Class 3's 'mmm-ah' without judging either, and reflected on comfort and effort.",
+        "Explored the feeling of lighter singing, practised gentle humming, a light 'oo', and a gentle siren glide, compared chest-dominant and head-dominant coordination, learned a little about falsetto, listened back to notice tone and coordination, and practised a short self-practice routine.",
       ],
       assignment: {
         instructions: [
-          "One short sentence, spoken naturally",
-          "Two comfortable “oo” sounds",
-          "One small pitch glide, if comfortable",
+          "The feeling-of-lighter-singing awareness exercise",
+          "At least one of the three gentle head-voice exercises",
+          "The self-practice routine, if comfortable",
         ],
         questions: []
       }

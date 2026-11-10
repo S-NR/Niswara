@@ -582,6 +582,20 @@ Added to `js/lessons/songLessonKit.js`'s Step 1 tempo block: `BPM_MIN`/`BPM_MAX`
 
 Verified (headless Chrome, zero console errors): the real routed page was re-dumped — the −/+ steppers, number input, reset button, and live BPM display are all present, and "Normal" (not "Slow") now correctly shows as selected by default, matching `DEFAULT_BPM`. Full existing test suite and `smoke-home.sh` still pass unchanged; this round only refactored existing tempo-setting logic into a shared function and added UI around it, no new pure-logic functions needed new tests.
 
+### 2026-11-10: Level 2, Class 8 "Head Voice Foundations" rebuilt against its own later, more detailed spec (committed)
+
+Changed: `js/data.js` (`headVoiceFoundationsClass` — `estMinutes` 15→27, `subtitle`/`description`/`content` reworded), `js/lessons/headVoiceFoundations.js` (fully rewritten). No other class touched, including Class 9, which this class's own completion screen already correctly hands off to.
+
+**Same rebuild pattern as Class 7 immediately above, continuing straight on to the sibling class the spec itself said to pay particular attention to.** Adds a dedicated Section 2 "feeling of lighter singing" 6-step awareness exercise, three explicitly named exercises (A — gentle humming with a small upward movement, B — a light "oo" moving between two nearby pitches, C — a gentle siren glide — all three sharing one piano-picked starting note), a 4-row chest-vs-head comparison table using the spec's own column heads (note that the spec's own 4th row, "Should remain comfortable," is identical in both columns — kept exactly as given, not "fixed"), a brand-new Section 5 introducing falsetto briefly and honestly (related to but not identical with head voice, varying by tradition, not required to master here), and the spec's own 6-step self-practice routine.
+
+**Section 6 ("Listen and observe") needed the same honesty call as Class 7's Section 5:** the spec asks for "suitable audio demonstrations" of chest-dominant, head-dominant, and a "clearly labelled" breathier falsetto example — none of which exist in this project — so it again has the learner listen back to their own Section 3 recordings instead, with an explicit line that this class never claims to automatically identify the learner's register (matching the spec's own instruction not to claim automatic register detection).
+
+This class had no knowledge check before this rebuild either — added the spec's full 5 questions (what head voice is, whether it's literally in the head, whether higher notes should be forced, how humming helps, whether falsetto equals every form of head voice) as a separate, non-gating concept check, and replaced the previous checklist with the spec's exact 6 items and reflection question.
+
+Verified (headless Chrome, a temporary `tests/debug_hv_v2.test.html`, deleted after the run, loading only this lesson file plus its direct dependencies): all 7 named sections and all 3 exercise labels render; the comparison table and the no-auto-register-detection note are present; reference-note and "slightly higher, then back" playback both work; a skip button persists; a knowledge-check answer saves; all 6 checklist items exist and ticking all 6 enables and completes the class. Re-ran the full existing `tests/*.test.html` suite and `smoke-home.sh` — all pass, cleanly this time with no retries needed.
+
+**Not verified:** real microphone recording end-to-end for any of the four recording slots (same scope as every other recording slot in this project). This completes the rebuild of both Chest Voice Foundations and Head Voice Foundations against their respective detailed specs; Connecting Chest & Head Voice (Class 9) has not been touched and has no fresh spec yet.
+
 ### 2026-11-10: Level 2, Class 7 "Chest Voice Foundations" rebuilt against its own later, more detailed spec (committed)
 
 Changed: `js/data.js` (`chestVoiceFoundationsClass` — `estMinutes` 15→27, `subtitle`/`description`/`content` reworded), `js/lessons/chestVoiceFoundations.js` (fully rewritten). No other class touched, including Class 8.
