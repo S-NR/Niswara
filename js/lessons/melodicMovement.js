@@ -70,7 +70,7 @@ const MelodicMovementLesson = (() => {
   const PRACTICE_TASK = "pitch";
   const PRACTICE_CATEGORY = "Melodic Movement";
   const MAX_DEGREE = 3;
-  const UP_SMALL = [0, 1], UP_MED = [0, 2], UP_LARGE = [0, 3];
+  const UP_SMALL = [0, 1], UP_MED = [0, 2], UP_LARGE = [0, 3], UP_THREE = [0, 1, 2];
   const DOWN_MED = [2, 1, 0], DOWN_LARGE = [3, 2, 1, 0];
   const UP_DOWN_MAIN = [0, 1, 2, 1, 0];
   const UP_DOWN_EXT = [0, 2, 1, 3, 2, 1, 0];
@@ -79,6 +79,17 @@ const MelodicMovementLesson = (() => {
   const DEST_PAIR = [0, 3];
   const CONNECT_PAIR = [0, 1];
   const SYLLABLE = "la";
+
+  /* Reference degrees behind each recording, so its pitch graph can show where the notes should sit.
+     Free-choice recordings show every note the learner might have chosen. */
+  const ALL_DEGREES = [0, 1, 2, 3];
+  const TAKE_DEGREES = {
+    humUp: UP_DOWN_MAIN, humDown: DOWN_MED, upDown: UP_DOWN_MAIN, upDownExt: UP_DOWN_EXT,
+    intervalSing: ALL_DEGREES, stepSkipSing: [0, 1, 2], melodicPattern: PATTERN_MAIN, melodicPatternAlt: PATTERN_ALT,
+    dynMovement: PATTERN_MAIN, rhythmMovement: PATTERN_MAIN, take1: PATTERN_MAIN, take2: PATTERN_MAIN, take3: PATTERN_MAIN,
+    slowPractice: ALL_DEGREES,
+    t1: PATTERN_MAIN, t2: PATTERN_MAIN, t3: PATTERN_MAIN, t4: PATTERN_MAIN, t5: PATTERN_MAIN, t6: PATTERN_MAIN,
+  };
 
   const PROGRESS_ITEMS = [
     { key: "lessonViewed", label: "Lesson viewed" },
@@ -225,7 +236,11 @@ const MelodicMovementLesson = (() => {
   }
 
   /* ---------- small views ---------- */
-  const recCard = (k, title, hint, max = 10) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
+  const recCard = (k, title, hint, max = 10) => `
+    <div>
+      ${RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false })}
+      <div class="mt-3">${StabilityPanel.render(`sp-${k}`, { title: "Your notes vs the reference — estimated pitch", compact: true })}</div>
+    </div>`;
   const flowStrip = (steps) => `<div class="flex flex-wrap items-center justify-center gap-2 my-4">${steps.map((s, i, arr) => `<span class="flow-chip !text-sm">${s}</span>${i < arr.length - 1 ? `<span class="text-ink-700 text-xs">→</span>` : ""}`).join("")}</div>`;
 
   function problems() {
@@ -367,6 +382,12 @@ const MelodicMovementLesson = (() => {
 
         ${chapter("ascend", 4, "Exercise 2 — Hum upward", `
           ${narrow(p("Hum “mmm” upward: 1 → 2, then 1 → 2 → 3, then 1 → 2 → 3 → 2 → 1. Keep the range small — focus on smooth movement, stable pitch, relaxation, and no pushing."))}
+          ${narrow(`<p class="text-sm text-ink-300 mb-3">Reference note (1): <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong> — change it with the piano in Exercise 1. Play the pattern first, then hum it back.</p>`)}
+          <div class="flex flex-wrap gap-3 mb-4">
+            <button type="button" data-play-move="up12" class="vr-btn">${icon("play", "w-4 h-4")} 1 → 2</button>
+            <button type="button" data-play-move="up123" class="vr-btn">${icon("play", "w-4 h-4")} 1 → 2 → 3</button>
+            <button type="button" data-play-move="updown-main" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} 1 → 2 → 3 → 2 → 1</button>
+          </div>
           ${recCard("humUp", "Hum the ascending pattern", "1 → 2 → 3 → 2 → 1", 10)}
         `)}
 
@@ -577,7 +598,7 @@ const MelodicMovementLesson = (() => {
     LessonKit.loadAndRefresh(container, classId, params);
 
     /* ---- Exercises 1/3/5/7: movement playback ---- */
-    const MOVES = { up12: UP_SMALL, up13: UP_MED, up14: UP_LARGE, down321: DOWN_MED, down4321: DOWN_LARGE, "updown-main": UP_DOWN_MAIN, "updown-ext": UP_DOWN_EXT };
+    const MOVES = { up12: UP_SMALL, up13: UP_MED, up14: UP_LARGE, up123: UP_THREE, down321: DOWN_MED, down4321: DOWN_LARGE, "updown-main": UP_DOWN_MAIN, "updown-ext": UP_DOWN_EXT };
     function onPlayMove(e) {
       const btn = e.target.closest("[data-play-move]");
       if (!btn) return;
@@ -604,7 +625,7 @@ const MelodicMovementLesson = (() => {
         lastPianoNote = midi;
         if (midi > RANGE.to - MAX_DEGREE * STEP) { $("[data-base-hint]").textContent = `(choose ${N(RANGE.to - MAX_DEGREE * STEP)} or lower so every movement stays comfortable)`; return; }
         set("setup", "note", midi);
-        $("[data-base-note]").textContent = N(midi);
+        container.querySelectorAll("[data-base-note]").forEach((el) => { el.textContent = N(midi); });
         $("[data-base-hint]").textContent = "";
         exDest.refresh(); exConnect.refresh(); exPhrase.refresh();
       },
@@ -699,11 +720,22 @@ const MelodicMovementLesson = (() => {
       dynMovement: 10, rhythmMovement: 10, take1: 10, take2: 10, take3: 10, slowPractice: 10,
       t1: 10, t2: 10, t3: 10, t4: 10, t5: 10, t6: 10,
     };
+    const pitchPanels = {};
     Object.keys(NAMES).forEach((k) => {
       own(RecordingCard.wire(container, `rc-${k}`, {
         classId, take: take(rec0(), k), maxSeconds: MAX_SECONDS[k] || 10,
         meta: { name: `Class 20 — ${NAMES[k]}`, exercise: `movement-${k}` },
-        onSaved: (t) => { set("recs", k, t); ClassActivity.bump(classId, "recordings"); syncCheckpoints(); refreshLive(); },
+        onSaved: (t) => {
+          // keep the reference notes this take was sung against, so the graph stays right if the learner later changes their note
+          set("recs", k, { ...t, notes: degreesToNotes(base(), TAKE_DEGREES[k] || PATTERN_MAIN) });
+          ClassActivity.bump(classId, "recordings"); syncCheckpoints(); refreshLive();
+          if (pitchPanels[k]) pitchPanels[k].refresh();
+        },
+      }));
+      pitchPanels[k] = own(StabilityPanel.wire(container, `sp-${k}`, {
+        chain: true,
+        getTake: () => { const t = take(rec0(), k); return t && t.mediaId ? { mediaId: t.mediaId, notes: t.notes || degreesToNotes(base(), TAKE_DEGREES[k] || PATTERN_MAIN) } : null; },
+        canReveal: () => true, // these recordings have no self-check; the graph is opt-in via its own "Look" button
       }));
     });
 
