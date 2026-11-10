@@ -4,94 +4,150 @@
    Rendered by ClassDetailPage for interactive: "basic-swara-patterns".
 
    Curriculum identity: Level 2, Class 6 (`number: 6`, `levelId: 2`
-   in data.js, explicit id `L2C29`). Last of four new "Musical
-   Foundations" classes, closing that short arc before the curriculum
-   returns to the vocal-technique track at Class 7 (Chest Voice
-   Foundations). Builds on Class 5's arohana/avarohana (`L2C28`),
-   combining a few swaras at a time into short, repeatable patterns
-   instead of always singing the full seven-swara scale.
+   in data.js, explicit id `L2C29`). Rebuilt against this class's own
+   later, more detailed "Claude Prompt" spec (14 named patterns across
+   3 groups, a 3-level guided-practice section with a genuine listen-
+   and-recognise quiz and a complete-the-pattern exercise, a steady-
+   pulse rhythm section, a 6-question knowledge check, and a 6-item
+   checklist) — supersedes the shorter 3-pattern version first written
+   during the Level 2 Curriculum Upgrade. Last of four new "Musical
+   Foundations" classes, closing that arc before Class 7 (Chest Voice
+   Foundations) returns to vocal technique.
 
-   Core idea: short swara patterns — moving a few steps up and back
-   down — are a common, practical way to practise before attempting
-   a full scale or a song. This class deliberately keeps to three
-   small patterns and does not introduce tala (rhythm cycles) or
-   gamaka (ornamentation); both are named here only as "for later."
+   Core idea: "Don't just sing Sa Ri Ga Ma in order. Learn to
+   recognise and sing different combinations of notes." 14 beginner
+   patterns across three groups (three-note, returning, longer),
+   explicitly framed as introductory practice, not traditional named
+   Carnatic exercises, and explicitly NOT an introduction to tala
+   theory (left for Level 3) — Section 6's "steady pulse" reuses the
+   existing `Metronome` component purely as a timing aid.
 
-   Honesty boundaries, matching every earlier class: no fabricated
-   pitch-detection; the knowledge check is a concept check, not a
-   performance score; completion never depends on singing in tune.
+   Honesty boundaries this spec asks for explicitly: no automatic
+   pitch evaluation of the learner's own singing; the listen-and-
+   recognise and complete-the-pattern exercises only ever grade a
+   sequence this app itself generated and played, never a claim about
+   analysing the learner's voice. Highlighting during playback is
+   genuinely synchronized via `PianoSynth.playSequence`'s own `onNote`
+   callback — not faked.
 
-   Reuses: LessonKit, VirtualPiano, PianoSynth.playSequence,
-   RecordingCard, SelfAssessment, PersonalNotes, ClassProgress.
+   Reuses: LessonKit, VirtualPiano (visual aid only), PianoSynth
+   .play/.playSequence, Metronome (Section 6's steady pulse — already
+   built for Level 1's Rhythm & Timing class), RecordingCard,
+   PersonalNotes, ClassProgress.
    ============================================================ */
 
 const BasicSwaraPatternsLesson = (() => {
   const STAGES = [
-    { id: "understand", label: "Understand" },
-    { id: "patterns", label: "Patterns" },
-    { id: "listen", label: "Listen" },
-    { id: "sing", label: "Sing" },
-    { id: "mistakes", label: "Mistakes" },
+    { id: "recap", label: "Recap" },
+    { id: "what", label: "What's a Pattern?" },
+    { id: "learn", label: "Learn" },
+    { id: "practice", label: "Practice" },
+    { id: "rhythm", label: "Rhythm" },
+    { id: "quiz", label: "Quiz" },
     { id: "reflect", label: "Reflect" },
     { id: "complete", label: "Complete" },
   ];
 
   const RANGE = { from: 48, to: 72 };
   const SA_MAX = RANGE.to - 12;
-
-  const SEMITONE = { sa: 0, ri: 2, ga: 4, ma: 5, pa: 7, dha: 9, ni: 11, sa2: 12 };
-  const LABEL = { sa: "Sa", ri: "Ri", ga: "Ga", ma: "Ma", pa: "Pa", dha: "Dha", ni: "Ni", sa2: "Sa˙" };
+  const SEMITONE = { sa: 0, ri: 2, ga: 4, ma: 5, pa: 7, dha: 9, ni: 11 };
+  const LABEL = { sa: "Sa", ri: "Ri", ga: "Ga", ma: "Ma", pa: "Pa", dha: "Dha", ni: "Ni" };
+  const ALL_SWARAS = ["sa", "ri", "ga", "ma", "pa", "dha", "ni"];
 
   const PATTERNS = [
-    { key: "p1", title: "Sa Ri Ga Ri Sa", swaras: ["sa", "ri", "ga", "ri", "sa"] },
-    { key: "p2", title: "Sa Ri Ga Ma Ga Ri Sa", swaras: ["sa", "ri", "ga", "ma", "ga", "ri", "sa"] },
-    { key: "p3", title: "Sa Ri Ga Ma Pa Ma Ga Ri Sa", swaras: ["sa", "ri", "ga", "ma", "pa", "ma", "ga", "ri", "sa"] },
+    { key: "a1", group: "A", swaras: ["sa", "ri", "ga"] },
+    { key: "a2", group: "A", swaras: ["ri", "ga", "ma"] },
+    { key: "a3", group: "A", swaras: ["ga", "ma", "pa"] },
+    { key: "a4", group: "A", swaras: ["ma", "pa", "dha"] },
+    { key: "a5", group: "A", swaras: ["pa", "dha", "ni"] },
+    { key: "b1", group: "B", swaras: ["sa", "ri", "sa"] },
+    { key: "b2", group: "B", swaras: ["sa", "ri", "ga", "ri", "sa"] },
+    { key: "b3", group: "B", swaras: ["sa", "ga", "ri", "sa"] },
+    { key: "b4", group: "B", swaras: ["sa", "ri", "ga", "ma", "ga", "ri", "sa"] },
+    { key: "c1", group: "C", swaras: ["sa", "ri", "ga", "ma"] },
+    { key: "c2", group: "C", swaras: ["ri", "ga", "ma", "pa"] },
+    { key: "c3", group: "C", swaras: ["ga", "ma", "pa", "dha"] },
+    { key: "c4", group: "C", swaras: ["sa", "ri", "ga", "ma", "pa"] },
+    { key: "c5", group: "C", swaras: ["sa", "ri", "ga", "ma", "ga", "ri", "sa"] },
   ];
+  const GROUP_TITLE = { A: "Group A — Three-note patterns", B: "Group B — Returning patterns", C: "Group C — Longer patterns" };
+  const title = (pt) => pt.swaras.map((s) => LABEL[s]).join(" ");
+
+  // Section 5, Level C — a fixed example, matching the spec exactly: Sa — Ri — ? — Ma (missing Ga)
+  const COMPLETE_EXAMPLE = { shown: ["sa", "ri", null, "ma"], answer: "ga" };
 
   const KNOWLEDGE_CHECK = [
     {
-      key: "pattern",
-      question: "What is a basic swara pattern, as used in this class?",
+      key: "whatIs",
+      question: "What is a swara pattern?",
       options: [
-        { value: "rhythm", label: "A fixed rhythm cycle (tala)", correct: false },
-        { value: "short", label: "A short, repeatable sequence using a few swaras, moving up and back down", correct: true },
-        { value: "ornament", label: "A vocal ornament (gamaka)", correct: false },
+        { value: "volume", label: "A rule about how loudly to sing", correct: false },
+        { value: "combo", label: "A combination of notes arranged in a particular sequence", correct: true },
+        { value: "rhythm", label: "A rhythm cycle (tala)", correct: false },
       ],
-      explain: { rhythm: "Not quite — tala is a separate idea, not covered here.", short: "Exactly — a small, manageable group of swaras to practise before a full scale or song.", ornament: "Not quite — gamaka is a separate, more advanced idea." },
+      explain: { volume: "Not quite — a pattern isn't about loudness.", combo: "Exactly right.", rhythm: "Not quite — tala is a separate idea, not covered here." },
     },
     {
-      key: "why",
-      question: "Why practise short patterns instead of always singing the full seven-swara scale?",
+      key: "afterRi",
+      question: "Which swara comes after Ri?",
       options: [
-        { value: "easier", label: "Shorter patterns are easier to focus on and repeat comfortably", correct: true },
-        { value: "faster", label: "So you can sing as fast as possible", correct: false },
-        { value: "required", label: "Because the full scale is no longer useful once you know patterns", correct: false },
+        { value: "sa", label: "Sa", correct: false },
+        { value: "ga", label: "Ga", correct: true },
+        { value: "ma", label: "Ma", correct: false },
       ],
-      explain: { easier: "Right — smaller, focused practice builds comfort and accuracy gradually.", faster: "Not quite — speed isn't the goal here.", required: "Not quite — the full scale from Classes 4 and 5 is still useful; patterns are a complementary way to practise." },
+      explain: { sa: "Not quite — Sa comes before Ri.", ga: "Right — Sa, Ri, Ga, Ma, Pa, Dha, Ni.", ma: "Not quite — Ga comes between Ri and Ma." },
     },
     {
-      key: "scope",
-      question: "Does this class teach tala (rhythm cycles) or gamaka (ornamentation)?",
+      key: "missing",
+      question: "What is the missing swara in Sa Ri ? Ma?",
       options: [
-        { value: "yes", label: "Yes, both are covered in full here", correct: false },
-        { value: "no", label: "No — both are only named as ideas for later, more advanced classes", correct: true },
-        { value: "tala", label: "Only tala is covered", correct: false },
+        { value: "pa", label: "Pa", correct: false },
+        { value: "ga", label: "Ga", correct: true },
+        { value: "ni", label: "Ni", correct: false },
       ],
-      explain: { yes: "Not quite — neither is taught in depth in this class.", no: "Right. This class stays focused on simple pitch patterns.", tala: "Not quite — tala isn't taught here either." },
+      explain: { pa: "Not quite — Pa comes after Ma, not between Ri and Ma.", ga: "Exactly right.", ni: "Not quite — Ni is much later in the sequence." },
+    },
+    {
+      key: "whyPractise",
+      question: "Why do we practise different swara combinations?",
+      options: [
+        { value: "awareness", label: "To develop pitch awareness, note coordination and familiarity with musical movement", correct: true },
+        { value: "louder", label: "To learn to sing louder", correct: false },
+        { value: "western", label: "To memorise Western note names", correct: false },
+      ],
+      explain: { awareness: "Right — that's exactly what patterns build.", louder: "Not quite — volume isn't the goal.", western: "Not quite — swara names aren't the same as Western note names." },
+    },
+    {
+      key: "whyListenFirst",
+      question: "Why should we listen before attempting a new pattern?",
+      options: [
+        { value: "familiar", label: "To become familiar with the pattern before singing it", correct: true },
+        { value: "detect", label: "So the app can analyse your pitch", correct: false },
+        { value: "unnecessary", label: "It isn't necessary", correct: false },
+      ],
+      explain: { familiar: "Right — listening first makes singing it back much easier.", detect: "Not quite — this app doesn't analyse your sung pitch.", unnecessary: "Not quite — listening first genuinely helps." },
+    },
+    {
+      key: "steadySa",
+      question: "Why is maintaining a steady Sa important?",
+      options: [
+        { value: "positioned", label: "Because it keeps every pattern's notes correctly positioned relative to your reference pitch", correct: true },
+        { value: "louder", label: "It makes you sing louder", correct: false },
+        { value: "unimportant", label: "It isn't important", correct: false },
+      ],
+      explain: { positioned: "Exactly right.", louder: "Not quite — Sa has nothing to do with volume.", unimportant: "Not quite — every swara you sing is described relative to Sa." },
     },
   ];
 
-  const PROGRESS_ITEMS = [
-    { key: "understood", label: "I understand what a basic swara pattern is." },
-    { key: "heardPattern", label: "I listened to at least one pattern." },
-    { key: "triedOrSkipped", label: "I tried singing a pattern, or chose to skip for comfort." },
-    { key: "reflected", label: "I reflected on which pattern felt most comfortable." },
+  const CHECKLIST_ITEMS = [
+    { key: "rememberSwaras", label: "I can remember the seven basic swaras." },
+    { key: "recogniseThreeNote", label: "I can recognise simple three-note patterns." },
+    { key: "singReturning", label: "I can sing a returning pattern." },
+    { key: "followLonger", label: "I can follow a longer swara sequence." },
+    { key: "maintainSteady", label: "I can maintain a steady reference pitch." },
+    { key: "practiceSlowly", label: "I can practise patterns slowly without rushing." },
   ];
-
-  const opt = (value, label, tone = "neutral") => ({ value, label, tone });
-  const Q = {
-    favorite: { question: "Which pattern felt most comfortable?", options: PATTERNS.map((pt) => opt(pt.key, pt.title)).concat([opt("none", "None of them yet")]) },
-  };
+  const PROGRESS_ITEMS = CHECKLIST_ITEMS;
 
   const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
   const { p, narrow } = LessonKit;
@@ -121,40 +177,78 @@ const BasicSwaraPatternsLesson = (() => {
 
   const take = (rec, k) => A(rec, "recs")[k] || null;
   const q = (rec, k) => A(rec, "q")[k] || null;
-  const skipped = (rec, k) => !!A(rec, "skip")[k];
-  const heard = (rec) => A(rec, "heard");
+  const checklist = (rec) => A(rec, "checklist");
 
   function derivedCheckpoints(rec) {
     const out = {};
-    if (KNOWLEDGE_CHECK.every((k) => q(rec, `kc_${k.key}`)) && !!rec.checkpoints.lessonViewed) out.understood = true;
-    if (Object.values(heard(rec)).some(Boolean)) out.heardPattern = true;
-    if (PATTERNS.some((pt) => take(rec, `${pt.key}Take`)) || skipped(rec, "sing")) out.triedOrSkipped = true;
-    if (q(rec, "favorite")) out.reflected = true;
+    const c = checklist(rec);
+    CHECKLIST_ITEMS.forEach((item, i) => { out[item.key] = !!c[i]; });
     return out;
+  }
+
+  function randomDistractors(correctKey, count) {
+    const others = PATTERNS.filter((pt) => pt.key !== correctKey);
+    const picked = [];
+    while (picked.length < count && others.length) {
+      const i = Math.floor(Math.random() * others.length);
+      picked.push(others.splice(i, 1)[0]);
+    }
+    return picked;
   }
 
   /* ---------- small views ---------- */
   const recCard = (k, title, hint, max = 15) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
-  const flowStrip = (steps) => `<div class="flex flex-wrap items-center justify-center gap-2 my-4">${steps.map((s, i, arr) => `<span class="flow-chip !text-sm">${s}</span>${i < arr.length - 1 ? `<span class="text-ink-700 text-xs">→</span>` : ""}`).join("")}</div>`;
-  const skipBtn = (k, label = "Skip this exercise") => `<button type="button" data-skip-ex="${k}" class="text-xs text-ink-500 hover:text-ink-300 underline">${label}</button>`;
 
   function ladderHtml(swaras, activeIndex = -1) {
     return `<div class="flex flex-wrap items-end justify-center gap-2 my-4">
       ${swaras.map((s, i) => `
         <div class="flex flex-col items-center gap-1 px-2.5 py-2 rounded-xl border transition-colors ${activeIndex === i ? "border-gold-400/50 bg-gold-500/15" : "border-white/10 bg-white/[0.02]"}">
-          <span class="font-display text-base ${activeIndex === i ? "text-gold-300" : "text-ink-100"}">${LABEL[s]}</span>
+          <span class="font-display text-base ${activeIndex === i ? "text-gold-300" : "text-ink-100"}">${s === null ? "?" : LABEL[s]}</span>
         </div>`).join("")}
     </div>`;
   }
 
-  function patternCardHtml(pt, rec, activeIndex = -1) {
+  function patternCardHtml(pt, rec) {
     return `<div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 mb-4" data-pattern-card="${pt.key}">
-      <p class="font-display text-lg text-ink-50 mb-2">${pt.title}</p>
-      <div data-pattern-ladder="${pt.key}">${ladderHtml(pt.swaras, activeIndex)}</div>
-      <div class="flex flex-wrap gap-3 mb-3">
-        <button type="button" data-play-pattern="${pt.key}" class="vr-btn vr-btn-gold">${icon("play", "w-3.5 h-3.5")} Play this pattern</button>
+      <p class="font-display text-lg text-ink-50 mb-2">${title(pt)}</p>
+      <div data-pattern-ladder="${pt.key}">${ladderHtml(pt.swaras)}</div>
+      <div class="flex flex-wrap gap-3">
+        <button type="button" data-play-pattern="${pt.key}" class="vr-btn vr-btn-gold">${icon("play", "w-3.5 h-3.5")} Listen</button>
       </div>
-      ${recCard(`${pt.key}Take`, `Singing: ${pt.title}`, "", 15)}
+    </div>`;
+  }
+
+  function recogniseHtml(rec) {
+    const r = A(rec, "recognise");
+    const targetKey = r.targetKey;
+    const choiceKeys = r.choiceKeys || [];
+    const answered = r.answered || null;
+    const target = PATTERNS.find((pt) => pt.key === targetKey);
+    return `<div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5" data-recognise>
+      <p class="text-sm text-ink-300 mb-3">Press play, then choose which pattern you heard.</p>
+      <div class="flex flex-wrap gap-3 mb-4">
+        <button type="button" data-recognise-play class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play a pattern</button>
+        <button type="button" data-recognise-new class="vr-btn">New pattern</button>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        ${choiceKeys.map((k) => {
+          const pt = PATTERNS.find((x) => x.key === k);
+          return `<button type="button" data-recognise-choice="${k}" class="ex-chip ${answered === k ? "is-selected" : ""}">${title(pt)}</button>`;
+        }).join("")}
+      </div>
+      ${answered ? `<p class="text-xs mt-2.5 ${answered === targetKey ? "text-emerald-300" : "text-amber-300"}">${answered === targetKey ? "Correct!" : `Not quite — that was ${target ? title(target) : ""}.`} This is a listening exercise, not a score on your singing.</p>` : ""}
+    </div>`;
+  }
+
+  function completeHtml(rec) {
+    const answered = A(rec, "complete").answered || null;
+    return `<div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5" data-complete-pattern>
+      ${ladderHtml(COMPLETE_EXAMPLE.shown)}
+      <p class="text-sm text-ink-300 mb-3 text-center">Which swara completes the pattern?</p>
+      <div class="flex flex-wrap justify-center gap-2">
+        ${ALL_SWARAS.map((s) => `<button type="button" data-complete-choice="${s}" class="ex-chip ${answered === s ? "is-selected" : ""}">${LABEL[s]}</button>`).join("")}
+      </div>
+      ${answered ? `<p class="text-xs mt-2.5 text-center ${answered === COMPLETE_EXAMPLE.answer ? "text-emerald-300" : "text-amber-300"}">${answered === COMPLETE_EXAMPLE.answer ? "Correct — Ga." : `Not quite — the missing swara was Ga.`}</p>` : ""}
     </div>`;
   }
 
@@ -175,26 +269,12 @@ const BasicSwaraPatternsLesson = (() => {
     </div>`;
   }
 
-  function problems() {
-    const items = [
-      ["Trying all three patterns perfectly on the first attempt", "One comfortable pattern, practised a few times, is a complete session."],
-      ["Singing faster to sound more skilled", "A slow, even pace makes each swara easier to hear and place accurately."],
-      ["Treating this as the start of tala or gamaka study", "Both are separate, more advanced topics saved for later levels."],
-      ["Skipping straight to the longest pattern", "Starting with the shortest pattern and only adding length when it feels easy is a better beginner approach."],
-    ];
-    return `<div class="flex flex-col gap-2">${items.map(([t, a], i) => `
-      <details class="group rounded-2xl border border-white/5 bg-white/[0.02] px-5 py-4">
-        <summary class="cursor-pointer list-none flex items-center justify-between gap-3 text-ink-100 font-display text-lg">Mistake ${i + 1}: ${t}<span class="text-ink-500 text-sm transition-transform group-open:rotate-45">＋</span></summary>
-        <p class="text-sm text-ink-300 leading-relaxed mt-3">${a}</p>
-      </details>`).join("")}</div>`;
-  }
-
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
         <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 6 milestone</p>
         <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Musical Foundations complete.</p>
-        <p class="text-sm text-ink-300">Shruti, Sa, the seven swaras, arohana, avarohana, and a few short patterns — all built from your own voice.</p>
+        <p class="text-sm text-ink-300">Shruti, Sa, the seven swaras, arohana, avarohana, and 14 short patterns — all built from your own voice.</p>
         <p class="text-sm text-ink-100">The next classes return to vocal technique, carrying this listening vocabulary forward.</p>
       </div>`;
   }
@@ -217,7 +297,7 @@ const BasicSwaraPatternsLesson = (() => {
           ${milestone()}
           <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.05] p-6 sm:p-8 text-center">
             <p class="text-[11px] tracking-[0.25em] uppercase text-emerald-300 mb-2">Class complete</p>
-            <h3 class="font-display text-2xl text-ink-50 mb-5">Short, repeatable swara patterns are a practical way to build comfort before a full scale or song.</h3>
+            <h3 class="font-display text-2xl text-ink-50 mb-5">Swara patterns build pitch awareness and note coordination — one comfortable combination at a time.</h3>
             <ul class="inline-flex flex-col gap-2 text-left mx-auto">${lines}</ul>
             ${preview}
             ${next ? `
@@ -255,7 +335,9 @@ const BasicSwaraPatternsLesson = (() => {
     const rec = ClassActivity.get(cls.id);
     const pct = ClassProgress.percent(PROGRESS_ITEMS, rec.checkpoints);
     const b = baseNote(rec);
-    const sel = (k) => q(rec, k);
+    const growth = A(rec, "growth");
+    const c = checklist(rec);
+    const selectedForRepeat = A(rec, "repeat").selectedKey || PATTERNS[0].key;
 
     return `
     <div class="pitch-lesson">
@@ -264,56 +346,96 @@ const BasicSwaraPatternsLesson = (() => {
 
       <div class="max-w-5xl mx-auto px-5 lg:px-8 py-12 flex flex-col gap-20">
 
-        ${chapter("understand", 1, "Section A — Practising in small pieces", `
-          ${narrow(`
-            ${p("Classes 4 and 5 worked with the full seven-swara scale, up and down. This class breaks that scale into a few short, repeatable patterns — a common, practical way to build comfort before attempting a full scale or a song.")}
-          `)}
-          ${flowStrip(["CHOOSE", "LISTEN", "SING", "REFLECT"])}
+        ${chapter("recap", 1, "Section 1 — Recap", `
+          ${narrow(p("A quick revision before learning something new: the seven sapta swaras (Class 4), arohana and avarohana (Class 5), and your own selected Sa (Class 3)."))}
+          ${ladderHtml(["sa", "ri", "ga", "ma", "pa", "dha", "ni"])}
+          <div class="flex flex-wrap gap-3 mb-2">
+            <button type="button" data-play-recap class="vr-btn">${icon("play", "w-4 h-4")} Quick listen</button>
+          </div>
           <div data-lesson-viewed-sentinel class="h-px"></div>
         `)}
 
-        ${chapter("patterns", 2, "Section B — What a swara pattern is", `
+        ${chapter("what", 2, "Section 2 — What is a swara pattern?", `
           ${narrow(`
-            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-5">
-              ${["A swara pattern is a short, repeatable sequence that uses a few swaras, usually moving up and then back down.", "Practising short patterns builds comfort and accuracy gradually, before attempting a full scale or song.", "This class doesn't introduce tala (rhythm cycles) or gamaka (ornamentation) — both are separate ideas for later, more advanced classes.", "There's no need to master all three patterns below — even one, practised comfortably, is a complete session."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
-            </ul>
+            ${p("A swara pattern is a combination of notes arranged in a particular sequence — not necessarily in simple ascending or descending order. For example: Sa Ri Ga · Sa Ga Ri · Sa Ri Ga Ri Sa · Sa Ri Ga Ma Ga Ri Sa.")}
+            ${p("Patterns help singers develop pitch awareness, note coordination, and familiarity with musical movement.")}
           `)}
-          <p class="font-display text-lg text-ink-50 mb-3">A quick check</p>
-          ${knowledgeCheckHtml(rec)}
         `)}
 
-        ${chapter("listen", 3, "Section C — Three basic patterns", `
-          ${narrow(p("Your Sa carries over from the earlier classes. Press play on any pattern to hear it, then try singing along or on your own below."))}
+        ${chapter("learn", 3, "Section 3 — Learn beginner swara patterns", `
+          ${narrow(p("Your Sa carries over from the earlier classes. For each pattern: listen, follow the names visually, listen again, hum gently, sing at a comfortable pace, and repeat until it feels familiar."))}
           <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-3">
             ${VirtualPiano.render("bp-piano", { controls: false, keyboard: true, display: true })}
           </div>
           ${narrow(`<p class="text-sm text-ink-300 mb-5">Your Sa: <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong></p>`)}
-          <div data-patterns-host>${PATTERNS.map((pt) => patternCardHtml(pt, rec)).join("")}</div>
+          ${["A", "B", "C"].map((g) => `
+            <p class="font-display text-lg text-ink-50 mb-3 mt-4">${GROUP_TITLE[g]}</p>
+            <div data-patterns-host="${g}">${PATTERNS.filter((pt) => pt.group === g).map((pt) => patternCardHtml(pt, rec)).join("")}</div>
+          `).join("")}
         `, { wide: true })}
 
-        ${chapter("sing", 4, "Section D — Singing a pattern", `
-          ${narrow(p("The recordings above are entirely optional — pick whichever pattern felt most comfortable and try singing it, with or without the audio playing first."))}
-          ${narrow(`<div class="mt-1">${skipBtn("sing")}</div>`)}
+        ${chapter("practice", 4, "Section 5 — Guided practice", `
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2">Level A — Listen and recognise</p>${p("A pattern will play — choose which one you heard from the options below.")}`)}
+          <div data-recognise-host>${recogniseHtml(rec)}</div>
+
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2 mt-8">Level B — Repeat the pattern</p>${p("Pick any pattern above, listen to it, then sing it back.")}`)}
+          <div class="flex flex-wrap gap-3 mb-2">
+            <select data-repeat-select class="field max-w-xs">
+              ${PATTERNS.map((pt) => `<option value="${pt.key}" ${selectedForRepeat === pt.key ? "selected" : ""}>${GROUP_TITLE[pt.group].split(" — ")[0]}: ${title(pt)}</option>`).join("")}
+            </select>
+            <button type="button" data-repeat-play class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen</button>
+          </div>
+          ${recCard("repeatTake", "Singing the selected pattern back", "Entirely optional.", 20)}
+
+          ${narrow(`<p class="font-display text-lg text-ink-50 mb-2 mt-8">Level C — Complete the pattern</p>`)}
+          <div data-complete-host>${completeHtml(rec)}</div>
         `)}
 
-        ${chapter("mistakes", 5, "Section E — Common beginner mistakes", problems())}
-
-        ${chapter("reflect", 6, "Section F — Reflection", `
+        ${chapter("rhythm", 5, "Section 6 — Rhythm and swara coordination", `
           ${narrow(`
-            <div class="flex flex-col gap-4">
-              ${SelfAssessment.render("favorite-q", { ...Q.favorite, selected: sel("favorite") })}
+            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-4">
+              ${["Keep a comfortable, steady rhythm.", "Sing one swara at a time.", "Avoid rushing through the sequence.", "Maintain clarity when moving between notes."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
+            </ul>
+            <p class="text-xs text-ink-500 mb-4">This is a simple steady pulse to practise against — not tala theory, which is a Level 3 topic.</p>
+          `)}
+          ${Metronome.render("bp-metro", { bpm: 70 })}
+        `)}
+
+        ${chapter("quiz", 6, "Knowledge check", `
+          ${narrow(p("A quick concept check — not a vocal-performance score."))}
+          ${knowledgeCheckHtml(rec)}
+        `)}
+
+        ${chapter("reflect", 7, "Self-assessment and reflection", `
+          ${narrow(`
+            ${p("A simple checklist — tick what's true for you.")}
+            <div class="flex flex-col gap-1 mb-6">
+              ${CHECKLIST_ITEMS.map((item, i) => `
+                <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">
+                  <input type="checkbox" data-checklist="${i}" ${c[i] ? "checked" : ""} class="mt-0.5 w-4 h-4 accent-amber-400 shrink-0">
+                  <span class="text-sm text-ink-200">${item.label}</span>
+                </label>`).join("")}
             </div>
+            <div><label class="block text-sm text-ink-200 mb-1.5" for="bp-reflection">Which swara pattern was easiest for you? Which pattern was difficult to remember or sing?</label><textarea id="bp-reflection" data-growth="reflection" rows="3" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.reflection || "")}</textarea></div>
           `)}
         `)}
 
-        ${chapter("complete", 7, "My Notes", `
+        ${chapter("complete", 8, "My Notes", `
           ${p("Your private notebook for this class. Only you can see it.")}
           ${PersonalNotes.render("notes-bp", { placeholder: "e.g. Which pattern felt easiest... Whether I'd like to try a longer pattern next time..." })}
         `)}
 
-        ${chapter("complete", 8, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+        ${chapter("complete", 9, "Vocal safety", `
+          ${narrow(`
+            ${p("Use the comfortable Sa selected in Class 3. Don't force high or low notes — practise in short sessions, with breaks between repetitions.")}
+            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort.")}
+            <div data-warmup-note></div>
+          `)}
+        `)}
 
-        ${chapter("complete", 9, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
+        ${chapter("complete", 10, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+
+        ${chapter("complete", 11, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
       </div>
     </div>`;
   }
@@ -336,7 +458,7 @@ const BasicSwaraPatternsLesson = (() => {
     function syncCheckpoints() {
       const rec = rec0();
       Object.entries(derivedCheckpoints(rec)).forEach(([k, v]) => {
-        if (v && !rec.checkpoints[k]) ClassActivity.markCheckpoint(classId, k, true);
+        if (!!rec.checkpoints[k] !== v) ClassActivity.markCheckpoint(classId, k, v);
       });
     }
     let syncing = false;
@@ -347,6 +469,26 @@ const BasicSwaraPatternsLesson = (() => {
     }));
     LessonKit.loadAndRefresh(container, classId, params);
 
+    /* ---- Section 5, Level A: ensure a stable target + choice set exist before any interaction.
+       render() already ran once (producing the initial DOM) before mount() gets a chance to seed
+       this, so an empty `recognise` answer means the choice buttons rendered empty — refresh the
+       host once seeded, or "New pattern"/clicking a never-rendered button silently does nothing. ---- */
+    if (!A(rec0(), "recognise").targetKey) {
+      const target = PATTERNS[Math.floor(Math.random() * PATTERNS.length)];
+      const choices = [target, ...randomDistractors(target.key, 2)].sort(() => Math.random() - 0.5);
+      set("recognise", "targetKey", target.key);
+      set("recognise", "choiceKeys", choices.map((pt) => pt.key));
+      refreshRecogniseHost();
+    }
+
+    /* ---- Section 1: recap playback ---- */
+    function onPlayRecap(e) {
+      if (!e.target.closest("[data-play-recap]")) return;
+      PianoSynth.playSequence(["sa", "ri", "ga", "ma", "pa", "dha", "ni"].map((s) => base() + SEMITONE[s]), { duration: 0.5, gap: 0.1 });
+    }
+    container.addEventListener("click", onPlayRecap);
+    cleanups.push(() => container.removeEventListener("click", onPlayRecap));
+
     /* ---- knowledge check ---- */
     function onKcChoice(e) {
       const btn = e.target.closest("[data-kc-choice]");
@@ -354,72 +496,117 @@ const BasicSwaraPatternsLesson = (() => {
       const itemEl = btn.closest("[data-kc-item]");
       const key = itemEl.dataset.kcItem;
       set("q", `kc_${key}`, btn.dataset.kcChoice);
-      syncCheckpoints();
       $("[data-kc]").outerHTML = knowledgeCheckHtml(rec0());
-      refreshLive();
     }
     container.addEventListener("click", onKcChoice);
     cleanups.push(() => container.removeEventListener("click", onKcChoice));
 
-    /* ---- Section C: piano + pattern playback ---- */
+    /* ---- Section 3: piano (visual aid) + pattern playback ---- */
     own(VirtualPiano.wire(container, "bp-piano", {
       range: RANGE, keyboard: true,
-      onNote: ({ midi }) => { if (midi >= RANGE.from && midi <= SA_MAX) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); refreshLive(); } },
+      onNote: ({ midi }) => { if (midi >= RANGE.from && midi <= SA_MAX) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
     }));
+    function playPattern(key, onNote) {
+      const pt = PATTERNS.find((x) => x.key === key);
+      if (!pt) return;
+      return PianoSynth.playSequence(pt.swaras.map((s) => base() + SEMITONE[s]), { duration: 0.5, gap: 0.12, onNote });
+    }
     function onPlayPattern(e) {
       const btn = e.target.closest("[data-play-pattern]");
       if (!btn) return;
       const key = btn.dataset.playPattern;
-      const pt = PATTERNS.find((x) => x.key === key);
-      if (!pt) return;
-      const b = base();
       const ladderHost = $(`[data-pattern-ladder="${key}"]`);
-      PianoSynth.playSequence(pt.swaras.map((s) => b + SEMITONE[s]), {
-        duration: 0.55, gap: 0.12,
-        onNote: (i) => { if (ladderHost) ladderHost.innerHTML = ladderHtml(pt.swaras, i); },
-      }).then(() => {
-        set("heard", key, true);
-        syncCheckpoints(); refreshLive();
-      });
+      const pt = PATTERNS.find((x) => x.key === key);
+      playPattern(key, (i) => { if (ladderHost) ladderHost.innerHTML = ladderHtml(pt.swaras, i); });
     }
     container.addEventListener("click", onPlayPattern);
     cleanups.push(() => container.removeEventListener("click", onPlayPattern));
 
-    /* ---- skip buttons ---- */
-    function onSkip(e) {
-      const btn = e.target.closest("[data-skip-ex]");
-      if (!btn) return;
-      set("skip", btn.dataset.skipEx, true);
-      btn.textContent = "Skipped — that's okay";
-      btn.disabled = true;
-      syncCheckpoints(); refreshLive();
+    /* ---- Section 5, Level A: listen and recognise ---- */
+    function refreshRecogniseHost() {
+      const host = $("[data-recognise-host]");
+      if (host) host.innerHTML = recogniseHtml(rec0());
     }
-    container.addEventListener("click", onSkip);
-    cleanups.push(() => container.removeEventListener("click", onSkip));
+    function onRecognisePlay(e) {
+      if (!e.target.closest("[data-recognise-play]")) return;
+      playPattern(A(rec0(), "recognise").targetKey);
+    }
+    function onRecogniseNew(e) {
+      if (!e.target.closest("[data-recognise-new]")) return;
+      const target = PATTERNS[Math.floor(Math.random() * PATTERNS.length)];
+      const choices = [target, ...randomDistractors(target.key, 2)].sort(() => Math.random() - 0.5);
+      set("recognise", "targetKey", target.key);
+      set("recognise", "choiceKeys", choices.map((pt) => pt.key));
+      set("recognise", "answered", null);
+      refreshRecogniseHost();
+    }
+    function onRecogniseChoice(e) {
+      const btn = e.target.closest("[data-recognise-choice]");
+      if (!btn) return;
+      set("recognise", "answered", btn.dataset.recogniseChoice);
+      refreshRecogniseHost();
+    }
+    container.addEventListener("click", onRecognisePlay);
+    container.addEventListener("click", onRecogniseNew);
+    container.addEventListener("click", onRecogniseChoice);
+    cleanups.push(() => container.removeEventListener("click", onRecognisePlay));
+    cleanups.push(() => container.removeEventListener("click", onRecogniseNew));
+    cleanups.push(() => container.removeEventListener("click", onRecogniseChoice));
 
-    /* ---- recordings ---- */
-    PATTERNS.forEach((pt) => {
-      own(RecordingCard.wire(container, `rc-${pt.key}Take`, {
-        classId, take: take(rec0(), `${pt.key}Take`), maxSeconds: 15,
-        meta: { name: `Level 2, Class 6 — Singing ${pt.title}`, exercise: `basic-swara-patterns-${pt.key}` },
-        onSaved: (t) => { set("recs", `${pt.key}Take`, t); ClassActivity.bump(classId, "recordings"); syncCheckpoints(); refreshLive(); },
-      }));
+    /* ---- Section 5, Level B: repeat the pattern ---- */
+    const repeatSelect = $("[data-repeat-select]");
+    if (repeatSelect) repeatSelect.addEventListener("change", () => set("repeat", "selectedKey", repeatSelect.value));
+    function onRepeatPlay(e) {
+      if (!e.target.closest("[data-repeat-play]")) return;
+      playPattern(repeatSelect ? repeatSelect.value : PATTERNS[0].key);
+    }
+    container.addEventListener("click", onRepeatPlay);
+    cleanups.push(() => container.removeEventListener("click", onRepeatPlay));
+    own(RecordingCard.wire(container, "rc-repeatTake", {
+      classId, take: take(rec0(), "repeatTake"), maxSeconds: 20,
+      meta: { name: "Level 2, Class 6 — Repeat the pattern", exercise: "basic-swara-patterns-repeatTake" },
+      onSaved: (t) => { set("recs", "repeatTake", t); ClassActivity.bump(classId, "recordings"); },
+    }));
+
+    /* ---- Section 5, Level C: complete the pattern ---- */
+    function refreshCompleteHost() {
+      const host = $("[data-complete-host]");
+      if (host) host.innerHTML = completeHtml(rec0());
+    }
+    function onCompleteChoice(e) {
+      const btn = e.target.closest("[data-complete-choice]");
+      if (!btn) return;
+      set("complete", "answered", btn.dataset.completeChoice);
+      refreshCompleteHost();
+    }
+    container.addEventListener("click", onCompleteChoice);
+    cleanups.push(() => container.removeEventListener("click", onCompleteChoice));
+
+    /* ---- Section 6: metronome (steady pulse) ---- */
+    own(Metronome.wire(container, "bp-metro", { bpm: 70 }));
+
+    /* ---- growth textarea (reflection) ---- */
+    container.querySelectorAll("[data-growth]").forEach((ta) => {
+      const key = ta.dataset.growth;
+      const save = Utils.debounce((v) => set("growth", key, v), 500);
+      ta.addEventListener("input", () => save(ta.value));
     });
 
-    /* ---- generic self-assess dispatcher ---- */
-    const assessMap = { "favorite-q": "favorite" };
-    function onAssess(e) {
-      const chip = e.target.closest("[data-assess-choice]");
-      if (!chip) return;
-      const group = chip.closest("[data-assess]");
-      const name = group && group.dataset.assess;
-      if (!name || !assessMap[name]) return;
-      group.querySelectorAll("[data-assess-choice]").forEach((x) => x.classList.toggle("is-selected", x === chip));
-      set("q", assessMap[name], chip.dataset.assessChoice);
+    /* ---- completion checklist ---- */
+    function onChecklist(e) {
+      const cb = e.target.closest("[data-checklist]");
+      if (!cb) return;
+      set("checklist", cb.dataset.checklist, cb.checked);
       syncCheckpoints(); refreshLive();
     }
-    container.addEventListener("click", onAssess);
-    cleanups.push(() => container.removeEventListener("click", onAssess));
+    container.addEventListener("change", onChecklist);
+    cleanups.push(() => container.removeEventListener("change", onChecklist));
+
+    /* ---- Common Warm-up note (only if already unlocked) ---- */
+    const warmupHost = $("[data-warmup-note]");
+    if (warmupHost && Warmup.isUnlocked()) {
+      warmupHost.innerHTML = `<p class="text-sm text-ink-400 mt-2">You can also use the <a href="#/warmup" class="text-gold-300 hover:text-gold-200 underline">Common Warm-up</a> before practising, if that feels useful.</p>`;
+    }
 
     /* ---- notes ---- */
     own(PersonalNotes.wire(container, "notes-bp", { classId, onSaved: (body) => { if (body.trim()) ClassActivity.markCheckpoint(classId, "notesAdded"); } }));
@@ -433,9 +620,9 @@ const BasicSwaraPatternsLesson = (() => {
       Store.addJournalEntry({
         classId,
         classTitle: `Level 2, Class ${cls.number} — ${cls.title}`,
-        learned: "Short, repeatable swara patterns are a practical way to build comfort before a full scale or song.",
+        learned: "A swara pattern is a combination of notes arranged in a particular sequence — practising a few different combinations builds pitch awareness and note coordination.",
         struggled: "",
-        toPractice: "",
+        toPractice: A(rec0(), "growth").reflection || "",
         thoughts: "",
       });
       Router.softRefresh(container, ClassDetailPage, params);
@@ -443,7 +630,7 @@ const BasicSwaraPatternsLesson = (() => {
     container.addEventListener("click", onComplete);
     cleanups.push(() => container.removeEventListener("click", onComplete));
 
-    cleanups.push(LessonKit.wireViewedSentinel(container, () => { ClassActivity.markCheckpoint(classId, "lessonViewed"); syncCheckpoints(); refreshLive(); }));
+    cleanups.push(LessonKit.wireViewedSentinel(container, () => ClassActivity.markCheckpoint(classId, "lessonViewed")));
     cleanups.push(LessonKit.wireStepper(container));
     syncCheckpoints();
 

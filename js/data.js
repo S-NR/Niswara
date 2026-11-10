@@ -1129,22 +1129,23 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 6 (interactive, id L2C29) ---------- */
   const basicSwaraPatternsClass = {
     number: 6, id: "L2C29", section: "Musical Foundations", title: "Basic Swara Patterns", category: "Carnatic Fundamentals", skillTag: "swara",
-    difficulty: "Beginner", estMinutes: 15,
+    difficulty: "Beginner to early intermediate", estMinutes: 28,
     // Rendered by the interactive lesson in js/lessons/basicSwaraPatterns.js
     interactive: "basic-swara-patterns",
-    subtitle: "A few swaras at a time — short, repeatable patterns instead of the full scale.",
-    description: "An interactive lesson: three short swara patterns, each moving a few steps up and back down, as a practical way to build comfort before attempting a full scale or song. Closes the four-class Musical Foundations arc before the curriculum returns to vocal technique at Class 7. No tala or gamaka is introduced.",
+    subtitle: "Don't just sing Sa Ri Ga Ma in order — learn to recognise and sing different combinations of notes.",
+    description: "An interactive lesson: 14 beginner swara patterns across three groups (three-note, returning, longer), a listen-and-recognise exercise, a repeat-the-pattern recording exercise, a complete-the-pattern exercise, and a steady-pulse rhythm-coordination section (a basic metronome, not tala theory, which stays a Level 3 topic). Closes the four-class Musical Foundations arc before the curriculum returns to vocal technique at Class 7.",
     content: {
-      whatYoullLearn: "What a basic swara pattern is, why practising a short pattern builds comfort and accuracy before a full scale, how to listen to and sing three example patterns, and that tala and gamaka remain separate ideas for later, more advanced classes.",
-      whyItMatters: "A short, well-practised pattern is a more useful and more comfortable building block than attempting a full scale or song too soon — and completing even one pattern well is a genuine step forward.",
-      theory: "A swara pattern is a short, repeatable sequence using a few swaras, typically moving up and then back down. Working with small patterns is a common, practical way to build familiarity and accuracy gradually.",
+      whatYoullLearn: "What a swara pattern is, how to recognise different combinations of swaras (three-note, returning, and longer patterns), how to sing a pattern without losing the reference pitch, and how a steady pulse supports clear, unhurried movement between notes.",
+      whyItMatters: "Patterns develop pitch awareness, note coordination and familiarity with musical movement — a more useful and comfortable building block than attempting a full scale or song too soon.",
+      theory: "A swara pattern is a combination of notes arranged in a particular sequence — not necessarily ascending or descending in simple order. These are introductory practice patterns, not a claim that every sequence is a traditional named Carnatic exercise, and no tala theory is introduced here; that belongs in Level 3.",
       guidedPractice: [
-        "Listened to three short swara patterns built from a personal Sa, chose whichever felt most comfortable, and sang it with or without the audio playing first.",
+        "Reviewed the seven swaras, arohana and avarohana, listened to and sang three-note, returning and longer patterns, practised a listen-and-recognise exercise, a repeat-the-pattern recording, and a complete-the-pattern exercise, and practised singing with a steady pulse.",
       ],
       assignment: {
         instructions: [
-          "Listening to at least one pattern",
-          "Singing one pattern, with or without audio",
+          "Listening to at least one pattern from each group",
+          "Singing at least one pattern back, with or without audio",
+          "The complete-the-pattern exercise",
         ],
         questions: []
       }
