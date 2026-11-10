@@ -241,6 +241,7 @@ const MelodicMovementLesson = (() => {
       ${RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false })}
       <div class="mt-3">${StabilityPanel.render(`sp-${k}`, { title: "Your notes vs the reference — estimated pitch", compact: true })}</div>
     </div>`;
+  const hearMain = () => `<div class="flex flex-wrap items-center gap-3 mb-4"><button type="button" data-play-move="updown-main" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Hear 1 → 2 → 3 → 2 → 1</button><span class="text-xs text-ink-500">from your reference note</span></div>`;
   const flowStrip = (steps) => `<div class="flex flex-wrap items-center justify-center gap-2 my-4">${steps.map((s, i, arr) => `<span class="flow-chip !text-sm">${s}</span>${i < arr.length - 1 ? `<span class="text-ink-700 text-xs">→</span>` : ""}`).join("")}</div>`;
 
   function problems() {
@@ -449,6 +450,11 @@ const MelodicMovementLesson = (() => {
         ${chapter("pattern", 11, "Exercise 9 — Melodic pattern", `
           ${narrow(p("Connecting Class 19."))}
           ${flowStrip(["HEAR", "SING", "LISTEN", "REPEAT"])}
+          ${narrow(`<p class="text-sm text-ink-300 mb-3">Reference note (1): <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong> — hear the pattern first, then sing it and repeat.</p>`)}
+          <div class="flex flex-wrap gap-3 mb-4">
+            <button type="button" data-play-move="pattern-main" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} 1 → 2 → 3 → 2 → 1</button>
+            <button type="button" data-play-move="pattern-alt" class="vr-btn">${icon("play", "w-4 h-4")} 1 → 3 → 4 → 3 → 1 (optional)</button>
+          </div>
           ${recCard("melodicPattern", "1 → 2 → 3 → 2 → 1, repeated", "Only use a comfortable range.", 12)}
           <div class="mt-3">${recCard("melodicPatternAlt", "Optional — 1 → 3 → 4 → 3 → 1", "", 12)}</div>
         `)}
@@ -481,6 +487,7 @@ const MelodicMovementLesson = (() => {
 
         ${chapter("connect", 14, "Exercise 12 — Dynamics during movement", `
           ${narrow(p("Connecting Class 14. Sing 1 → 2 → 3 → 2 → 1 naturally, then try: slightly softer on the way up, comfortable at the peak, slightly softer on the way down. No loud peak required — the objective is controlled movement."))}
+          ${hearMain()}
           ${recCard("dynMovement", "Sing the pattern with this gentle shape", "Subtle, never forced.", 10)}
         `)}
 
@@ -489,6 +496,7 @@ const MelodicMovementLesson = (() => {
           <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-5">
             ${Metronome.render("mm-metro", { bpm: BPM })}
           </div>
+          ${hearMain()}
           ${recCard("rhythmMovement", "1 — 2 — 3 — 2 — 1, one note per beat", "", 10)}
         `, { wide: true })}
 
@@ -499,6 +507,7 @@ const MelodicMovementLesson = (() => {
 
         ${chapter("review", 17, "Exercise 15 — Record three takes", `
           ${p("Compare honestly — don't automatically pick the technically “best” one. Comfort matters.")}
+          ${hearMain()}
           <div class="grid sm:grid-cols-3 gap-3 mb-4">
             ${recCard("take1", "Take 1 — natural", "", 10)}
             ${recCard("take2", "Take 2 — focus on smooth movement", "", 10)}
@@ -535,6 +544,7 @@ const MelodicMovementLesson = (() => {
 
         ${chapter("practice", 23, `Class ${cls.number} Assignment`, `
           ${p("Using a comfortable 5-note pattern (e.g. 1 → 2 → 3 → 2 → 1), complete six takes. You don't need to do all six in one session.")}
+          ${hearMain()}
           <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-5">
             ${recCard("t1", "Take 1 — Hum the pattern", "", 10)}
             ${recCard("t2", "Take 2 — Sing it on “AH”", "", 10)}
@@ -598,7 +608,7 @@ const MelodicMovementLesson = (() => {
     LessonKit.loadAndRefresh(container, classId, params);
 
     /* ---- Exercises 1/3/5/7: movement playback ---- */
-    const MOVES = { up12: UP_SMALL, up13: UP_MED, up14: UP_LARGE, up123: UP_THREE, down321: DOWN_MED, down4321: DOWN_LARGE, "updown-main": UP_DOWN_MAIN, "updown-ext": UP_DOWN_EXT };
+    const MOVES = { up12: UP_SMALL, up13: UP_MED, up14: UP_LARGE, up123: UP_THREE, down321: DOWN_MED, down4321: DOWN_LARGE, "updown-main": UP_DOWN_MAIN, "updown-ext": UP_DOWN_EXT, "pattern-main": PATTERN_MAIN, "pattern-alt": PATTERN_ALT };
     function onPlayMove(e) {
       const btn = e.target.closest("[data-play-move]");
       if (!btn) return;
