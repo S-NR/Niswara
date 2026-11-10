@@ -472,7 +472,11 @@ const MelodicMovementLesson = (() => {
         `)}
 
         ${chapter("range", 13, "Exercise 11 — Range map (optional)", `
-          ${narrow(p("Using the piano above, play a note, then mark it. This is today's comfortable area — not your “lowest note,” “highest note” or permanent vocal range. This may change from day to day."))}
+          ${narrow(p("Tap a key on the piano below to hear a note and select it, sing it to check it feels comfortable, then press the matching Mark button. This is today's comfortable area — not your “lowest note,” “highest note” or permanent vocal range. This may change from day to day."))}
+          <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-3">
+            ${VirtualPiano.render("mm-range-piano", { controls: false, keyboard: false, display: true })}
+          </div>
+          ${narrow(`<p class="text-sm text-ink-300 mb-3">Selected note: <strong class="text-ink-50 font-display text-xl" data-range-selected>—</strong> <span class="text-xs text-ink-500" data-range-hint></span></p>`)}
           <div class="flex flex-wrap gap-3 mb-4">
             <button type="button" data-mark-range="low" class="vr-btn">Mark comfortable low</button>
             <button type="button" data-mark-range="mid" class="vr-btn">Mark comfortable middle</button>
@@ -628,11 +632,18 @@ const MelodicMovementLesson = (() => {
     cleanups.push(() => container.removeEventListener("click", onPlayStepSkip));
 
     /* ---- reference piano (shared by Exercises 1–9) ---- */
-    let lastPianoNote = base();
+    let lastPianoNote = null; // the note picked on either piano; the range map marks this one
+    const showSelected = (midi) => { const el = $("[data-range-selected]"); if (el) el.textContent = N(midi); const h = $("[data-range-hint]"); if (h) h.textContent = ""; };
+    // Exercise 11 has its own piano so students don't scroll back up to pick a note (it never changes the reference note)
+    own(VirtualPiano.wire(container, "mm-range-piano", {
+      range: RANGE, keyboard: false,
+      onNote: ({ midi }) => { lastPianoNote = midi; showSelected(midi); },
+    }));
     own(VirtualPiano.wire(container, "mm-piano", {
       range: RANGE, keyboard: true,
       onNote: ({ midi }) => {
         lastPianoNote = midi;
+        showSelected(midi);
         if (midi > RANGE.to - MAX_DEGREE * STEP) { $("[data-base-hint]").textContent = `(choose ${N(RANGE.to - MAX_DEGREE * STEP)} or lower so every movement stays comfortable)`; return; }
         set("setup", "note", midi);
         container.querySelectorAll("[data-base-note]").forEach((el) => { el.textContent = N(midi); });
@@ -675,6 +686,7 @@ const MelodicMovementLesson = (() => {
       const btn = e.target.closest("[data-mark-range]");
       if (!btn) return;
       const key = btn.dataset.markRange;
+      if (lastPianoNote === null) { const h = $("[data-range-hint]"); if (h) h.textContent = "(tap a key on the piano first, then mark it)"; return; }
       set("rangeMap", key, lastPianoNote);
       const out = $(`[data-range-${key}]`);
       if (out) out.textContent = N(lastPianoNote);
