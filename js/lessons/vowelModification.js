@@ -1,60 +1,47 @@
 /* ============================================================
-   LEVEL 2, CLASS 7 — VOWEL MODIFICATION FOUNDATIONS
+   LEVEL 2, CLASS 11 — VOWEL MODIFICATION FOUNDATIONS
    (interactive lesson)
 
    Rendered by ClassDetailPage for interactive: "vowel-modification".
 
-   Curriculum identity: Level 2, Class 7 (`number: 7`, `levelId: 2`
-   in data.js, id `L2C07`). Same mechanism Classes 1-6 already
-   proved six times over. This class's own title matched the
-   placeholder list's already-renamed entry exactly (renamed from
-   "Vocal Range" during Class 6's turn), so nothing needed renaming
-   to add Class 7 itself.
+   Curriculum identity: Level 2, Class 11 (`number: 11`, `levelId: 2`
+   in data.js, explicit id `L2C07` — unchanged since the Level 2
+   Curriculum Upgrade, which moved this class from old number 7 to
+   new number 11 without touching its id). Rebuilt against this
+   class's own later, more detailed spec (5 named guided exercises
+   each with purpose/instructions/repetitions/rest/listening-focus/
+   common-mistakes, a practical word-application section, a 5-
+   question knowledge check, and a 5-question self-assessment) —
+   supersedes the shorter version first written earlier in the
+   project.
 
-   **Level 2's class count grows a third time.** This spec's own
-   Section K previews the real Class 8 as "Resonance and Tone
-   Colour" — not the placeholder list's "Dynamics". Following the
-   same precedent Classes 5 and 6 both set (and Level 1's five times
-   before that), `levelClassDefs[2].titles`' next entry was renamed
-   in place, not removed.
-
-   Core idea: "Vowel modification is gradual and depends on pitch,
-   voice, language, musical context, and the individual singer... a
-   small adjustment, not a completely different word... There is no
-   single universal vowel shape that works for every singer." A
-   genuinely different topic from Classes 3-6 (register coordination)
-   — this is the first Level 2 class about diction/vowels rather than
-   chest/head/mix.
+   Core idea: "Vowel modification is a singing technique, not an
+   instruction to distort words or change pronunciation
+   unnecessarily." Vowel modification is gradual, depends on pitch,
+   voice, language, musical context and the individual singer, and
+   should always stay subtle — never forced.
 
    Honesty boundaries, matching every earlier class: no fabricated
    vowel recognition, pronunciation scoring, or audio analysis;
    completion never depends on perfect pronunciation, a successful
-   recording, or finishing every optional activity (the spec says
-   this explicitly).
-
-   Section I is five plain first-person self-attestations again, so
-   this file reuses Classes 3-6's plain-checkbox completion pattern
-   (Class 10's original `PRE_CHECK_ITEMS` style).
+   recording, or finishing every optional activity.
 
    Reuses: LessonKit (+ its automatic Warm-up card), VirtualPiano
    (Class 3), RecordingCard (Class 5), SelfAssessment (Class 4),
-   ObservationChecklist (Class 5), PersonalNotes, ClassProgress. The
-   "skip this exercise" button pattern and the "reuse an earlier
-   recording instead of asking again" pattern (Sections C and G both
-   reuse Section B's five individual vowel recordings) are both
-   reused exactly as Classes 1-6 established them.
+   PersonalNotes, ClassProgress. The "skip this exercise" button and
+   "reuse an earlier recording instead of asking again" patterns
+   (Section C's five vowel recordings feed both the comparison and
+   review sections) are reused exactly as earlier classes established
+   them.
    ============================================================ */
 
 const VowelModificationLesson = (() => {
   const STAGES = [
     { id: "understand", label: "Understand" },
-    { id: "vowels", label: "Vowels" },
-    { id: "compare", label: "Compare" },
-    { id: "transition", label: "Transition" },
-    { id: "pitch", label: "Pitch" },
-    { id: "pronunciation", label: "Pronunciation" },
-    { id: "record", label: "Record" },
-    { id: "mistakes", label: "Mistakes" },
+    { id: "listen", label: "Listen" },
+    { id: "exercises", label: "Exercises" },
+    { id: "words", label: "Words" },
+    { id: "quiz", label: "Quiz" },
     { id: "reflect", label: "Reflect" },
     { id: "complete", label: "Complete" },
   ];
@@ -73,13 +60,124 @@ const VowelModificationLesson = (() => {
     { a: "ee", b: "eh", label: "“Ee” and “Eh”" },
     { a: "oo", b: "oh", label: "“Oo” and “Oh”" },
   ];
+  const WORDS = [
+    { key: "cat", word: "Cat", vowel: "ah" },
+    { key: "see", word: "See", vowel: "ee" },
+    { key: "moon", word: "Moon", vowel: "oo" },
+    { key: "bed", word: "Bed", vowel: "eh" },
+    { key: "go", word: "Go", vowel: "oh" },
+  ];
+
+  // Section C — every exercise carries purpose/instructions/repetitions/rest/listening-focus/
+  // common-mistakes, per the spec's own explicit per-exercise structure.
+  const EXERCISES = [
+    {
+      key: "awareness", title: "Exercise 1 — Comfortable vowel awareness",
+      purpose: "Build familiarity with each vowel at an easy, natural pitch.",
+      instructions: "Practise each of the five vowels gently at a comfortable speaking pitch.",
+      repetitions: "Once or twice per vowel.", rest: "Rest briefly between vowels.",
+      listening: "Notice how each vowel's shape and sound differ.",
+      mistakes: "Exaggerating the mouth shape, or rushing between vowels.",
+      maxSeconds: 15,
+    },
+    {
+      key: "sustained", title: "Exercise 2 — Sustained vowels",
+      purpose: "Notice how a vowel feels when held, without pushing or running out of breath.",
+      instructions: "Hold each vowel briefly, using a comfortable, natural breath.",
+      repetitions: "One or two attempts per vowel.", rest: "Rest and breathe normally between attempts.",
+      listening: "Listen for whether the sound stays steady and comfortable.",
+      mistakes: "Holding past a comfortable breath, or pushing for volume.",
+      maxSeconds: 15,
+    },
+    {
+      key: "transitions", title: "Exercise 3 — Vowel transitions",
+      purpose: "Explore how one vowel can move gently into another.",
+      instructions: "Practise “Ah→Oh,” “Ee→Eh,” and “Oo→Oh,” keeping the transitions gentle and natural.",
+      repetitions: "Once or twice per pair.", rest: "Rest between pairs.",
+      listening: "Notice how the mouth shape changes between the two vowels.",
+      mistakes: "Forcing a sudden change, or losing the first vowel's clarity.",
+      maxSeconds: 20,
+    },
+    {
+      key: "consistency", title: "Exercise 4 — Vowel consistency",
+      purpose: "Practise keeping one vowel's shape steady while singing a short pattern.",
+      instructions: "Sing a simple, comfortable repeated-note pattern using one vowel at a time.",
+      repetitions: "One pattern per vowel, for as many vowels as feel comfortable.", rest: "Rest between vowels.",
+      listening: "Notice whether the vowel's shape stays consistent across the repeated notes.",
+      mistakes: "Letting the vowel drift or change shape unintentionally partway through.",
+      maxSeconds: 20, usesPiano: true,
+    },
+    {
+      key: "glide", title: "Exercise 5 — Gentle pitch movement",
+      purpose: "Notice whether a vowel needs a subtle adjustment to stay comfortable as pitch changes.",
+      instructions: "Explore a small, gentle pitch glide on one vowel, noticing any need for adjustment.",
+      repetitions: "A few gentle glides, if comfortable.", rest: "Rest between glides.",
+      listening: "Notice whether a small adjustment makes the vowel feel easier — not whether you hit an exact pitch.",
+      mistakes: "Forcing a wide pitch range, or exaggerating the adjustment.",
+      maxSeconds: 15, usesPiano: true,
+    },
+  ];
+
+  const KNOWLEDGE_CHECK = [
+    {
+      key: "whatAreVowels",
+      question: "What are vowels in singing?",
+      options: [
+        { value: "consonants", label: "Sounds like “m,” “b” and “t”", correct: false },
+        { value: "vowels", label: "Sounds like “ah,” “ee,” “oo,” “eh” and “oh” that shape vocal tone", correct: true },
+        { value: "rhythm", label: "A rhythm pattern", correct: false },
+      ],
+      explain: { consonants: "Not quite — those are consonants.", vowels: "Exactly right.", rhythm: "Not quite — vowels are about tone and shape, not rhythm." },
+    },
+    {
+      key: "whyInfluence",
+      question: "Why do vowels influence vocal tone and clarity?",
+      options: [
+        { value: "shape", label: "The shape of the mouth, tongue and lips changes the sound", correct: true },
+        { value: "none", label: "They don't influence tone at all", correct: false },
+        { value: "consonantsOnly", label: "Only consonants affect tone", correct: false },
+      ],
+      explain: { shape: "Right — vocal-tract shape is exactly what gives each vowel its character.", none: "Not quite — vowels shape tone a great deal.", consonantsOnly: "Not quite — vowels matter just as much, if not more, for sustained tone." },
+    },
+    {
+      key: "whyAdjust",
+      question: "Why might a vowel need a small adjustment as pitch changes?",
+      options: [
+        { value: "comfort", label: "To stay comfortable and clear at different pitches", correct: true },
+        { value: "different", label: "To completely change the word", correct: false },
+        { value: "never", label: "It never needs adjusting", correct: false },
+      ],
+      explain: { comfort: "Exactly right.", different: "Not quite — modification is subtle, never a new word.", never: "Not quite — a small adjustment can genuinely help at some pitches." },
+    },
+    {
+      key: "distort",
+      question: "Should vowel modification distort the word or change pronunciation unnecessarily?",
+      options: [
+        { value: "yes", label: "Yes, that's the whole point", correct: false },
+        { value: "no", label: "No — it should be subtle and should never feel forced", correct: true },
+        { value: "sometimes", label: "Only on high notes", correct: false },
+      ],
+      explain: { yes: "Not quite — modification should never distort the word.", no: "Right.", sometimes: "Not quite — subtlety matters at every pitch." },
+    },
+    {
+      key: "universal",
+      question: "Is there one universal vowel shape correct for every singer and every note?",
+      options: [
+        { value: "yes", label: "Yes, always", correct: false },
+        { value: "no", label: "No — it depends on pitch, voice, language, musical context and the individual singer", correct: true },
+        { value: "unsure", label: "This hasn't been mentioned in this course", correct: false },
+      ],
+      explain: { yes: "Not quite — there's no single shape that works for everyone.", no: "Exactly right.", unsure: "It has — Section A says this explicitly." },
+    },
+  ];
 
   const CHECKLIST_ITEMS = [
     { key: "recognised", label: "I can recognise the five basic vowel sounds." },
-    { key: "pairsExplored", label: "I explored differences between vowel pairs." },
-    { key: "transitionExplored", label: "I tried a gentle vowel transition or chose to skip it." },
-    { key: "comfortable", label: "I kept my jaw and tongue comfortable." },
-    { key: "reflected", label: "I reflected on which vowels felt easiest." },
+    { key: "sustainedTried", label: "I can hold a vowel briefly without pushing, or chose to skip it." },
+    { key: "transitionExplored", label: "I tried a gentle vowel transition." },
+    { key: "consistencyTried", label: "I explored vowel consistency on a repeated-note pattern, or chose to skip it." },
+    { key: "wordPractised", label: "I practised at least one word while keeping it understandable." },
+    { key: "noticedAdjustment", label: "I noticed whether a small adjustment made singing more comfortable." },
   ];
   const PROGRESS_ITEMS = CHECKLIST_ITEMS;
 
@@ -87,9 +185,10 @@ const VowelModificationLesson = (() => {
   const VOWEL_OPTS = [...VOWELS.map((v) => opt(v.key, v.label)), opt("notsure", "Not sure")];
   const Q = {
     easiestVowel: { question: "Which vowel felt easiest?", options: VOWEL_OPTS },
-    unfamiliarVowel: { question: "Which vowel felt unfamiliar?", options: VOWEL_OPTS },
-    mouthShapeChanged: { question: "Did I change my mouth shape naturally?", options: [opt("yes", "Yes", "good"), opt("no", "No", "neutral"), opt("unsure", "Not sure")] },
-    exaggerated: { question: "Did I exaggerate any vowel?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
+    difficultVowel: { question: "Which vowel felt difficult?", options: VOWEL_OPTS },
+    clearPronunciation: { question: "Could I maintain clear pronunciation?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
+    tensionNoticed: { question: "Did I notice tension?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
+    adjustmentHelped: { question: "Did a small adjustment make singing more comfortable?", options: [opt("yes", "Yes", "good"), opt("somewhat", "Somewhat", "good"), opt("no", "Not really", "neutral"), opt("didnttry", "Didn't try")] },
   };
 
   const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
@@ -161,6 +260,34 @@ const VowelModificationLesson = (() => {
     <p class="text-xs text-ink-500 mt-3">${VOWELS.some((v) => take(rec, `${v.key}Take`)) ? "Playing back your own recordings from Section B — or just say the pairs aloud yourself." : "Record the vowels in Section B above to compare them here, or just say the pairs aloud yourself."}</p>`;
   }
 
+  const FIELD = (label, value) => `<p class="text-xs text-ink-300 leading-relaxed"><span class="text-ink-500 uppercase tracking-wide text-[10px]">${label}:</span> ${value}</p>`;
+  function exerciseCardHtml(ex) {
+    return `<div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 mb-4" data-exercise-card="${ex.key}">
+      <p class="font-display text-lg text-ink-50 mb-3">${ex.title}</p>
+      <div class="flex flex-col gap-1.5 mb-4">
+        ${FIELD("Purpose", ex.purpose)}
+        ${FIELD("Instructions", ex.instructions)}
+        ${FIELD("Repetitions", ex.repetitions)}
+        ${FIELD("Rest", ex.rest)}
+        ${FIELD("Listening focus", ex.listening)}
+        ${FIELD("Common mistakes", ex.mistakes)}
+      </div>
+      ${recCard(`${ex.key}Take`, `Recording for ${ex.title.replace(/^Exercise \d+ — /, "")}`, "Entirely optional.", ex.maxSeconds)}
+      <div class="mt-2">${skipBtn(ex.key)}</div>
+    </div>`;
+  }
+
+  function wordsHtml(rec) {
+    const selected = A(rec, "words").selected || WORDS[0].key;
+    const w = WORDS.find((x) => x.key === selected);
+    return `<div data-words>
+      <div class="flex flex-wrap gap-2 mb-4">
+        ${WORDS.map((x) => `<button type="button" data-word-select="${x.key}" class="ex-chip ${selected === x.key ? "is-selected" : ""}">${x.word} (${VOWELS.find((v) => v.key === x.vowel).label})</button>`).join("")}
+      </div>
+      <p class="text-sm text-ink-300 mb-3">Speak “${w.word}” naturally, then sing it on a comfortable note. Repeat gently while keeping the word understandable, and notice whether a small adjustment makes it easier.</p>
+    </div>`;
+  }
+
   function problems() {
     const items = [
       ["Opening the mouth as wide as possible", "Use a natural, comfortable mouth opening."],
@@ -180,6 +307,23 @@ const VowelModificationLesson = (() => {
     const present = VOWELS.filter((v) => take(rec, `${v.key}Take`));
     if (!present.length) return `<p class="text-sm text-ink-500">Record your five vowels in Section B above, then come back here to listen and reflect.</p>`;
     return `<div class="flex flex-wrap gap-2 mb-4">${present.map((v) => `<button type="button" data-play-review="${v.key}Take" class="vr-btn">${icon("play", "w-3.5 h-3.5")} ${v.label}</button>`).join("")}</div>`;
+  }
+
+  function knowledgeCheckHtml(rec) {
+    return `<div class="flex flex-col gap-5" data-kc>
+      ${KNOWLEDGE_CHECK.map((item) => {
+        const selected = q(rec, `kc_${item.key}`);
+        return `
+        <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-4" data-kc-item="${item.key}">
+          <p class="text-sm text-ink-200 mb-2.5">${item.question}</p>
+          <div class="flex flex-wrap gap-2">
+            ${item.options.map((o) => `<button type="button" data-kc-choice="${o.value}" class="ex-chip ${selected === o.value ? "is-selected" : ""}">${o.label}</button>`).join("")}
+          </div>
+          ${selected ? `<p class="text-xs mt-2.5 ${item.options.find((o) => o.value === selected).correct ? "text-emerald-300" : "text-amber-300"}">${item.explain[selected]}</p>` : ""}
+        </div>`;
+      }).join("")}
+      <p class="text-xs text-ink-500">This is a quick concept check, not a vocal-performance score.</p>
+    </div>`;
   }
 
   function milestone() {
@@ -262,70 +406,65 @@ const VowelModificationLesson = (() => {
         ${chapter("understand", 1, "Section A — Welcome: What is a vowel?", `
           ${narrow(`
             ${p("Vowels are sounds such as “ah,” “ee,” “oo,” “eh” and “oh.” Consonants are sounds such as “m,” “b” and “t” that help form words.")}
-            ${p("The shape of the mouth, the position of the tongue, and the rounding of the lips all affect a vowel sound. Singing may sometimes call for a small adjustment to a vowel to make a note more comfortable — but that doesn't mean distorting the word.")}
+            ${p("The shape of the mouth, the position of the tongue, and the rounding of the lips all affect a vowel sound, which is why vowels influence vocal tone and clarity. Singing may sometimes call for a small adjustment to a vowel to make a note more comfortable — but vowel modification is a singing technique, not an instruction to distort words or change pronunciation unnecessarily.")}
           `)}
           ${flowStrip(["NOTICE", "COMPARE", "EXPLORE", "REFLECT"])}
           <div data-lesson-viewed-sentinel class="h-px"></div>
         `)}
 
-        ${chapter("vowels", 2, "Section B — Explore five vowel sounds", `
+        ${chapter("understand", 2, "Section B — Explore five vowel sounds", `
           ${narrow(`
             ${p("Say each vowel naturally and briefly, at a comfortable speaking pitch. Keep the jaw relaxed, avoid exaggerated mouth shapes, and rest briefly between sounds. Notice which vowels feel easiest to say.")}
           `)}
           ${vowelCardsHtml()}
         `, { wide: true })}
 
-        ${chapter("compare", 3, "Section C — Listen to the differences", `
+        ${chapter("listen", 3, "Section C1 — Listen to the differences", `
           ${narrow(p("Each vowel has its own sound quality because the vocal tract shape changes — not because one is objectively better or more resonant than another."))}
           <div data-compare-host>${compareHtml(rec)}</div>
         `)}
 
-        ${chapter("transition", 4, "Section D — Gentle vowel transitions", `
-          ${narrow(`
-            ${p("Say the first vowel comfortably, then move gently into the second — jaw and tongue relaxed. Repeat only once or twice if comfortable, resting between attempts. The aim is to notice the difference, not to make both vowels sound identical.")}
-            <p class="font-display text-lg text-ink-50 mb-2">“Ah–Oh” · “Ee–Eh” · “Oo–Oh”</p>
-          `)}
-          ${recCard("transitionsTake", "Gentle transitions", "All three, one after another.", 20)}
-          ${narrow(`<div class="mt-3">${skipBtn("transition")}</div>`)}
-        `)}
-
-        ${chapter("pitch", 5, "Section E — Vowel shape during a comfortable note", `
-          ${narrow(p("Listen to a comfortable reference note, sing a short “ah” on it, then — if comfortable — repeat the same note with “oh” or “oo.” Compare how the sound changes. Vowels may need small adjustments as pitch rises, but this is only an introduction — not advanced high-note vowel modification."))}
+        ${chapter("exercises", 4, "Section C — Guided exercises", `
+          ${narrow(p("Exercises 4 and 5 use a comfortable reference note — choose one on the piano below."))}
           <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-3">
             ${VirtualPiano.render("vm-piano", { controls: false, keyboard: true, display: true })}
           </div>
           ${narrow(`<p class="text-sm text-ink-300 mb-5">Your note: <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong></p>`)}
-          <div class="flex flex-wrap gap-3 mb-4">
+          <div class="flex flex-wrap gap-3 mb-6">
             <button type="button" data-play-pitch class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Reference note</button>
           </div>
-          ${recCard("pitchVowelTake", "“ah” on your note, then “oh” or “oo” if comfortable", "", 15)}
-          ${narrow(`<div class="mt-3">${skipBtn("pitchvowel")}</div>`)}
+          ${EXERCISES.map((ex) => exerciseCardHtml(ex)).join("")}
         `, { wide: true })}
 
-        ${chapter("pronunciation", 6, "Section F — Pronunciation versus modification", `
-          ${narrow(`
-            ${p("Vowel modification is a small adjustment, not a completely different word. Clear pronunciation remains important, and different musical phrases and languages may call for different choices. There is no single universal vowel shape that works for every singer.")}
-            ${p("For example: a singer may subtly adjust an “ah” vowel while singing a comfortable phrase, but shouldn't change it so much that the word becomes unrecognisable.")}
-          `)}
+        ${chapter("words", 5, "Section D — Practical word application", `
+          ${narrow(p("A few simple example words, each built around one of the five vowels. Speak the word naturally, sing it on a comfortable note, repeat gently while keeping it clear, and notice whether a small adjustment makes it easier — no exaggerated mouth shapes needed."))}
+          <div data-words-host>${wordsHtml(rec)}</div>
+          ${recCard("wordApplicationTake", "Speaking then singing the selected word", "Entirely optional.", 15)}
         `)}
 
-        ${chapter("record", 7, "Section G — Optional recording and reflection", `
+        ${chapter("quiz", 6, "Section F — Knowledge check", `
+          ${narrow(p("A quick concept check — not a vocal-performance score."))}
+          ${knowledgeCheckHtml(rec)}
+        `)}
+
+        ${chapter("reflect", 7, "Section E — Self-assessment and reflection", `
           ${narrow(p("Recording is entirely optional — nothing here is automatically analyzed, and no recording is sent anywhere outside your own account."))}
           <div data-review-host>${reviewHtml(rec)}</div>
           ${narrow(`
             <div class="flex flex-col gap-4 mt-5">
               ${SelfAssessment.render("easiestVowel-q", { ...Q.easiestVowel, selected: sel("easiestVowel") })}
-              ${SelfAssessment.render("unfamiliarVowel-q", { ...Q.unfamiliarVowel, selected: sel("unfamiliarVowel") })}
-              ${SelfAssessment.render("mouthShapeChanged-q", { ...Q.mouthShapeChanged, selected: sel("mouthShapeChanged") })}
-              ${SelfAssessment.render("exaggerated-q", { ...Q.exaggerated, selected: sel("exaggerated") })}
+              ${SelfAssessment.render("difficultVowel-q", { ...Q.difficultVowel, selected: sel("difficultVowel") })}
+              ${SelfAssessment.render("clearPronunciation-q", { ...Q.clearPronunciation, selected: sel("clearPronunciation") })}
+              ${SelfAssessment.render("tensionNoticed-q", { ...Q.tensionNoticed, selected: sel("tensionNoticed") })}
+              ${SelfAssessment.render("adjustmentHelped-q", { ...Q.adjustmentHelped, selected: sel("adjustmentHelped") })}
               <div><label class="block text-sm text-ink-200 mb-1.5" for="vm-again">Which sound would I like to practise again?</label><textarea id="vm-again" data-growth="practiceAgain" rows="2" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.practiceAgain || "")}</textarea></div>
             </div>
           `)}
         `)}
 
-        ${chapter("mistakes", 8, "Section H — Common beginner mistakes", problems())}
+        ${chapter("complete", 8, "Common beginner mistakes", problems())}
 
-        ${chapter("reflect", 9, "Section I — Reflection and completion", `
+        ${chapter("complete", 9, "Section G — Reflection and completion", `
           ${narrow(`
             ${p("A simple checklist — tick what's true for you. Completion doesn't depend on perfect pronunciation, a successful recording, or finishing every optional activity.")}
             <div class="flex flex-col gap-1 mb-5">
@@ -340,12 +479,12 @@ const VowelModificationLesson = (() => {
 
         ${chapter("complete", 10, "My Notes", `
           ${p("Your private notebook for this class. Only you can see it.")}
-          ${PersonalNotes.render("notes-vm", { placeholder: "e.g. Which vowel felt easiest... Whether any vowel felt unfamiliar... What I want to try next time..." })}
+          ${PersonalNotes.render("notes-vm", { placeholder: "e.g. Which vowel felt easiest... Whether any vowel felt difficult... What I want to try next time..." })}
         `)}
 
-        ${chapter("complete", 11, "Section J — Optional home practice", `
+        ${chapter("complete", 11, "Vocal safety", `
           ${narrow(`
-            ${p("About 2–3 optional minutes: say “ah,” “ee” and “oo” naturally, compare “ah–oh” once or twice, keep the mouth and tongue relaxed, then write down one observation. No need for excessive repetition.")}
+            ${p("Don't force mouth or tongue positions, and don't push for louder or higher sounds. Take breaks and rest when necessary.")}
             ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort.")}
             <div data-warmup-note></div>
           `)}
@@ -387,7 +526,19 @@ const VowelModificationLesson = (() => {
     }));
     LessonKit.loadAndRefresh(container, classId, params);
 
-    /* ---- Section E: piano + playback ---- */
+    /* ---- knowledge check ---- */
+    function onKcChoice(e) {
+      const btn = e.target.closest("[data-kc-choice]");
+      if (!btn) return;
+      const itemEl = btn.closest("[data-kc-item]");
+      const key = itemEl.dataset.kcItem;
+      set("q", `kc_${key}`, btn.dataset.kcChoice);
+      $("[data-kc]").outerHTML = knowledgeCheckHtml(rec0());
+    }
+    container.addEventListener("click", onKcChoice);
+    cleanups.push(() => container.removeEventListener("click", onKcChoice));
+
+    /* ---- Section C: piano + playback ---- */
     own(VirtualPiano.wire(container, "vm-piano", {
       range: RANGE, keyboard: true,
       onNote: ({ midi }) => { if (midi >= RANGE.from && midi + STEP <= RANGE.to) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
@@ -410,6 +561,20 @@ const VowelModificationLesson = (() => {
     container.addEventListener("click", onSkip);
     cleanups.push(() => container.removeEventListener("click", onSkip));
 
+    /* ---- Section D: word selector ---- */
+    function refreshWordsHost() {
+      const host = $("[data-words-host]");
+      if (host) host.innerHTML = wordsHtml(rec0());
+    }
+    function onWordSelect(e) {
+      const btn = e.target.closest("[data-word-select]");
+      if (!btn) return;
+      set("words", "selected", btn.dataset.wordSelect);
+      refreshWordsHost();
+    }
+    container.addEventListener("click", onWordSelect);
+    cleanups.push(() => container.removeEventListener("click", onWordSelect));
+
     /* ---- recordings ---- */
     function refreshCompareHost() {
       const host = $("[data-compare-host]");
@@ -420,13 +585,14 @@ const VowelModificationLesson = (() => {
       if (host) host.innerHTML = reviewHtml(rec0());
     }
     const VOWEL_NAMES = Object.fromEntries(VOWELS.map((v) => [`${v.key}Take`, v.label]));
-    const NAMES = { ...VOWEL_NAMES, transitionsTake: "Vowel transitions", pitchVowelTake: "Vowel on a comfortable note" };
-    const MAX_SECONDS = { ...Object.fromEntries(VOWELS.map((v) => [`${v.key}Take`, 8])), transitionsTake: 20, pitchVowelTake: 15 };
+    const EXERCISE_NAMES = Object.fromEntries(EXERCISES.map((ex) => [`${ex.key}Take`, ex.title]));
+    const NAMES = { ...VOWEL_NAMES, ...EXERCISE_NAMES, wordApplicationTake: "Word application" };
+    const MAX_SECONDS = { ...Object.fromEntries(VOWELS.map((v) => [`${v.key}Take`, 8])), ...Object.fromEntries(EXERCISES.map((ex) => [`${ex.key}Take`, ex.maxSeconds])), wordApplicationTake: 15 };
     const VOWEL_KEYS = VOWELS.map((v) => `${v.key}Take`);
     Object.keys(NAMES).forEach((k) => {
       own(RecordingCard.wire(container, `rc-${k}`, {
         classId, take: take(rec0(), k), maxSeconds: MAX_SECONDS[k],
-        meta: { name: `Level 2, Class 7 — ${NAMES[k]}`, exercise: `vowel-modification-${k}` },
+        meta: { name: `Level 2, Class 11 — ${NAMES[k]}`, exercise: `vowel-modification-${k}` },
         onSaved: (t) => {
           set("recs", k, t); ClassActivity.bump(classId, "recordings");
           if (VOWEL_KEYS.includes(k)) { refreshCompareHost(); refreshReviewHost(); }
@@ -434,7 +600,7 @@ const VowelModificationLesson = (() => {
       }));
     });
 
-    /* ---- Section C: play-to-compare, Section G: play-to-review ---- */
+    /* ---- Section C1: play-to-compare, Section E: play-to-review ---- */
     function onPlayCompare(e) {
       const btn = e.target.closest("[data-play-compare]");
       if (!btn) return;
@@ -453,7 +619,7 @@ const VowelModificationLesson = (() => {
     cleanups.push(() => container.removeEventListener("click", onPlayReview));
 
     /* ---- generic self-assess dispatcher ---- */
-    const assessMap = { "easiestVowel-q": "easiestVowel", "unfamiliarVowel-q": "unfamiliarVowel", "mouthShapeChanged-q": "mouthShapeChanged", "exaggerated-q": "exaggerated" };
+    const assessMap = { "easiestVowel-q": "easiestVowel", "difficultVowel-q": "difficultVowel", "clearPronunciation-q": "clearPronunciation", "tensionNoticed-q": "tensionNoticed", "adjustmentHelped-q": "adjustmentHelped" };
     function onAssess(e) {
       const chip = e.target.closest("[data-assess-choice]");
       if (!chip) return;
@@ -473,7 +639,7 @@ const VowelModificationLesson = (() => {
       ta.addEventListener("input", () => save(ta.value));
     });
 
-    /* ---- Section I: completion checklist ---- */
+    /* ---- Section G: completion checklist ---- */
     function onChecklist(e) {
       const cb = e.target.closest("[data-checklist]");
       if (!cb) return;
@@ -503,7 +669,7 @@ const VowelModificationLesson = (() => {
         classId,
         classTitle: `Level 2, Class ${cls.number} — ${cls.title}`,
         learned: "Vowel modification is a small adjustment, not a different word — there's no single universal vowel shape for every singer.",
-        struggled: q(rec, "unfamiliarVowel") && q(rec, "unfamiliarVowel") !== "notsure" ? `The “${q(rec, "unfamiliarVowel")}” vowel felt unfamiliar.` : "",
+        struggled: q(rec, "difficultVowel") && q(rec, "difficultVowel") !== "notsure" ? `The “${q(rec, "difficultVowel")}” vowel felt difficult.` : "",
         toPractice: A(rec, "growth").practiceAgain || "",
         thoughts: "",
       });

@@ -1261,22 +1261,23 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 7 (interactive) ---------- */
   const vowelModificationClass = {
     number: 11, id: "L2C07", section: "Vocal Technique Development", title: "Vowel Modification Foundations", category: "Vocal Technique", skillTag: "vocal",
-    difficulty: "Beginner", estMinutes: 15,
+    difficulty: "Beginner", estMinutes: 27,
     // Rendered by the interactive lesson in js/lessons/vowelModification.js
     interactive: "vowel-modification",
     subtitle: "Hear and explore how small changes in vowel shape affect the sound and comfort of singing.",
-    description: "An interactive lesson: the five basic vowel sounds (ah/ee/oo/eh/oh), how mouth, tongue and lip shape affect them, and how singing may call for a small, gentle adjustment — never a distorted word. The first Level 2 class about diction rather than register coordination.",
+    description: "An interactive lesson: the five basic vowel sounds (ah/ee/oo/eh/oh), how mouth, tongue and lip shape affect them, five named guided exercises (awareness, sustained vowels, transitions, consistency, gentle pitch movement), a practical word-application section, and a knowledge check — never a distorted word or an instruction to change pronunciation unnecessarily.",
     content: {
-      whatYoullLearn: "What vowels are and how they differ from consonants, how mouth opening, tongue position and lip shape influence vowel sounds, why vowel sounds can change slightly when singing, how to explore vowel shapes without exaggerating or forcing them, and why clear pronunciation and comfortable singing both matter.",
+      whatYoullLearn: "What vowels are and how they differ from consonants, why vowels influence vocal tone and clarity, why a vowel may need a small adjustment as pitch changes, how to maintain understandable pronunciation while exploring comfortable vowel shapes, and why vowel modification should be subtle and should never feel forced.",
       whyItMatters: "Vowel modification is gradual and depends on pitch, voice, language, musical context and the individual singer — there's no single vowel shape that's correct for every person or every note.",
-      theory: "Vowel modification is a small adjustment, not a completely different word. Clear pronunciation remains important, and different musical phrases and languages may call for different choices.",
+      theory: "Vowel modification is a singing technique — a small adjustment, not an instruction to distort words or change pronunciation unnecessarily. Clear pronunciation remains important, and different musical phrases and languages may call for different choices.",
       guidedPractice: [
-        "Explored the five basic vowel sounds, compared vowel pairs, tried gentle transitions between vowels, noticed how a vowel can change slightly on a comfortable note, and reflected on which vowels felt easiest without exaggerating or forcing any of them.",
+        "Explored the five basic vowel sounds, practised sustained vowels, gentle transitions, vowel consistency on a repeated-note pattern, and gentle pitch movement, applied vowels to a few simple words, and reflected on which vowels felt easiest without exaggerating or forcing any of them.",
       ],
       assignment: {
         instructions: [
           "“Ah,” “ee” and “oo,” spoken naturally",
-          "“Ah–oh” once or twice",
+          "At least one of the five guided exercises",
+          "One word, spoken then sung",
         ],
         questions: []
       }
