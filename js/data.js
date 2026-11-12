@@ -1339,23 +1339,23 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 10 (interactive) ---------- */
   const registerTransitionsClass = {
     number: 14, id: "L2C10", section: "Vocal Technique Development", title: "Register Transitions and Coordination", category: "Vocal Technique", skillTag: "vocal",
-    difficulty: "Beginner", estMinutes: 15,
+    difficulty: "Beginner", estMinutes: 27,
     // Rendered by the interactive lesson in js/lessons/registerTransitions.js
     interactive: "register-transitions",
-    subtitle: "Notice changes in vocal quality, and explore how chest, head, and mixed coordination connect.",
-    description: "An interactive lesson: a synthesis of Classes 7, 8, 9, 10 and 13 — noticing vocal-quality changes as pitch changes, rather than eliminating every difference, then applying that noticing directly to the lower-area/higher-area/transition coordination chest voice, head voice and mixed coordination describe. A voice break is not automatically a failure; vocal continuity and coordination both develop gradually.",
+    subtitle: "How the voice travels across its range, and how to practise that journey gently.",
+    description: "An interactive lesson: a recap of Classes 7-10's register work, an introduction to the passaggio (a transition area, not one fixed note), six named guided exercises (humming glide, “oo” glide, lip trill, two-note and three-note patterns, speech-to-song), a progressive transition routine, and a knowledge check. A voice break is not automatically a failure; vocal continuity and coordination both develop gradually.",
     content: {
-      whatYoullLearn: "That vocal quality and coordination can change as pitch changes, that a noticeable transition or voice break is not automatically a failure, how to explore small pitch movements with comfortable volume, how chest-dominant and head-dominant coordination can differ and connect through a gentle transition, how to distinguish gentle vocal exploration from pushing or squeezing, and why vocal continuity and register coordination both develop gradually through practice.",
-      whyItMatters: "A noticeable transition or voice break is not automatically a failure — the amount of change varies between singers and exercises, and persistent discomfort (never a break itself) is the only thing that should never be ignored. Register transitions are a normal part of how voices work, not a flaw to eliminate immediately.",
-      theory: "The voice may change in quality as pitch changes. A transition may feel smooth, noticeable, or uneven. A voice break does not automatically indicate damage or incorrect technique. Chest voice and head voice are terms for different patterns of vocal coordination and sensation — not places sound is literally produced — and mixed coordination describes a more balanced transition between the two; smoother transitions develop gradually.",
+      whatYoullLearn: "How the voice may behave differently across its range, why transitions between registers can feel uneven, how chest-dominant, head-dominant and mixed coordination relate to vocal development, how to practise transitions using small, comfortable patterns, and how to identify tension and avoid forcing the voice.",
+      whyItMatters: "Vocal registers and coordination are complex, and sensations differ among singers — there are no rigid universal register boundaries, and a noticeable transition or voice break is not automatically a failure.",
+      theory: "A register transition is an area where the voice's coordination shifts as pitch changes — often called the passaggio, a transition area rather than one fixed note. The voice may change in quality or feel less stable around this area; this varies between singers and develops gradually through gentle, repeated practice, never by forcing a transition to disappear immediately.",
       guidedPractice: [
-        "Reviewed Classes 7, 8, 9, 10 and 13, explored a comfortable reference pitch, tried a small 'oo' glide, compared two separate sounds with one gentle glide, learned about voice breaks and transitions, explored a comfortable lower-range area and a lighter higher-range area, attempted a small gentle transition between them, optionally tried a short melodic pattern, and reflected on comfort and tension rather than forcing a perfect result.",
+        "Recapped chest voice, head voice, connecting chest and head voice, and mixed coordination, learned what the passaggio means, practised six gentle guided exercises (humming glide, “oo” glide, lip trill, two-note and three-note patterns, and speech-to-song), worked through a progressive transition routine, and reflected on tension and comfort rather than forcing a perfect result.",
       ],
       assignment: {
         instructions: [
-          "One short sentence, spoken naturally",
-          "One comfortable “oo”, and one small glide, if comfortable",
-          "A comfortable lower-area hum and a lighter higher-area hum, with a gentle transition between them if comfortable",
+          "The recap listening exercise",
+          "At least one of the six guided exercises",
+          "The progressive transition routine, if comfortable",
         ],
         questions: []
       }
