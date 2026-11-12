@@ -1,164 +1,201 @@
 /* ============================================================
-   LEVEL 2, CLASS 17 — VOCAL AGILITY DEVELOPMENT (interactive
-   lesson)
+   LEVEL 2, CLASS 18 — VOCAL AGILITY DEVELOPMENT
+   (interactive lesson)
 
    Rendered by ClassDetailPage for interactive: "vocal-agility-development".
 
-   Curriculum identity: Level 2, Class 17 (`number: 17`, `levelId: 2`
-   in data.js, id `L2C17`). Same mechanism Classes 1-16 already
-   proved sixteen times over. This class's own title matched the
-   placeholder list's already-renamed entry exactly (renamed from
-   "Phrase Shaping and Musical Interpretation" during Class 16's
-   turn), so nothing needed renaming or adding to bring Class 17
-   itself onto the page.
+   Curriculum identity: Level 2, Class 18 (`number: 18`, `levelId: 2`
+   in data.js, explicit id `L2C17` — unchanged since the Level 2
+   Curriculum Upgrade). Rebuilt against this class's own later, more
+   detailed spec (a named recap, seven progressive exercises each
+   with purpose/instructions/repetitions/rest/listening-focus/
+   mistakes, beginner swara patterns built from the learner's own
+   chosen Sa, a real tempo-selectable practice stage, and a 5-
+   question knowledge check) — supersedes the shorter version first
+   written earlier in the project. Part of a combined rebuild
+   alongside Classes 19 and 20.
 
-   **Level 2's class count grows a thirteenth time.** This spec's own
-   "Next class preview" names the real Class 18 as "Register
-   Coordination Practice." Since an entry already existed in
-   `levelClassDefs[2]` from Class 16's turn, this is a plain rename
-   in place, the same precedent every class since 5 has followed
-   (apart from Class 11's one-off addition).
-
-   Note: Level 1 already has its own, differently-titled "Vocal
-   Agility Foundations" at Class 22 (`js/lessons/vocalAgility.js`,
-   const `vocalAgilityClass`). This Level 2 class covers similar
-   ground at a gentler pace and is a deliberately distinct const,
-   `vocalAgilityDevelopmentClass` — no name collision, no shared
-   state, same as every other Level-1/Level-2 title that happens to
-   rhyme (e.g. both levels have a "Class 10").
-
-   Core idea: "Vocal agility is not about singing fast. It is about
-   moving between notes comfortably and accurately... A smooth and
-   accurate slow pattern is more useful than a fast, unclear one."
-   Explicitly progressive: two notes, then three, then an optional
-   five — never pushing toward speed.
+   Core idea: "Vocal agility is not simply singing fast — it's
+   moving between notes with control." Accuracy and comfort come
+   first; speed is introduced only afterward, via a genuine (not
+   faked) tempo control over the same synthesized patterns. The
+   swara patterns used (Sa Ri Sa; Sa Ri Ga Ri Sa; Sa Ri Ga Ma Ga Ri
+   Sa; Sa Ga Ri Ma Ga Ri Sa) are beginner practice patterns, never
+   presented as named ragas or formal compositions, and Sa is never
+   assumed to be any fixed Western note.
 
    Honesty boundaries, matching every earlier class: no fabricated
-   pitch-detection or vocal-agility scoring (none exists in this
-   codebase); completion never depends on the five-note pattern, a
-   particular speed, perfect pitch accuracy, recording, or completing
-   optional repetitions (the spec says this explicitly).
-
-   Like Classes 11-16, this spec gives no literal Section-I
-   completion-checklist text (its "Completion criteria" is phrased
-   as negative constraints), so this file self-authors a 5-item
-   plain-checkbox checklist from the lesson's own Parts A-H, the same
-   style Class 10's original `PRE_CHECK_ITEMS` established.
-
-   First class since Class 11/23 to need a genuinely BIDIRECTIONAL
-   range clamp again — Part C explicitly asks for both an ascending
-   AND a descending two-note movement from the same starting note,
-   so `baseNote()` and the piano's `onNote` handler both verify room
-   below (for the two-note descent) and room above (for the optional
-   five-note pattern's furthest degree), reusing Class 11's corrected
-   hint-element pattern exactly (not its original broken draft).
+   pitch-detection; the tempo control genuinely changes playback
+   speed (not a cosmetic label) — it's exactly what `PianoSynth
+   .playSequence`'s own `duration`/`gap` parameters already do.
 
    Reuses: LessonKit (+ its automatic Warm-up card), VirtualPiano
-   (Class 3), RecordingCard (Class 5), SelfAssessment (Class 4),
-   PersonalNotes, ClassProgress, the `degreesToNotes` melody pattern
-   (Level 1 Class 24 / Classes 15-16), the per-item recording layout
-   (Classes 7, 8, 13, 15), and skip buttons for optional exercises
-   (Classes 9-16). Part G reuses Parts C/D's own recordings for its
-   "listen and compare" section rather than asking for a new one —
-   the tenth Level 2 class in a row (after 7-16) to substantially
-   reuse its final optional-recording section.
+   (Class 3), PianoSynth.playSequence, RecordingCard, SelfAssessment,
+   PersonalNotes, ClassProgress.
    ============================================================ */
 
 const VocalAgilityDevelopmentLesson = (() => {
   const STAGES = [
+    { id: "recap", label: "Recap" },
     { id: "understand", label: "Understand" },
-    { id: "prepare", label: "Prepare" },
-    { id: "twoNote", label: "Two Notes" },
-    { id: "threeNote", label: "Three Notes" },
-    { id: "fiveNote", label: "Five Notes" },
-    { id: "smoothness", label: "Smoothness" },
+    { id: "exercises", label: "Exercises" },
+    { id: "tempo", label: "Tempo" },
+    { id: "apply", label: "Apply" },
     { id: "record", label: "Record" },
+    { id: "quiz", label: "Quiz" },
     { id: "reflect", label: "Reflect" },
     { id: "complete", label: "Complete" },
   ];
 
   const RANGE = { from: 48, to: 72 };
   const STEP = 2;
-  const MAX_UP = 4;
+  const MAX_UP = 3;
+  const SWARA_SEMITONE = { sa: 0, ri: 2, ga: 4, ma: 5 };
+  const SWARA_LABEL = { sa: "Sa", ri: "Ri", ga: "Ga", ma: "Ma" };
+  const swaraNotes = (b, keys) => keys.map((k) => b + SWARA_SEMITONE[k]);
 
-  const PATTERNS = {
-    twoUp: [0, 1, 0],
-    twoDown: [0, -1, 0],
-    three: [0, 1, 2, 1, 0],
-    five: [0, 1, 2, 3, 4, 3, 2, 1, 0],
-  };
+  const EXERCISES = [
+    {
+      key: "twoNote", title: "Exercise 1 — Two-note movement", swaras: ["sa", "ri", "sa"],
+      purpose: "Build the simplest possible movement between two nearby notes.",
+      instructions: "Listen to Sa–Ri–Sa, then sing it slowly and gently.",
+      repetitions: "Two or three times.", rest: "Rest between attempts.",
+      listening: "Notice whether the move between Sa and Ri feels smooth.", mistakes: "Rushing the movement before it feels comfortable.",
+    },
+    {
+      key: "threeNote", title: "Exercise 2 — Three-note patterns", swaras: ["sa", "ri", "ga", "ri", "sa"],
+      purpose: "Extend to a small three-note pattern.",
+      instructions: "Listen to Sa–Ri–Ga–Ri–Sa, then sing it slowly.",
+      repetitions: "Two or three times.", rest: "Rest between attempts.",
+      listening: "Notice whether each note stays clear, especially Ga.", mistakes: "Sliding between notes instead of singing each one clearly.",
+    },
+    {
+      key: "fourNote", title: "Exercise 3 — Four-note patterns", swaras: ["sa", "ri", "ga", "ma", "ga", "ri", "sa"],
+      purpose: "Extend further to a four-note pattern.",
+      instructions: "Listen to Sa–Ri–Ga–Ma–Ga–Ri–Sa, then sing it slowly.",
+      repetitions: "One or two times.", rest: "Rest between attempts.",
+      listening: "Notice whether Ma stays clear and in tune with the rest.", mistakes: "Losing accuracy on the highest note of the pattern.",
+    },
+    {
+      key: "updown", title: "Exercise 4 — Gentle ascending and descending patterns", swaras: ["sa", "ri", "ga", "ma"],
+      purpose: "Clearly distinguish ascending movement from descending movement.",
+      instructions: "Listen to the ascending Sa–Ri–Ga–Ma, then the descending Ma–Ga–Ri–Sa, separately.",
+      repetitions: "Once each.", rest: "Rest between the two.",
+      listening: "Notice whether ascending or descending feels easier.", mistakes: "Treating both directions as identical.",
+    },
+    {
+      key: "repeated", title: "Exercise 5 — Repeated-note patterns", swaras: ["sa", "sa", "ri", "ri", "sa", "sa"],
+      purpose: "Practise repeating a single note clearly before moving, building coordination without pitch change.",
+      instructions: "Listen to Sa-Sa–Ri-Ri–Sa-Sa, then sing it, keeping each repeated note clear and even.",
+      repetitions: "Two or three times.", rest: "Rest between attempts.",
+      listening: "Notice whether the repeated notes stay even in tone and timing.", mistakes: "Letting repeated notes blur together.",
+    },
+    {
+      key: "variation", title: "Exercise 6 — Simple melodic variations", swaras: ["sa", "ga", "ri", "ma", "ga", "ri", "sa"],
+      purpose: "Explore a varied ordering of the same four notes.",
+      instructions: "Listen to Sa–Ga–Ri–Ma–Ga–Ri–Sa — the same notes as Exercise 3, in a different order.",
+      repetitions: "Once or twice.", rest: "Rest between attempts.",
+      listening: "Notice how reordering the same notes changes the shape of the pattern.", mistakes: "Confusing this variation with Exercise 3's pattern.",
+    },
+  ];
+
+  const TEMPO_PATTERN = ["sa", "ri", "ga", "ri", "sa"];
+  const TEMPOS = [
+    { key: "slow", label: "Slow", duration: 0.9, gap: 0.4 },
+    { key: "medium", label: "Comfortable medium", duration: 0.6, gap: 0.25 },
+    { key: "fast", label: "Slightly faster", duration: 0.4, gap: 0.12 },
+  ];
+
+  const KNOWLEDGE_CHECK = [
+    {
+      key: "whatIsAgility",
+      question: "What does vocal agility mean?",
+      options: [
+        { value: "fast", label: "Singing as fast as possible", correct: false },
+        { value: "control", label: "Moving between notes smoothly and accurately", correct: true },
+        { value: "loud", label: "Singing loudly across a wide range", correct: false },
+      ],
+      explain: { fast: "Not quite — agility isn't about raw speed.", control: "Exactly right.", loud: "Not quite — agility has nothing to do with volume." },
+    },
+    {
+      key: "stepwise",
+      question: "What is stepwise movement?",
+      options: [
+        { value: "neighbour", label: "Moving to a neighbouring, nearby note", correct: true },
+        { value: "jump", label: "A large jump between distant notes", correct: false },
+        { value: "repeat", label: "Singing the same note twice", correct: false },
+      ],
+      explain: { neighbour: "Exactly right.", jump: "Not quite — that describes a larger interval, not a step.", repeat: "Not quite — that's a repeated note, not a step." },
+    },
+    {
+      key: "priority",
+      question: "Should speed be prioritised over accuracy?",
+      options: [
+        { value: "yes", label: "Yes, speed matters most", correct: false },
+        { value: "no", label: "No — accuracy and comfort come first; speed develops later", correct: true },
+        { value: "equal", label: "They're equally important from the start", correct: false },
+      ],
+      explain: { yes: "Not quite — this class explicitly reverses that priority.", no: "Right.", equal: "Not quite — accuracy comes first here." },
+    },
+    {
+      key: "tempoProgress",
+      question: "Does increasing tempo always mean better progress?",
+      options: [
+        { value: "yes", label: "Yes, faster is always better", correct: false },
+        { value: "no", label: "No — only once accuracy is comfortably maintained", correct: true },
+        { value: "sometimes", label: "Only for advanced singers", correct: false },
+      ],
+      explain: { yes: "Not quite — speed without accuracy isn't real progress.", no: "Exactly right.", sometimes: "Not quite — this applies to every learner at this stage." },
+    },
+    {
+      key: "ragaClaim",
+      question: "Are the Sa-Ri-Ga-style patterns in this class full ragas or formal compositions?",
+      options: [
+        { value: "yes", label: "Yes, each is a named raga", correct: false },
+        { value: "no", label: "No — they're beginner practice patterns", correct: true },
+        { value: "unsure", label: "This class doesn't say", correct: false },
+      ],
+      explain: { yes: "Not quite — none of these patterns are presented as ragas.", no: "Exactly right.", unsure: "It does say — the theory section states this explicitly." },
+    },
+  ];
 
   const CHECKLIST_ITEMS = [
-    { key: "understood", label: "I understand what vocal agility means." },
-    { key: "triedTwoNote", label: "I tried the two-note movement, ascending and/or descending." },
-    { key: "triedThreeNote", label: "I tried the three-note pattern, or chose to skip it." },
-    { key: "keptItSlow", label: "I kept the pattern slow and comfortable rather than rushing." },
-    { key: "reflectionRecorded", label: "I reflected on the exercise, or chose not to." },
+    { key: "understoodAgility", label: "I understand what vocal agility means." },
+    { key: "triedSimple", label: "I tried at least one simple pattern (two-note, three-note, or four-note)." },
+    { key: "triedAdvanced", label: "I tried at least one of ascending/descending, repeated-note, or variation." },
+    { key: "triedTempo", label: "I tried the gradual tempo increase, or chose to stay slow." },
+    { key: "stayedRelaxed", label: "I kept my voice relaxed throughout." },
+    { key: "reflected", label: "I reflected on which pattern felt most difficult." },
   ];
   const PROGRESS_ITEMS = CHECKLIST_ITEMS;
 
   const opt = (value, label, tone = "neutral") => ({ value, label, tone });
   const Q = {
-    heardEachNote: { question: "Could I hear each note clearly?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
-    movedSmoothly: { question: "Did I move between notes smoothly?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
-    rushed: { question: "Did I rush?", options: [opt("no", "No", "good"), opt("alittle", "A little"), opt("yes", "Yes"), opt("unsure", "Not sure")] },
-    throatRelaxed: { question: "Did my throat remain relaxed?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
-    easierSecondTime: { question: "Was the pattern easier the second time?", options: [opt("yes", "Yes", "good"), opt("similar", "About the same"), opt("no", "Not really"), opt("unsure", "Not sure")] },
-    easiestPattern: { question: "Which pattern felt easiest?", options: [opt("two", "Two notes"), opt("three", "Three notes"), opt("five", "Five notes"), opt("unsure", "Not sure")] },
-    direction: { question: "Was ascending or descending easier?", options: [opt("ascending", "Ascending"), opt("descending", "Descending"), opt("similar", "About the same"), opt("unsure", "Not sure")] },
-    temptedFaster: { question: "Did I feel tempted to sing faster?", options: [opt("no", "No", "good"), opt("alittle", "A little"), opt("yes", "Yes"), opt("unsure", "Not sure")] },
-    remainedComfortable: { question: "Did I remain comfortable?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
+    notesClear: { question: "Were the notes clear?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
+    movedComfortably: { question: "Could I move between notes comfortably?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
+    lostAccuracy: { question: "Did I lose accuracy when increasing speed?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Didn't increase speed")] },
+    hardestPattern: {
+      question: "Which pattern was most difficult?",
+      options: [opt("two", "Two-note"), opt("three", "Three-note"), opt("four", "Four-note"), opt("updown", "Ascending/descending"), opt("repeated", "Repeated-note"), opt("variation", "Melodic variation"), opt("notsure", "Not sure")],
+    },
+    relaxed: { question: "Did I maintain a relaxed voice?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
   };
 
   const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
   const { p, narrow } = LessonKit;
   const A = (rec, g) => rec.answers[g] || {};
-  const filled = (v) => v && String(v).trim();
   const N = (m) => NoteUtils.name(m);
-  const degreesToNotes = (b, degrees) => degrees.map((d) => b + d * STEP);
 
   function baseNote(rec) {
-    const ok = (n) => typeof n === "number" && n - STEP >= RANGE.from && n + MAX_UP * STEP <= RANGE.to;
+    const ok = (n) => typeof n === "number" && n >= RANGE.from && n + MAX_UP * STEP <= RANGE.to;
     const own = A(rec, "setup").note;
     if (ok(own)) return own;
-    const l2c16 = (ClassActivity.get("L2C16").answers.setup || {}).note;
-    if (ok(l2c16)) return l2c16;
-    const l2c15 = (ClassActivity.get("L2C15").answers.setup || {}).note;
-    if (ok(l2c15)) return l2c15;
-    const l2c14 = (ClassActivity.get("L2C14").answers.setup || {}).note;
-    if (ok(l2c14)) return l2c14;
-    const l2c13 = (ClassActivity.get("L2C13").answers.setup || {}).note;
-    if (ok(l2c13)) return l2c13;
-    const l2c12 = (ClassActivity.get("L2C12").answers.setup || {}).note;
-    if (ok(l2c12)) return l2c12;
-    const l2c11 = (ClassActivity.get("L2C11").answers.setup || {}).note;
-    if (ok(l2c11)) return l2c11;
-    const l2c10 = (ClassActivity.get("L2C10").answers.setup || {}).note;
-    if (ok(l2c10)) return l2c10;
-    const l2c9 = (ClassActivity.get("L2C09").answers.setup || {}).note;
-    if (ok(l2c9)) return l2c9;
-    const l2c8 = (ClassActivity.get("L2C08").answers.setup || {}).note;
-    if (ok(l2c8)) return l2c8;
-    const l2c7 = (ClassActivity.get("L2C07").answers.setup || {}).note;
-    if (ok(l2c7)) return l2c7;
-    const l2c6 = (ClassActivity.get("L2C06").answers.setup || {}).note;
-    if (ok(l2c6)) return l2c6;
-    const l2c5 = (ClassActivity.get("L2C05").answers.setup || {}).note;
-    if (ok(l2c5)) return l2c5;
-    const l2c4 = (ClassActivity.get("L2C04").answers.setup || {}).note;
-    if (ok(l2c4)) return l2c4;
-    const l2c3 = (ClassActivity.get("L2C03").answers.setup || {}).note;
-    if (ok(l2c3)) return l2c3;
-    const l2c2 = (ClassActivity.get("L2C02").answers.setup || {}).note;
-    if (ok(l2c2)) return l2c2;
-    const l2c1 = (ClassActivity.get("L2C01").answers.setup || {}).note;
-    if (ok(l2c1)) return l2c1;
-    const c25 = (ClassActivity.get("L1C25").answers.setup || {}).note;
-    if (ok(c25)) return c25;
-    const c2 = (ClassActivity.get("L1C02").answers.setup || {}).note;
-    if (ok(c2)) return c2;
+    for (const id of ["L2C13", "L2C12", "L2C11", "L2C10", "L2C09", "L2C08", "L2C07", "L2C06", "L2C05", "L2C04", "L2C03", "L2C02", "L2C01", "L1C25", "L1C02"]) {
+      const n = (ClassActivity.get(id).answers.setup || {}).note;
+      if (ok(n)) return n;
+    }
     const fallback = (ClassActivity.get("L1C01").answers.setup || {}).voice === "lower" ? 50 : 60;
-    return Math.max(RANGE.from + STEP, Math.min(RANGE.to - MAX_UP * STEP, fallback));
+    return Math.max(RANGE.from, Math.min(RANGE.to - MAX_UP * STEP, fallback));
   }
 
   const take = (rec, k) => A(rec, "recs")[k] || null;
@@ -173,24 +210,84 @@ const VocalAgilityDevelopmentLesson = (() => {
   }
 
   /* ---------- small views ---------- */
-  const recCard = (k, title, hint, max = 10) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
+  const recCard = (k, title, hint, max = 15) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
   const skipBtn = (k, label = "Skip this exercise") => `<button type="button" data-skip-ex="${k}" class="text-xs text-ink-500 hover:text-ink-300 underline">${label}</button>`;
-  const flowStrip = (steps) => `<div class="flex flex-wrap items-center justify-center gap-2 my-4">${steps.map((s, i, arr) => `<span class="flow-chip !text-sm">${s}</span>${i < arr.length - 1 ? `<span class="text-ink-700 text-xs">→</span>` : ""}`).join("")}</div>`;
+
+  function ladderHtml(swaras, activeIndex = -1) {
+    return `<div class="flex flex-wrap items-end justify-center gap-2 my-3">
+      ${swaras.map((s, i) => `
+        <div class="flex flex-col items-center gap-1 px-2.5 py-2 rounded-xl border transition-colors ${activeIndex === i ? "border-gold-400/50 bg-gold-500/15" : "border-white/10 bg-white/[0.02]"}">
+          <span class="font-display text-base ${activeIndex === i ? "text-gold-300" : "text-ink-100"}">${SWARA_LABEL[s]}</span>
+        </div>`).join("")}
+    </div>`;
+  }
+
+  const FIELD = (label, value) => `<p class="text-xs text-ink-300 leading-relaxed"><span class="text-ink-500 uppercase tracking-wide text-[10px]">${label}:</span> ${value}</p>`;
+  function exerciseCardHtml(ex) {
+    return `<div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 mb-4" data-exercise-card="${ex.key}">
+      <p class="font-display text-lg text-ink-50 mb-2">${ex.title}</p>
+      <div data-pattern-ladder="${ex.key}">${ladderHtml(ex.swaras)}</div>
+      <div class="flex flex-col gap-1.5 mb-4">
+        ${FIELD("Purpose", ex.purpose)}
+        ${FIELD("Instructions", ex.instructions)}
+        ${FIELD("Repetitions", ex.repetitions)}
+        ${FIELD("Rest", ex.rest)}
+        ${FIELD("Listening focus", ex.listening)}
+        ${FIELD("Common mistakes", ex.mistakes)}
+      </div>
+      <div class="flex flex-wrap gap-3 mb-3">
+        <button type="button" data-play-ex="${ex.key}" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen</button>
+      </div>
+      ${recCard(`${ex.key}Take`, `Recording for ${ex.title.replace(/^Exercise \d+ — /, "")}`, "Entirely optional.", 15)}
+      <div class="mt-2">${skipBtn(ex.key)}</div>
+    </div>`;
+  }
+
+  function problems() {
+    const items = [
+      ["Trying to sing fast before the pattern feels comfortable slowly", "Stay slow until the pattern feels easy, then increase tempo gradually."],
+      ["Sliding between notes instead of singing each one clearly", "Aim for clear, distinct notes, even at a slow tempo."],
+      ["Pushing volume to reach the higher notes in a pattern", "Keep the volume comfortable throughout — agility isn't about power."],
+      ["Treating these patterns as named ragas or finished compositions", "These are simple beginner practice patterns only."],
+      ["Practising through tension or fatigue to 'get it right'", "Rest and return later — a relaxed voice matters more than finishing today."],
+    ];
+    return `<div class="flex flex-col gap-2">${items.map(([t, a]) => `
+      <details class="group rounded-2xl border border-white/5 bg-white/[0.02] px-5 py-4">
+        <summary class="cursor-pointer list-none flex items-center justify-between gap-3 text-ink-100 font-display text-lg">${t}<span class="text-ink-500 text-sm transition-transform group-open:rotate-45">＋</span></summary>
+        <p class="text-sm text-ink-300 leading-relaxed mt-3">${a}</p>
+      </details>`).join("")}</div>`;
+  }
 
   function reviewHtml(rec) {
-    const sources = [["twoUpTake", "Two notes, ascending"], ["twoDownTake", "Two notes, descending"], ["threeTake", "Three-note pattern"], ["fiveTake", "Five-note pattern"]];
+    const sources = [...EXERCISES.map((ex) => [`${ex.key}Take`, ex.title.replace(/^Exercise \d+ — /, "")]), ["tempoTake", "Gradual tempo increase"], ["applyTake", "Melodic agility application"]];
     const present = sources.filter(([k]) => take(rec, k));
-    if (!present.length) return `<p class="text-sm text-ink-500">Record any of the two-note, three-note, or five-note attempts above — then come back here to listen and compare.</p>`;
+    if (!present.length) return `<p class="text-sm text-ink-500">Record any of the exercises above, then come back here to listen and reflect.</p>`;
     return `<div class="flex flex-wrap gap-2 mb-4">${present.map(([k, label]) => `<button type="button" data-play-review="${k}" class="vr-btn">${icon("play", "w-3.5 h-3.5")} ${label}</button>`).join("")}</div>`;
+  }
+
+  function knowledgeCheckHtml(rec) {
+    return `<div class="flex flex-col gap-5" data-kc>
+      ${KNOWLEDGE_CHECK.map((item) => {
+        const selected = q(rec, `kc_${item.key}`);
+        return `
+        <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-4" data-kc-item="${item.key}">
+          <p class="text-sm text-ink-200 mb-2.5">${item.question}</p>
+          <div class="flex flex-wrap gap-2">
+            ${item.options.map((o) => `<button type="button" data-kc-choice="${o.value}" class="ex-chip ${selected === o.value ? "is-selected" : ""}">${o.label}</button>`).join("")}
+          </div>
+          ${selected ? `<p class="text-xs mt-2.5 ${item.options.find((o) => o.value === selected).correct ? "text-emerald-300" : "text-amber-300"}">${item.explain[selected]}</p>` : ""}
+        </div>`;
+      }).join("")}
+      <p class="text-xs text-ink-500">This is a quick concept check, not a vocal-performance score.</p>
+    </div>`;
   }
 
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
         <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 18 milestone</p>
-        <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Smooth and slow beats fast and unclear.</p>
-        <p class="text-sm text-ink-300">Agility is about moving between notes comfortably and accurately — speed comes later, once coordination feels easy.</p>
-        <p class="text-sm text-ink-100">A two-note movement, practised comfortably, is already real progress.</p>
+        <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Smooth first, fast later.</p>
+        <p class="text-sm text-ink-300">A slow, accurate pattern is worth more than a fast, unclear one.</p>
       </div>`;
   }
 
@@ -204,7 +301,7 @@ const VocalAgilityDevelopmentLesson = (() => {
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
         <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 19 — Tone Consistency and Vocal Endurance</p>
-        <p class="text-sm text-ink-300 leading-relaxed">The next lesson listens to how tone changes across nearby notes, and carries that same comfortable coordination across a slightly longer phrase.</p>
+        <p class="text-sm text-ink-300 leading-relaxed">The next lesson explores comfortable, consistent tone across your range and over slightly longer phrases.</p>
       </div>`;
     if (status === "completed") {
       return `
@@ -212,7 +309,7 @@ const VocalAgilityDevelopmentLesson = (() => {
           ${milestone()}
           <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.05] p-6 sm:p-8 text-center">
             <p class="text-[11px] tracking-[0.25em] uppercase text-emerald-300 mb-2">Class complete</p>
-            <h3 class="font-display text-2xl text-ink-50 mb-5">Simple, slow movements between nearby notes — the start of vocal agility.</h3>
+            <h3 class="font-display text-2xl text-ink-50 mb-5">Vocal agility is moving between notes with control — not simply singing fast.</h3>
             <ul class="inline-flex flex-col gap-2 text-left mx-auto">${lines}</ul>
             ${preview}
             ${next ? `
@@ -252,7 +349,7 @@ const VocalAgilityDevelopmentLesson = (() => {
     const b = baseNote(rec);
     const sel = (k) => q(rec, k);
     const c = checklist(rec);
-    const growth = A(rec, "growth");
+    const tempoKey = A(rec, "tempo").selected || "slow";
 
     return `
     <div class="pitch-lesson">
@@ -261,111 +358,76 @@ const VocalAgilityDevelopmentLesson = (() => {
 
       <div class="max-w-5xl mx-auto px-5 lg:px-8 py-12 flex flex-col gap-20">
 
-        ${chapter("understand", 1, "Part A — Understand vocal agility", `
-          ${narrow(`
-            ${p("Vocal agility is the ability to move between notes with flexibility and control — it helps with melodic patterns, runs, and quick note changes. Agility begins with simple, slow movements; speed comes later, once coordination improves.")}
-            ${p("A smooth and accurate slow pattern is far more useful than a fast, unclear one.")}
-            <ul class="flex flex-col gap-1.5 text-sm text-ink-300 mb-2">
-              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Ascending:</strong> moving from lower notes to higher notes.</li>
-              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Descending:</strong> moving from higher notes to lower notes.</li>
-              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Melodic pattern:</strong> a small group of notes arranged in a sequence.</li>
-            </ul>
-          `)}
+        ${chapter("recap", 1, "Section A — Recap", `
+          ${narrow(p("Class 15 explored controlled range development, Class 16 explored sustained notes, and Class 17 explored vocal dynamics. A gentle warm-up before today's agility work:"))}
+          <div class="flex flex-wrap gap-3 mb-2">
+            <button type="button" data-play-recap class="vr-btn">${icon("play", "w-4 h-4")} Gentle warm-up</button>
+          </div>
           <div data-lesson-viewed-sentinel class="h-px"></div>
         `)}
 
-        ${chapter("prepare", 2, "Part B — Gentle preparation", `
+        ${chapter("understand", 2, "Section B — Understanding vocal agility", `
           ${narrow(`
-            <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed">
-              ${["Relax your jaw, shoulders, and neck.", "Breathe normally.", "Make a gentle hum, if comfortable.", "Sing one comfortable note.", "Rest briefly."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
-            </ol>
+            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed">
+              ${["Melodic movement means moving from one note to another.", "Stepwise movement is to a nearby note; a larger jump skips several notes.", "Accuracy is more important than speed.", "Repetition develops coordination over time.", "Start slowly — speed comes later, once the pattern feels easy."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
+            </ul>
           `)}
         `)}
 
-        ${chapter("twoNote", 3, "Part C — Two-note movement", `
-          ${narrow(p("Choose a comfortable starting note below. Sing it, move to the nearby higher note, then return — repeat slowly if comfortable. Then try the same movement going down to a nearby lower note. Focus on hearing the difference between the notes, moving without pushing, and keeping both notes comfortable and relaxed."))}
+        ${chapter("exercises", 3, "Section C — Guided exercises", `
+          ${narrow(p("All six patterns are built from your own chosen Sa — choose a comfortable Sa on the piano below. These are beginner practice patterns, not named ragas or formal compositions."))}
           <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-3">
             ${VirtualPiano.render("vad-piano", { controls: false, keyboard: true, display: true })}
           </div>
-          ${narrow(`<p class="text-sm text-ink-300 mb-5">Your note: <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong> <span class="text-ink-500 text-xs" data-base-hint></span></p>`)}
-          <div class="grid sm:grid-cols-2 gap-4">
-            <div>
-              <p class="text-sm text-ink-200 mb-2">Ascending</p>
-              <button type="button" data-play-pattern="twoUp" class="vr-btn vr-btn-gold mb-3">${icon("play", "w-4 h-4")} Listen</button>
-              ${recCard("twoUpTake", "Two notes, ascending", "", 10)}
-            </div>
-            <div>
-              <p class="text-sm text-ink-200 mb-2">Descending</p>
-              <button type="button" data-play-pattern="twoDown" class="vr-btn vr-btn-gold mb-3">${icon("play", "w-4 h-4")} Listen</button>
-              ${recCard("twoDownTake", "Two notes, descending", "", 10)}
-            </div>
-          </div>
+          ${narrow(`<p class="text-sm text-ink-300 mb-5">Your Sa: <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong></p>`)}
+          ${EXERCISES.map((ex) => exerciseCardHtml(ex)).join("")}
         `, { wide: true })}
 
-        ${chapter("threeNote", 4, "Part D — Three-note patterns", `
-          ${narrow(p("A simple three-note pattern — 1 → 2 → 3 → 2 → 1, where the numbers are relative positions in your own comfortable range, not fixed notes. Listen first, sing it slowly, pause, and repeat only if comfortable. Listen again afterward and notice whether the movement feels smoother."))}
-          ${flowStrip(["1", "2", "3", "2", "1"])}
-          <div class="flex flex-wrap gap-3 mb-4">
-            <button type="button" data-play-pattern="three" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen</button>
+        ${chapter("tempo", 4, "Section D — Interactive practice: gradual tempo increase", `
+          ${narrow(p("Using Exercise 2's three-note pattern (Sa–Ri–Ga–Ri–Sa), choose a tempo. Only move to a faster tempo once the slower one feels comfortable and accurate."))}
+          <div class="flex flex-wrap gap-2 mb-4" data-tempo-buttons>
+            ${TEMPOS.map((t) => `<button type="button" data-tempo-select="${t.key}" class="ex-chip ${tempoKey === t.key ? "is-selected" : ""}">${t.label}</button>`).join("")}
           </div>
-          ${recCard("threeTake", "Three-note pattern", "", 12)}
+          <div class="flex flex-wrap gap-3 mb-3">
+            <button type="button" data-play-tempo class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen at this tempo</button>
+          </div>
+          ${recCard("tempoTake", "Singing the pattern at your chosen tempo", "Entirely optional.", 15)}
         `)}
 
-        ${chapter("fiveNote", 5, "Part E — A gentle five-note pattern (optional)", `
-          ${narrow(p("Only once the three-note pattern feels familiar: 1 → 2 → 3 → 4 → 5 → 4 → 3 → 2 → 1, kept slow and within a comfortable range. Listen first, sing one note at a time, pause between attempts, and return to the starting note comfortably. You can complete this lesson without this exercise at all."))}
-          ${flowStrip(["1", "2", "3", "4", "5", "4", "3", "2", "1"])}
-          <div class="flex flex-wrap gap-3 mb-4">
-            <button type="button" data-play-pattern="five" class="vr-btn">${icon("play", "w-4 h-4")} Listen</button>
-          </div>
-          ${recCard("fiveTake", "Five-note pattern", "Entirely optional.", 16)}
-          ${narrow(`<div class="mt-3">${skipBtn("five")}</div>`)}
-        `)}
-
-        ${chapter("smoothness", 6, "Part F — Smoothness before speed", `
+        ${chapter("apply", 5, "Section E — Practical application", `
           ${narrow(`
-            ${p("Agility develops in stages:")}
             <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-4">
-              ${["Learn the note sequence.", "Sing slowly and accurately.", "Make the transitions smoother.", "Repeat comfortably.", "Increase speed only when the pattern is already easy."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
+              ${["Listen.", "Sing slowly.", "Repeat accurately.", "Increase speed slightly.", "Compare the result."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
             </ol>
-            ${p("There's no automatic speed increase and no target tempo here — slow, comfortable practice is successful practice.")}
-            <button type="button" data-play-pattern="three" class="vr-btn mt-2">${icon("play", "w-4 h-4")} Play the three-note pattern again, slowly</button>
           `)}
+          <div class="flex flex-wrap gap-3 mb-3">
+            <button type="button" data-play-apply class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen</button>
+          </div>
+          ${recCard("applyTake", "The melodic agility application", "Entirely optional.", 15)}
         `)}
 
-        ${chapter("record", 7, "Part G — Listen and compare", `
-          ${narrow(p("Listen back to any of your recordings above and compare them. If you'd rather not record, the questions below work just as well as a self-reflection — simply answer from memory."))}
+        ${chapter("record", 6, "Section F — Recording and self-assessment", `
+          ${narrow(p("Recording is entirely optional — nothing here is automatically analyzed, and no recording is sent anywhere outside your own account."))}
           <div data-review-host>${reviewHtml(rec)}</div>
           ${narrow(`
             <div class="flex flex-col gap-4 mt-5">
-              ${SelfAssessment.render("heardEachNote-q", { ...Q.heardEachNote, selected: sel("heardEachNote") })}
-              ${SelfAssessment.render("movedSmoothly-q", { ...Q.movedSmoothly, selected: sel("movedSmoothly") })}
-              ${SelfAssessment.render("rushed-q", { ...Q.rushed, selected: sel("rushed") })}
-              ${SelfAssessment.render("throatRelaxed-q", { ...Q.throatRelaxed, selected: sel("throatRelaxed") })}
-              ${SelfAssessment.render("easierSecondTime-q", { ...Q.easierSecondTime, selected: sel("easierSecondTime") })}
+              ${SelfAssessment.render("notesClear-q", { ...Q.notesClear, selected: sel("notesClear") })}
+              ${SelfAssessment.render("movedComfortably-q", { ...Q.movedComfortably, selected: sel("movedComfortably") })}
+              ${SelfAssessment.render("lostAccuracy-q", { ...Q.lostAccuracy, selected: sel("lostAccuracy") })}
+              ${SelfAssessment.render("hardestPattern-q", { ...Q.hardestPattern, selected: sel("hardestPattern") })}
+              ${SelfAssessment.render("relaxed-q", { ...Q.relaxed, selected: sel("relaxed") })}
             </div>
           `)}
         `)}
 
-        ${chapter("reflect", 8, "Part H — Reflection", `
-          ${narrow(`
-            <div class="flex flex-col gap-4">
-              ${SelfAssessment.render("easiestPattern-q", { ...Q.easiestPattern, selected: sel("easiestPattern") })}
-              ${SelfAssessment.render("direction-q", { ...Q.direction, selected: sel("direction") })}
-              ${SelfAssessment.render("temptedFaster-q", { ...Q.temptedFaster, selected: sel("temptedFaster") })}
-              ${SelfAssessment.render("remainedComfortable-q", { ...Q.remainedComfortable, selected: sel("remainedComfortable") })}
-            </div>
-            <div class="mt-4"><label class="block text-sm text-ink-200 mb-1.5" for="vad-transition">Which transition needs more practice?</label><textarea id="vad-transition" data-growth="transition" rows="2" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.transition || "")}</textarea></div>
-          `)}
+        ${chapter("quiz", 7, "Knowledge check", `
+          ${narrow(p("A quick concept check — not a vocal-performance score."))}
+          ${knowledgeCheckHtml(rec)}
         `)}
 
-        ${chapter("complete", 9, "My Notes", `
-          ${p("Your private notebook for this class. Only you can see it.")}
-          ${PersonalNotes.render("notes-vad", { placeholder: "e.g. Which pattern felt most natural... Whether ascending or descending was easier... What I want to try next time..." })}
-        `)}
-
-        ${chapter("complete", 10, "Reflection and completion", `
+        ${chapter("reflect", 8, "Section G — Reflection and completion", `
           ${narrow(`
-            ${p("A simple checklist — tick what's true for you. Completion doesn't depend on the five-note pattern, a particular speed, perfect pitch accuracy, a recording, or completing optional repetitions.")}
+            ${p("A simple checklist — tick what's true for you.")}
             <div class="flex flex-col gap-1 mb-5">
               ${CHECKLIST_ITEMS.map((item, i) => `
                 <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">
@@ -376,9 +438,24 @@ const VocalAgilityDevelopmentLesson = (() => {
           `)}
         `)}
 
-        ${chapter("complete", 11, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+        ${chapter("complete", 9, "Common beginner mistakes", problems())}
 
-        ${chapter("complete", 12, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
+        ${chapter("complete", 10, "My Notes", `
+          ${p("Your private notebook for this class. Only you can see it.")}
+          ${PersonalNotes.render("notes-vad", { placeholder: "e.g. Which pattern felt most difficult... Whether I increased tempo comfortably... What I want to try next time..." })}
+        `)}
+
+        ${chapter("complete", 11, "Vocal safety", `
+          ${narrow(`
+            ${p("Don't force high or low notes or sing through fatigue. Rest between exercises, and never increase tempo past what feels comfortable and accurate.")}
+            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort. If discomfort repeatedly occurs, seek guidance from a qualified voice professional.")}
+            <div data-warmup-note></div>
+          `)}
+        `)}
+
+        ${chapter("complete", 12, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+
+        ${chapter("complete", 13, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
       </div>
     </div>`;
   }
@@ -412,27 +489,70 @@ const VocalAgilityDevelopmentLesson = (() => {
     }));
     LessonKit.loadAndRefresh(container, classId, params);
 
-    /* ---- Part C: piano + pattern playback ---- */
+    /* ---- Section A: recap playback ---- */
+    function onPlayRecap(e) {
+      if (!e.target.closest("[data-play-recap]")) return;
+      PianoSynth.playSequence(swaraNotes(base(), ["sa", "ri", "sa"]), { duration: 0.6, gap: 0.2 });
+    }
+    container.addEventListener("click", onPlayRecap);
+    cleanups.push(() => container.removeEventListener("click", onPlayRecap));
+
+    /* ---- knowledge check ---- */
+    function onKcChoice(e) {
+      const btn = e.target.closest("[data-kc-choice]");
+      if (!btn) return;
+      const itemEl = btn.closest("[data-kc-item]");
+      const key = itemEl.dataset.kcItem;
+      set("q", `kc_${key}`, btn.dataset.kcChoice);
+      $("[data-kc]").outerHTML = knowledgeCheckHtml(rec0());
+    }
+    container.addEventListener("click", onKcChoice);
+    cleanups.push(() => container.removeEventListener("click", onKcChoice));
+
+    /* ---- Section C: piano + exercise playback with ladder highlighting ---- */
     own(VirtualPiano.wire(container, "vad-piano", {
       range: RANGE, keyboard: true,
-      onNote: ({ midi }) => {
-        if (midi - STEP < RANGE.from || midi + MAX_UP * STEP > RANGE.to) {
-          $("[data-base-hint]").textContent = `(choose a note between ${N(RANGE.from + STEP)} and ${N(RANGE.to - MAX_UP * STEP)} so every pattern stays comfortable)`;
-          return;
-        }
-        set("setup", "note", midi);
-        $("[data-base-note]").textContent = N(midi);
-        $("[data-base-hint]").textContent = "";
-      },
+      onNote: ({ midi }) => { if (midi >= RANGE.from && midi + MAX_UP * STEP <= RANGE.to) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
     }));
-    function onPlayPattern(e) {
-      const btn = e.target.closest("[data-play-pattern]");
+    function onPlayEx(e) {
+      const btn = e.target.closest("[data-play-ex]");
       if (!btn) return;
-      const degrees = PATTERNS[btn.dataset.playPattern];
-      PianoSynth.playSequence(degreesToNotes(base(), degrees), { duration: 0.65, gap: 0.25 });
+      const ex = EXERCISES.find((x) => x.key === btn.dataset.playEx);
+      if (!ex) return;
+      const host = $(`[data-pattern-ladder="${ex.key}"]`);
+      PianoSynth.playSequence(swaraNotes(base(), ex.swaras), {
+        duration: 0.6, gap: 0.2,
+        onNote: (i) => { if (host) host.innerHTML = ladderHtml(ex.swaras, i); },
+      });
     }
-    container.addEventListener("click", onPlayPattern);
-    cleanups.push(() => container.removeEventListener("click", onPlayPattern));
+    container.addEventListener("click", onPlayEx);
+    cleanups.push(() => container.removeEventListener("click", onPlayEx));
+
+    /* ---- Section D: tempo selector + playback ---- */
+    function onTempoSelect(e) {
+      const btn = e.target.closest("[data-tempo-select]");
+      if (!btn) return;
+      set("tempo", "selected", btn.dataset.tempoSelect);
+      container.querySelectorAll("[data-tempo-select]").forEach((b) => b.classList.toggle("is-selected", b === btn));
+    }
+    function onPlayTempo(e) {
+      if (!e.target.closest("[data-play-tempo]")) return;
+      const key = A(rec0(), "tempo").selected || "slow";
+      const t = TEMPOS.find((x) => x.key === key) || TEMPOS[0];
+      PianoSynth.playSequence(swaraNotes(base(), TEMPO_PATTERN), { duration: t.duration, gap: t.gap });
+    }
+    container.addEventListener("click", onTempoSelect);
+    container.addEventListener("click", onPlayTempo);
+    cleanups.push(() => container.removeEventListener("click", onTempoSelect));
+    cleanups.push(() => container.removeEventListener("click", onPlayTempo));
+
+    /* ---- Section E: application playback ---- */
+    function onPlayApply(e) {
+      if (!e.target.closest("[data-play-apply]")) return;
+      PianoSynth.playSequence(swaraNotes(base(), ["sa", "ri", "ga", "ri", "sa"]), { duration: 0.5, gap: 0.15 });
+    }
+    container.addEventListener("click", onPlayApply);
+    cleanups.push(() => container.removeEventListener("click", onPlayApply));
 
     /* ---- skip buttons ---- */
     function onSkip(e) {
@@ -450,17 +570,17 @@ const VocalAgilityDevelopmentLesson = (() => {
       const host = $("[data-review-host]");
       if (host) host.innerHTML = reviewHtml(rec0());
     }
-    const NAMES = { twoUpTake: "Two notes, ascending", twoDownTake: "Two notes, descending", threeTake: "Three-note pattern", fiveTake: "Five-note pattern" };
-    const MAX_SECONDS = { twoUpTake: 10, twoDownTake: 10, threeTake: 12, fiveTake: 16 };
+    const EX_NAMES = Object.fromEntries(EXERCISES.map((ex) => [`${ex.key}Take`, ex.title]));
+    const NAMES = { ...EX_NAMES, tempoTake: "Gradual tempo increase", applyTake: "Melodic agility application" };
     Object.keys(NAMES).forEach((k) => {
       own(RecordingCard.wire(container, `rc-${k}`, {
-        classId, take: take(rec0(), k), maxSeconds: MAX_SECONDS[k],
-        meta: { name: `Level 2, Class 17 — ${NAMES[k]}`, exercise: `vocal-agility-development-${k}` },
+        classId, take: take(rec0(), k), maxSeconds: 15,
+        meta: { name: `Level 2, Class 18 — ${NAMES[k]}`, exercise: `vocal-agility-development-${k}` },
         onSaved: (t) => { set("recs", k, t); ClassActivity.bump(classId, "recordings"); refreshReviewHost(); },
       }));
     });
 
-    /* ---- Part G: play-to-review ---- */
+    /* ---- Section F: play-to-review ---- */
     function onPlayReview(e) {
       const btn = e.target.closest("[data-play-review]");
       if (!btn) return;
@@ -471,10 +591,7 @@ const VocalAgilityDevelopmentLesson = (() => {
     cleanups.push(() => container.removeEventListener("click", onPlayReview));
 
     /* ---- generic self-assess dispatcher ---- */
-    const assessMap = {
-      "heardEachNote-q": "heardEachNote", "movedSmoothly-q": "movedSmoothly", "rushed-q": "rushed", "throatRelaxed-q": "throatRelaxed", "easierSecondTime-q": "easierSecondTime",
-      "easiestPattern-q": "easiestPattern", "direction-q": "direction", "temptedFaster-q": "temptedFaster", "remainedComfortable-q": "remainedComfortable",
-    };
+    const assessMap = { "notesClear-q": "notesClear", "movedComfortably-q": "movedComfortably", "lostAccuracy-q": "lostAccuracy", "hardestPattern-q": "hardestPattern", "relaxed-q": "relaxed" };
     function onAssess(e) {
       const chip = e.target.closest("[data-assess-choice]");
       if (!chip) return;
@@ -486,13 +603,6 @@ const VocalAgilityDevelopmentLesson = (() => {
     }
     container.addEventListener("click", onAssess);
     cleanups.push(() => container.removeEventListener("click", onAssess));
-
-    /* ---- reflection textarea ---- */
-    container.querySelectorAll("[data-growth]").forEach((ta) => {
-      const key = ta.dataset.growth;
-      const save = Utils.debounce((v) => set("growth", key, v), 500);
-      ta.addEventListener("input", () => save(ta.value));
-    });
 
     /* ---- completion checklist ---- */
     function onChecklist(e) {
@@ -517,15 +627,14 @@ const VocalAgilityDevelopmentLesson = (() => {
     function onComplete(e) {
       const btn = e.target.closest("[data-complete-class]");
       if (!btn || btn.disabled) return;
-      const rec = rec0();
       Store.completeClass(classId);
       ClassActivity.markCompleted(classId);
       Store.addJournalEntry({
         classId,
         classTitle: `Level 2, Class ${cls.number} — ${cls.title}`,
-        learned: "Vocal agility is about moving between notes comfortably and accurately, not about singing fast — a smooth, slow pattern is more useful than a fast, unclear one.",
-        struggled: q(rec, "rushed") && q(rec, "rushed") !== "no" ? "Noticed some rushing while moving between notes." : "",
-        toPractice: A(rec, "growth").transition || "",
+        learned: "Vocal agility is moving between notes with control — accuracy and comfort come first, speed develops later.",
+        struggled: "",
+        toPractice: "",
         thoughts: "",
       });
       Router.softRefresh(container, ClassDetailPage, params);

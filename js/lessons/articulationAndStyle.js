@@ -4,16 +4,14 @@
    Rendered by ClassDetailPage for interactive: "articulation-and-style".
 
    Curriculum identity: Level 2, Class 20 (`number: 20`, `levelId: 2`
-   in data.js, id `L2C20`). Same mechanism Classes 1-19 already
-   proved nineteen times over. This class's own title matched the
-   placeholder list's already-renamed entry exactly (renamed from
-   "Tone Consistency Across Range" during Class 19's turn), so
-   nothing needed renaming or adding to bring Class 20 itself onto
-   the page.
-
-   This spec's own "Next class preview" names the real Class 21 as
-   "Vocal Endurance Foundations" — `levelClassDefs[2]` is renamed in
-   place again, the same precedent every class since 5 has followed.
+   in data.js, id `L2C20`). Rebuilt again against this class's own
+   later, more detailed spec (seven named guided exercises with
+   purpose/instructions/repetitions/rest/listening-focus/mistakes, an
+   optional Kannada lyric example, a simple legato/staccato
+   introduction, a practical application comparing a natural and a
+   smoother delivery, a short personal-style section, and a
+   5-question knowledge check) — supersedes the previous version.
+   Part of a combined rebuild alongside Classes 18 and 19.
 
    Core idea: articulation is making sung words understandable
    without interrupting the melody — vowels carry the sustained
@@ -25,41 +23,29 @@
    or accent correction.
 
    Honesty boundaries, matching every earlier class: no automatic
-   pronunciation scoring or speech-recognition (the spec explicitly
-   forbids building one — none exists in this codebase); completion
-   never depends on perfect pronunciation, accent, speed, or
-   recording quality (the spec says this explicitly).
-
-   This spec gives its Section 5 (self-review) as six literal
-   first-person QUESTIONS, not checkbox self-attestations — these
-   become six `SelfAssessment` chip questions (Class 4's pattern),
-   kept separate from the completion checklist itself. "Completion
-   criteria" is a negative-constraints paragraph again, so this file
-   self-authors its own 5-item plain-checkbox checklist, the same
-   style Class 10's original `PRE_CHECK_ITEMS` established.
-
-   The short original practice phrase ("I will sing this phrase with
-   ease.") is new, plain, beginner-friendly text written for this
-   lesson — not quoted from anywhere — matching the same convention
-   Class 10's `SENTENCE` ("I am exploring my voice today.") already
-   set.
+   pronunciation scoring or speech-recognition; completion never
+   depends on perfect pronunciation, accent, speed, or recording
+   quality; no invented audio demo — the "listening activity" plays
+   the same synthesized reference tones used throughout the app, not
+   a fabricated vocal recording. The optional Kannada lyric line
+   ("ಓ ನನ್ನ ಚೇತನ", already used elsewhere in the app) is offered
+   without assuming every learner sings in Kannada.
 
    Reuses: LessonKit (+ its automatic Warm-up card), VirtualPiano
-   (Class 3) for the one comfortable reference note, PianoSynth's
-   relative-degree pattern playback (Level 1 Class 24 / Classes
-   15-19) for every reference example, RecordingCard (Class 5) for
-   the one phrase recording, SelfAssessment (Class 4), PersonalNotes,
-   ClassProgress.
+   (Class 3), PianoSynth's relative-degree pattern playback,
+   RecordingCard, SelfAssessment, PersonalNotes, ClassProgress.
    ============================================================ */
 
 const ArticulationAndStyleLesson = (() => {
   const STAGES = [
-    { id: "understand", label: "Understand" },
-    { id: "prepare", label: "Prepare" },
-    { id: "syllables", label: "Syllables" },
-    { id: "words", label: "Across Notes" },
-    { id: "phrase", label: "Phrase" },
-    { id: "style", label: "Style" },
+    { id: "intro", label: "Introduction" },
+    { id: "listen", label: "Listening" },
+    { id: "exercises", label: "Exercises" },
+    { id: "style", label: "Legato/Staccato" },
+    { id: "apply", label: "Apply" },
+    { id: "personal", label: "Personal Style" },
+    { id: "record", label: "Record" },
+    { id: "quiz", label: "Quiz" },
     { id: "reflect", label: "Reflect" },
     { id: "complete", label: "Complete" },
   ];
@@ -68,20 +54,125 @@ const ArticulationAndStyleLesson = (() => {
   const STEP = 2;
   const MAX_UP = 2;
 
-  const SYLLABLES = ["Ma", "Na", "La", "Da", "Ta"];
-  const SENTENCE = "I will sing this phrase with ease.";
+  const NEUTRAL_PHRASE = "I will sing this phrase with ease.";
+  const KANNADA_PHRASE = "ಓ ನನ್ನ ಚೇತನ";
+  const KANNADA_TRANSLIT = "Oo nanna chetana";
+  const SONG_HREF = "#/songs/oo-nanna-chetana";
+
   const PATTERNS = {
     nearby: [0, 1, 0, -1, 0],
     phrase: [0, 1, 2, 1, 0],
     connected: [0, 1, 2, 1, 0],
   };
+  const degreesToNotes = (b, degrees) => degrees.map((d) => b + d * STEP);
+
+  const EXERCISES = [
+    {
+      key: "consonant", title: "Exercise 1 — Gentle consonant awareness", degrees: null,
+      purpose: "Notice how consonants are formed, before any singing.",
+      instructions: `Say “ma,” “la,” “na,” “da,” “ta” slowly, noticing the brief consonant and the vowel that follows each one.`,
+      repetitions: "Once through the list.", rest: "No rest needed — this is gentle speech.",
+      listening: "Notice how short and light each consonant actually is.", mistakes: "Over-emphasising consonants with extra force.",
+    },
+    {
+      key: "vowel", title: "Exercise 2 — Vowel clarity exercises", degrees: [0],
+      purpose: "Practise sustaining a clear, steady vowel.",
+      instructions: "Sing a comfortable “ah” on your reference note, holding it gently for a couple of seconds.",
+      repetitions: "Two or three times.", rest: "Rest between attempts.",
+      listening: "Notice whether the vowel stays steady, without wavering or changing shape.", mistakes: "Letting the vowel shape drift partway through.",
+    },
+    {
+      key: "speakLyric", title: "Exercise 3 — Speaking a lyric naturally", degrees: null,
+      purpose: "Hear the words at a natural, spoken pace before singing them.",
+      instructions: `Speak the practice phrase naturally, the way you would in conversation. If you'd like, try the optional Kannada line too — there's no expectation that you sing in Kannada.`,
+      repetitions: "Once or twice.", rest: "No rest needed.",
+      listening: "Notice the natural rhythm and emphasis of the words.", mistakes: "Speaking too quickly to actually notice the words.",
+    },
+    {
+      key: "singSlow", title: "Exercise 4 — Singing the same lyric slowly", degrees: PATTERNS.phrase, tempo: { duration: 0.75, gap: 0.3 },
+      purpose: "Carry the same words into singing, slowly and clearly.",
+      instructions: "Sing the practice phrase slowly, along with the reference melody.",
+      repetitions: "Once or twice.", rest: "Rest after.",
+      listening: "Notice whether the words stay clear even while sustaining each note.", mistakes: "Letting consonants interrupt the melody's flow.",
+    },
+    {
+      key: "connectedSyllables", title: "Exercise 5 — Singing with connected syllables", degrees: PATTERNS.connected, tempo: { duration: 0.6, gap: 0.03 },
+      purpose: "Practise connecting syllables smoothly, without gaps between them.",
+      instructions: "Sing the phrase again, this time connecting each syllable smoothly into the next — this is what “legato” means.",
+      repetitions: "Once or twice.", rest: "Rest after.",
+      listening: "Notice how the words flow into each other without separation.", mistakes: "Leaving awkward silent gaps between syllables.",
+    },
+    {
+      key: "shortPhrase", title: "Exercise 6 — Practising short lyric phrases", degrees: PATTERNS.nearby, tempo: { duration: 0.5, gap: 0.2 },
+      purpose: "Practise a short phrase on its own, outside the full sentence.",
+      instructions: "Choose any short phrase, a few words, and sing it slowly, focused only on clarity.",
+      repetitions: "Two or three times.", rest: "Rest between attempts.",
+      listening: "Notice whether this short phrase feels easier than the full sentence.", mistakes: "Rushing through without listening back.",
+    },
+    {
+      key: "naturalExpression", title: "Exercise 7 — Repeating a phrase with natural expression", degrees: PATTERNS.phrase, tempo: { duration: 0.4, gap: 0.4 },
+      purpose: "Add a touch of natural expression to a repeated phrase.",
+      instructions: `Repeat the practice phrase a few times, letting your own natural expression come through rather than performing it one fixed "correct" way.`,
+      repetitions: "Two or three times.", rest: "Rest between attempts.",
+      listening: "Notice which repetition felt most natural to you.", mistakes: "Trying to imitate a specific singer's style instead of your own.",
+    },
+  ];
+
+  const KNOWLEDGE_CHECK = [
+    {
+      key: "vowelsConsonants", question: "What mainly carries the sustained sound in singing?",
+      options: [
+        { value: "consonants", label: "Consonants", correct: false },
+        { value: "vowels", label: "Vowels", correct: true },
+        { value: "both", label: "Neither — pitch alone does", correct: false },
+      ],
+      explain: { consonants: "Not quite — consonants help recognise words, but don't sustain the sound.", vowels: "Exactly right.", both: "Not quite — vowels are what carry a sustained tone." },
+    },
+    {
+      key: "interrupt", question: "Should a consonant interrupt or cut off the vowel that follows it?",
+      options: [
+        { value: "yes", label: "Yes, that keeps words clear", correct: false },
+        { value: "no", label: "No — it should stay brief and clear without cutting the vowel off", correct: true },
+        { value: "sometimes", label: "Only for emphasis", correct: false },
+      ],
+      explain: { yes: "Not quite — that would work against the melody.", no: "Exactly right.", sometimes: "Not quite — this holds throughout." },
+    },
+    {
+      key: "legato", question: "What does “legato” mean?",
+      options: [
+        { value: "legato", label: "Smoothly connected notes, with no gaps", correct: true },
+        { value: "staccato", label: "Short, separated notes", correct: false },
+        { value: "loud", label: "Singing loudly", correct: false },
+      ],
+      explain: { legato: "Exactly right.", staccato: "Not quite — that describes staccato instead.", loud: "Not quite — this isn't about volume." },
+    },
+    {
+      key: "staccato", question: "What does “staccato” mean?",
+      options: [
+        { value: "legato", label: "Smoothly connected notes", correct: false },
+        { value: "staccato", label: "Short, separated notes", correct: true },
+        { value: "fast", label: "Singing as fast as possible", correct: false },
+      ],
+      explain: { legato: "Not quite — that describes legato instead.", staccato: "Exactly right.", fast: "Not quite — this is about separation, not speed." },
+    },
+    {
+      key: "personalStyle", question: "Does developing personal style mean imitating another singer's exact tone?",
+      options: [
+        { value: "yes", label: "Yes, copying a favourite singer exactly", correct: false },
+        { value: "no", label: "No — it develops gradually, through your own natural choices", correct: true },
+        { value: "unsure", label: "This class doesn't say", correct: false },
+      ],
+      explain: { yes: "Not quite — this class explicitly says style isn't about imitation.", no: "Exactly right.", unsure: "It does say — Section F states this explicitly." },
+    },
+  ];
 
   const CHECKLIST_ITEMS = [
     { key: "understood", label: "I understand what articulation means while singing." },
-    { key: "triedSyllables", label: "I practised the syllables on a comfortable note, or chose to skip it." },
-    { key: "triedWords", label: "I tried keeping words clear across nearby notes, or chose to skip it." },
-    { key: "triedPhrase", label: "I tried the simple phrase, or chose to skip it." },
-    { key: "reflected", label: "I reflected on the exercise, or chose not to." },
+    { key: "triedExercise", label: "I tried at least one of the seven guided exercises." },
+    { key: "triedLyric", label: "I tried the practical phrase, spoken then sung two ways." },
+    { key: "triedLegatoStaccato", label: "I listened to the legato and staccato comparison, or chose to skip it." },
+    { key: "reflectedStyle", label: "I reflected on personal style." },
+    { key: "reflected", label: "I reflected on which articulation approach felt comfortable." },
   ];
   const PROGRESS_ITEMS = CHECKLIST_ITEMS;
 
@@ -89,17 +180,15 @@ const ArticulationAndStyleLesson = (() => {
   const Q = {
     wordsUnderstandable: { question: "Were my words understandable?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
     vowelSteady: { question: "Did I keep the vowel sound steady?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
-    jawRelaxed: { question: "Was my jaw relaxed?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
-    noInterruption: { question: "Did I avoid interrupting the melody?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
+    noInterruption: { question: "Did I avoid interrupting the melody with consonants?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
     phraseNatural: { question: "Did the phrase sound natural?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
-    comfortableTone: { question: "Did I maintain a comfortable tone?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
+    comfortableTone: { question: "Did I maintain a comfortable tone throughout?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really"), opt("unsure", "Not sure")] },
   };
 
   const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
   const { p, narrow } = LessonKit;
   const A = (rec, g) => rec.answers[g] || {};
   const N = (m) => NoteUtils.name(m);
-  const degreesToNotes = (b, degrees) => degrees.map((d) => b + d * STEP);
 
   function baseNote(rec) {
     const ok = (n) => typeof n === "number" && n + MAX_UP * STEP <= RANGE.to && n - STEP >= RANGE.from;
@@ -125,14 +214,33 @@ const ArticulationAndStyleLesson = (() => {
   }
 
   /* ---------- small views ---------- */
-  const syllableChips = () => `<div class="flex flex-wrap gap-2 mb-2">${SYLLABLES.map((s) => `<span class="flow-chip !text-sm">${s}</span>`).join("")}</div>`;
+  const recCard = (k, title, hint, max = 15) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
+  const skipBtn = (k, label = "Skip this exercise") => `<button type="button" data-skip-ex="${k}" class="text-xs text-ink-500 hover:text-ink-300 underline">${label}</button>`;
+  const FIELD = (label, value) => `<p class="text-xs text-ink-300 leading-relaxed"><span class="text-ink-500 uppercase tracking-wide text-[10px]">${label}:</span> ${value}</p>`;
+
+  function exerciseCardHtml(ex) {
+    return `<div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 mb-4" data-exercise-card="${ex.key}">
+      <p class="font-display text-lg text-ink-50 mb-3">${ex.title}</p>
+      <div class="flex flex-col gap-1.5 mb-4">
+        ${FIELD("Purpose", ex.purpose)}
+        ${FIELD("Instructions", ex.instructions)}
+        ${FIELD("Repetitions", ex.repetitions)}
+        ${FIELD("Rest", ex.rest)}
+        ${FIELD("Listening focus", ex.listening)}
+        ${FIELD("Common mistakes", ex.mistakes)}
+      </div>
+      ${ex.degrees ? `<div class="flex flex-wrap gap-3 mb-3"><button type="button" data-play-ex="${ex.key}" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen</button></div>` : ""}
+      ${recCard(`${ex.key}Take`, `Recording for ${ex.title.replace(/^Exercise \d+ — /, "")}`, "Entirely optional.", 15)}
+      <div class="mt-2">${skipBtn(ex.key)}</div>
+    </div>`;
+  }
 
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
         <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 20 milestone</p>
         <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Clear words, uninterrupted melody.</p>
-        <p class="text-sm text-ink-300">Articulation means your words can be understood — it isn't about forcing crisp consonants at the cost of a smooth, sustained vowel.</p>
+        <p class="text-sm text-ink-300">Articulation means your words can be understood — it isn't about forcing crisp consonants at the cost of a smooth, sustained vowel. And your style will develop gradually, in your own way.</p>
       </div>`;
   }
 
@@ -154,7 +262,7 @@ const ArticulationAndStyleLesson = (() => {
           ${milestone()}
           <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.05] p-6 sm:p-8 text-center">
             <p class="text-[11px] tracking-[0.25em] uppercase text-emerald-300 mb-2">Class complete</p>
-            <h3 class="font-display text-2xl text-ink-50 mb-5">A first look at clear words and natural musical choices.</h3>
+            <h3 class="font-display text-2xl text-ink-50 mb-5">A first look at clear words, legato and staccato, and natural musical choices.</h3>
             <ul class="inline-flex flex-col gap-2 text-left mx-auto">${lines}</ul>
             ${preview}
             ${next ? `
@@ -187,6 +295,30 @@ const ArticulationAndStyleLesson = (() => {
     return [{ label: "Recordings", value: ClassActivity.count(cls.id, "recordings") }];
   }
 
+  function reviewHtml(rec) {
+    const sources = [...EXERCISES.filter((ex) => true).map((ex) => [`${ex.key}Take`, ex.title.replace(/^Exercise \d+ — /, "")]), ["phraseTake", "Natural vs. smoother delivery"]];
+    const present = sources.filter(([k]) => take(rec, k));
+    if (!present.length) return `<p class="text-sm text-ink-500">Record any of the exercises above, then come back here to listen and reflect.</p>`;
+    return `<div class="flex flex-wrap gap-2 mb-4">${present.map(([k, label]) => `<button type="button" data-play-review="${k}" class="vr-btn">${icon("play", "w-3.5 h-3.5")} ${label}</button>`).join("")}</div>`;
+  }
+
+  function knowledgeCheckHtml(rec) {
+    return `<div class="flex flex-col gap-5" data-kc>
+      ${KNOWLEDGE_CHECK.map((item) => {
+        const selected = q(rec, `kc_${item.key}`);
+        return `
+        <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-4" data-kc-item="${item.key}">
+          <p class="text-sm text-ink-200 mb-2.5">${item.question}</p>
+          <div class="flex flex-wrap gap-2">
+            ${item.options.map((o) => `<button type="button" data-kc-choice="${o.value}" class="ex-chip ${selected === o.value ? "is-selected" : ""}">${o.label}</button>`).join("")}
+          </div>
+          ${selected ? `<p class="text-xs mt-2.5 ${item.options.find((o) => o.value === selected).correct ? "text-emerald-300" : "text-amber-300"}">${item.explain[selected]}</p>` : ""}
+        </div>`;
+      }).join("")}
+      <p class="text-xs text-ink-500">This is a quick concept check, not a pronunciation score.</p>
+    </div>`;
+  }
+
   /* ---------- page ---------- */
   function render(cls, status) {
     const rec = ClassActivity.get(cls.id);
@@ -203,96 +335,98 @@ const ArticulationAndStyleLesson = (() => {
 
       <div class="max-w-5xl mx-auto px-5 lg:px-8 py-12 flex flex-col gap-20">
 
-        ${chapter("understand", 1, "Part A — Understanding articulation", `
+        ${chapter("intro", 1, "Section A — Introduction", `
           ${narrow(`
             ${p("Articulation means making your sung words understandable. Vowels carry most of the sustained singing sound, while consonants help a listener recognise the word — singing means balancing clear pronunciation with musical continuity, rather than treating either one as more important.")}
-            ${p("Try saying “la” quickly, the way you would in speech — then sing “la” held gently for a few seconds. Notice how the vowel is what actually sustains; the consonant is just a brief, clear doorway into it.")}
+            ${p("A consonant should never interrupt or cut off the vowel that follows it — that's the one idea this whole class builds from.")}
           `)}
           <div data-lesson-viewed-sentinel class="h-px"></div>
         `)}
 
-        ${chapter("prepare", 2, "Part B — Gentle speech and mouth preparation", `
+        ${chapter("listen", 2, "Section B — A short listening activity", `
           ${narrow(`
-            <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed">
-              ${["Let your jaw move gently and freely.", "Let your tongue move gently — no tension.", "Open and close your mouth comfortably, a few times.", "Slowly speak a few simple syllables, like “ma” or “la.”", "Rest briefly."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
-            </ol>
-            ${p("No exaggerated mouth movements and no tongue exercises that create tension — everything here stays easy.")}
-          `)}
-        `)}
-
-        ${chapter("syllables", 3, "Part C — Consonant and vowel practice", `
-          ${narrow(`
-            ${p("Choose a comfortable reference note below, then practise each syllable slowly on that note — keep the vowel sustained while the consonant stays short and clear. A consonant should never interrupt or cut off the vowel that follows it.")}
+            ${p("There's no invented audio demonstration here — instead, choose a comfortable reference note below, then listen to the same simple pattern played back, so you have something real to compare your own singing against.")}
           `)}
           <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-3">
             ${VirtualPiano.render("l2c20-piano", { controls: false, keyboard: true, display: true })}
           </div>
           ${narrow(`<p class="text-sm text-ink-300 mb-3">Your reference note: <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong> <span class="text-ink-500 text-xs" data-base-hint></span></p>`)}
-          ${narrow(`${syllableChips()}`)}
           <button type="button" data-play-pattern="reference" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Play reference note</button>
         `, { wide: true })}
 
-        ${chapter("words", 4, "Part D — Clear words across nearby notes", `
+        ${chapter("exercises", 3, "Section C — Guided exercises", `
+          ${narrow(p(`Practice phrase: “${NEUTRAL_PHRASE}” — and an optional Kannada line, “${KANNADA_PHRASE}” (${KANNADA_TRANSLIT}), already used elsewhere in Niswara's <a href="${SONG_HREF}" class="text-gold-300 hover:text-gold-200 underline">song library</a>. There's no expectation that you sing in Kannada — use whichever phrase feels comfortable.`))}
+          ${EXERCISES.map((ex) => exerciseCardHtml(ex)).join("")}
+        `, { wide: true })}
+
+        ${chapter("style", 4, "Section D — Introduction to legato and staccato", `
           ${narrow(`
-            ${p("Now try the same syllables while moving to a nearby note and back, then a nearby lower note and back. Keep your vowels clear, your jaw and tongue relaxed, and avoid unnecessary tension — the note should stay stable while you pronounce each syllable.")}
+            ${p("Two simple, beginner-level ideas — not advanced technique:")}
+            <ul class="flex flex-col gap-1.5 text-sm text-ink-300 mb-3">
+              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Legato</strong> — notes connected smoothly, with no gaps between them.</li>
+              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Staccato</strong> — notes kept short and gently separated.</li>
+              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Natural phrasing</strong> — shaping a line as one musical thought, not a string of separate notes.</li>
+            </ul>
           `)}
-          ${narrow(`${syllableChips()}`)}
-          <button type="button" data-play-pattern="nearby" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen</button>
+          <div class="flex flex-wrap gap-3">
+            <button type="button" data-play-style="connected" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen — legato</button>
+            <button type="button" data-play-style="separated" class="vr-btn">${icon("play", "w-4 h-4")} Listen — staccato</button>
+          </div>
         `)}
 
-        ${chapter("phrase", 5, "Part E — Singing a simple phrase", `
+        ${chapter("apply", 5, "Section E — Practical application", `
           ${narrow(`
-            ${p(`A short practice phrase: “${SENTENCE}”`)}
+            ${p(`Using the same phrase, “${NEUTRAL_PHRASE}”:`)}
             <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-3">
-              ${["Speak the phrase naturally.", "Speak it in rhythm.", "Sing it slowly with the reference melody below.", "Repeat it while keeping your pronunciation clear.", "Listen to your recording and reflect."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
+              <li class="flex gap-2"><span class="text-gold-400">1.</span>Speak the phrase naturally.</li>
+              <li class="flex gap-2"><span class="text-gold-400">2.</span>Sing it slowly, focusing on clear pronunciation.</li>
+              <li class="flex gap-2"><span class="text-gold-400">3.</span>Sing it again with a smoother, more connected delivery.</li>
+              <li class="flex gap-2"><span class="text-gold-400">4.</span>Compare the two — there's no "correct" answer, just noticing the difference.</li>
             </ol>
           `)}
           <div class="flex flex-wrap gap-3 mb-4">
-            <button type="button" data-play-pattern="phraseSlow" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen, slowly</button>
-            <button type="button" data-play-pattern="phrase" class="vr-btn">${icon("play", "w-4 h-4")} Listen, normal</button>
+            <button type="button" data-play-pattern="phraseSlow" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen, clearer delivery</button>
+            <button type="button" data-play-pattern="phrase" class="vr-btn">${icon("play", "w-4 h-4")} Listen, smoother delivery</button>
           </div>
-          ${RecordingCard.render("rc-phraseTake", { title: "Sing the phrase", hint: "Entirely optional.", maxSeconds: 20, section: false })}
-          <div data-review-host class="mt-3"></div>
+          ${recCard("phraseTake", "Sing the phrase, either delivery", "Entirely optional.", 20)}
         `)}
 
-        ${chapter("style", 6, "Part F — Introduction to musical style", `
+        ${chapter("personal", 6, "Section F — A short introduction to personal style", `
           ${narrow(`
             ${p("Singing style grows out of natural musical choices, not imitation. A few simple ideas to notice, not master:")}
             <ul class="flex flex-col gap-1.5 text-sm text-ink-300 mb-3">
-              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Connected singing</strong> versus gently separated notes.</li>
-              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Natural word emphasis</strong> — some words simply carry more weight than others.</li>
-              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Smooth phrasing</strong> — shaping a line as one musical thought.</li>
-              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Expressing the meaning</strong> of what you're singing, in your own way.</li>
+              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Your natural tone</strong> — the voice you already have.</li>
+              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Your own pronunciation</strong> — not an imitation of anyone else's.</li>
+              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Natural phrasing</strong> — shaping a line the way it feels right to you.</li>
+              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Expression</strong> — conveying meaning in your own way.</li>
+              <li class="flex gap-2"><span class="text-gold-400">•</span><strong class="text-ink-100">Listening</strong> — to others for inspiration, without copying their exact tone.</li>
             </ul>
-            ${p("There's no expectation to imitate a professional singer, and nothing here is about correcting your accent — this is about noticing choices you can already make.")}
+            ${p("There's no expectation to imitate a professional singer's exact tone, and nothing here is about correcting your accent — personal style develops gradually, through practice.")}
           `)}
-          <div class="flex flex-wrap gap-3">
-            <button type="button" data-play-style="connected" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen — connected</button>
-            <button type="button" data-play-style="separated" class="vr-btn">${icon("play", "w-4 h-4")} Listen — gently separated</button>
-          </div>
         `)}
 
-        ${chapter("reflect", 7, "Self-review", `
+        ${chapter("record", 7, "Section G — Recording and self-assessment", `
+          ${narrow(p("Recording is entirely optional — nothing here is automatically scored for pronunciation, accent, or speed."))}
+          <div data-review-host>${reviewHtml(rec)}</div>
           ${narrow(`
-            <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-4 mt-5">
               ${SelfAssessment.render("wordsUnderstandable-q", { ...Q.wordsUnderstandable, selected: sel("wordsUnderstandable") })}
               ${SelfAssessment.render("vowelSteady-q", { ...Q.vowelSteady, selected: sel("vowelSteady") })}
-              ${SelfAssessment.render("jawRelaxed-q", { ...Q.jawRelaxed, selected: sel("jawRelaxed") })}
               ${SelfAssessment.render("noInterruption-q", { ...Q.noInterruption, selected: sel("noInterruption") })}
               ${SelfAssessment.render("phraseNatural-q", { ...Q.phraseNatural, selected: sel("phraseNatural") })}
               ${SelfAssessment.render("comfortableTone-q", { ...Q.comfortableTone, selected: sel("comfortableTone") })}
             </div>
-            <div class="mt-4"><label class="block text-sm text-ink-200 mb-1.5" for="l2c20-next">What would I like to explore next time?</label><textarea id="l2c20-next" data-growth="next" rows="2" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.next || "")}</textarea></div>
           `)}
         `)}
 
-        ${chapter("complete", 8, "My Notes", `
-          ${p("Your private notebook for this class. Only you can see it.")}
-          ${PersonalNotes.render("notes-l2c20", { placeholder: "e.g. Which syllable felt easiest... Where the melody felt interrupted... What I want to try next time..." })}
+        ${chapter("quiz", 8, "Knowledge check", `
+          ${narrow(p("A quick concept check — not a pronunciation score."))}
+          ${knowledgeCheckHtml(rec)}
         `)}
 
-        ${chapter("complete", 9, "Reflection and completion", `
+        ${chapter("reflect", 9, "Section H — Reflection and completion", `
           ${narrow(`
+            <div class="mb-4"><label class="block text-sm text-ink-200 mb-1.5" for="l2c20-next">Which articulation approach felt most comfortable?</label><textarea id="l2c20-next" data-growth="next" rows="2" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.next || "")}</textarea></div>
             ${p("A simple checklist — tick what's true for you. Completion doesn't depend on perfect pronunciation, accent, speed, or recording quality.")}
             <div class="flex flex-col gap-1 mb-5">
               ${CHECKLIST_ITEMS.map((item, i) => `
@@ -301,13 +435,25 @@ const ArticulationAndStyleLesson = (() => {
                   <span class="text-sm text-ink-200">${item.label}</span>
                 </label>`).join("")}
             </div>
-            ${p("A reminder: keep every exercise within a comfortable range, avoid exaggerated mouth opening or jaw tension, don't use hard consonant attacks, and don't force long sustained notes. Stop if there's pain, dizziness, unusual breathlessness, or persistent throat discomfort.")}
           `)}
         `)}
 
-        ${chapter("complete", 10, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+        ${chapter("complete", 10, "My Notes", `
+          ${p("Your private notebook for this class. Only you can see it.")}
+          ${PersonalNotes.render("notes-l2c20", { placeholder: "e.g. Which syllable felt easiest... Where the melody felt interrupted... What my own style might sound like..." })}
+        `)}
 
-        ${chapter("complete", 11, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
+        ${chapter("complete", 11, "Vocal safety", `
+          ${narrow(`
+            ${p("Keep every exercise within a comfortable range, avoid exaggerated mouth opening or jaw tension, don't use hard consonant attacks, and don't force long sustained notes.")}
+            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort. If discomfort repeatedly occurs, seek guidance from a qualified voice professional.")}
+            <div data-warmup-note></div>
+          `)}
+        `)}
+
+        ${chapter("complete", 12, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+
+        ${chapter("complete", 13, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
       </div>
     </div>`;
   }
@@ -341,12 +487,12 @@ const ArticulationAndStyleLesson = (() => {
     }));
     LessonKit.loadAndRefresh(container, classId, params);
 
-    /* ---- Part C: piano ---- */
+    /* ---- Section B: piano ---- */
     own(VirtualPiano.wire(container, "l2c20-piano", {
       range: RANGE, keyboard: true,
       onNote: ({ midi }) => {
         if (midi + MAX_UP * STEP > RANGE.to || midi - STEP < RANGE.from) {
-          $("[data-base-hint]").textContent = `(choose a note between ${N(RANGE.from + STEP)} and ${N(RANGE.to - MAX_UP * STEP)} so the nearby-note references stay comfortable)`;
+          $("[data-base-hint]").textContent = `(choose a note between ${N(RANGE.from + STEP)} and ${N(RANGE.to - MAX_UP * STEP)} so the reference patterns stay comfortable)`;
           return;
         }
         set("setup", "note", midi);
@@ -355,7 +501,19 @@ const ArticulationAndStyleLesson = (() => {
       },
     }));
 
-    /* ---- Parts C/D/E: reference pattern playback ---- */
+    /* ---- knowledge check ---- */
+    function onKcChoice(e) {
+      const btn = e.target.closest("[data-kc-choice]");
+      if (!btn) return;
+      const itemEl = btn.closest("[data-kc-item]");
+      const key = itemEl.dataset.kcItem;
+      set("q", `kc_${key}`, btn.dataset.kcChoice);
+      $("[data-kc]").outerHTML = knowledgeCheckHtml(rec0());
+    }
+    container.addEventListener("click", onKcChoice);
+    cleanups.push(() => container.removeEventListener("click", onKcChoice));
+
+    /* ---- Sections B/C/E: reference + exercise pattern playback ---- */
     function onPlayPattern(e) {
       const btn = e.target.closest("[data-play-pattern]");
       if (!btn) return;
@@ -363,12 +521,32 @@ const ArticulationAndStyleLesson = (() => {
       if (key === "reference") { PianoSynth.play(base(), { duration: 1.2, velocity: 0.5 }); return; }
       if (key === "phraseSlow") { PianoSynth.playSequence(degreesToNotes(base(), PATTERNS.phrase), { duration: 0.75, gap: 0.3 }); return; }
       const degrees = PATTERNS[key];
-      PianoSynth.playSequence(degreesToNotes(base(), degrees), { duration: 0.5, gap: 0.2 });
+      if (degrees) PianoSynth.playSequence(degreesToNotes(base(), degrees), { duration: 0.5, gap: 0.2 });
     }
     container.addEventListener("click", onPlayPattern);
     cleanups.push(() => container.removeEventListener("click", onPlayPattern));
 
-    /* ---- Part F: connected vs. separated demo ---- */
+    function onPlayEx(e) {
+      const btn = e.target.closest("[data-play-ex]");
+      if (!btn) return;
+      const ex = EXERCISES.find((x) => x.key === btn.dataset.playEx);
+      if (ex && ex.degrees) PianoSynth.playSequence(degreesToNotes(base(), ex.degrees), ex.tempo || { duration: 0.6, gap: 0.25 });
+    }
+    container.addEventListener("click", onPlayEx);
+    cleanups.push(() => container.removeEventListener("click", onPlayEx));
+
+    /* ---- skip buttons ---- */
+    function onSkip(e) {
+      const btn = e.target.closest("[data-skip-ex]");
+      if (!btn) return;
+      set("skip", btn.dataset.skipEx, true);
+      btn.textContent = "Skipped — that's okay";
+      btn.disabled = true;
+    }
+    container.addEventListener("click", onSkip);
+    cleanups.push(() => container.removeEventListener("click", onSkip));
+
+    /* ---- Section D: legato vs. staccato demo ---- */
     function onPlayStyle(e) {
       const btn = e.target.closest("[data-play-style]");
       if (!btn) return;
@@ -378,22 +556,21 @@ const ArticulationAndStyleLesson = (() => {
     container.addEventListener("click", onPlayStyle);
     cleanups.push(() => container.removeEventListener("click", onPlayStyle));
 
-    /* ---- Part E: recording ---- */
-    function reviewHtml(rec) {
-      const t = take(rec, "phraseTake");
-      if (!t) return "";
-      return `<button type="button" data-play-review="phraseTake" class="vr-btn">${icon("play", "w-3.5 h-3.5")} Listen back</button>`;
-    }
+    /* ---- recordings ---- */
     function refreshReviewHost() {
       const host = $("[data-review-host]");
       if (host) host.innerHTML = reviewHtml(rec0());
     }
-    own(RecordingCard.wire(container, "rc-phraseTake", {
-      classId, take: take(rec0(), "phraseTake"), maxSeconds: 20,
-      meta: { name: "Level 2, Class 20 — Simple phrase", exercise: "articulation-and-style-phraseTake" },
-      onSaved: (t) => { set("recs", "phraseTake", t); ClassActivity.bump(classId, "recordings"); refreshReviewHost(); },
-    }));
-    refreshReviewHost();
+    const EX_NAMES = Object.fromEntries(EXERCISES.map((ex) => [`${ex.key}Take`, ex.title]));
+    const NAMES = { ...EX_NAMES, phraseTake: "Natural vs. smoother delivery" };
+    Object.keys(NAMES).forEach((k) => {
+      own(RecordingCard.wire(container, `rc-${k}`, {
+        classId, take: take(rec0(), k), maxSeconds: k === "phraseTake" ? 20 : 15,
+        meta: { name: `Level 2, Class 20 — ${NAMES[k]}`, exercise: `articulation-and-style-${k}` },
+        onSaved: (t) => { set("recs", k, t); ClassActivity.bump(classId, "recordings"); refreshReviewHost(); },
+      }));
+    });
+
     function onPlayReview(e) {
       const btn = e.target.closest("[data-play-review]");
       if (!btn) return;
@@ -405,7 +582,7 @@ const ArticulationAndStyleLesson = (() => {
 
     /* ---- generic self-assess dispatcher ---- */
     const assessMap = {
-      "wordsUnderstandable-q": "wordsUnderstandable", "vowelSteady-q": "vowelSteady", "jawRelaxed-q": "jawRelaxed",
+      "wordsUnderstandable-q": "wordsUnderstandable", "vowelSteady-q": "vowelSteady",
       "noInterruption-q": "noInterruption", "phraseNatural-q": "phraseNatural", "comfortableTone-q": "comfortableTone",
     };
     function onAssess(e) {
@@ -456,7 +633,7 @@ const ArticulationAndStyleLesson = (() => {
       Store.addJournalEntry({
         classId,
         classTitle: `Level 2, Class ${cls.number} — ${cls.title}`,
-        learned: "Articulation means making words understandable without interrupting the melody — vowels sustain the sound, consonants stay brief and clear.",
+        learned: "Articulation means making words understandable without interrupting the melody — vowels sustain the sound, consonants stay brief and clear. Personal style develops gradually, never by imitation.",
         struggled: q(rec, "noInterruption") && q(rec, "noInterruption") !== "yes" ? "Noticed the melody getting interrupted by consonants at times." : "",
         toPractice: A(rec, "growth").next || "",
         thoughts: "",

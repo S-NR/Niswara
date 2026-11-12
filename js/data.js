@@ -1520,23 +1520,22 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 17 (interactive) ---------- */
   const vocalAgilityDevelopmentClass = {
     number: 18, id: "L2C17", section: "Vocal Technique Development", title: "Vocal Agility Development", category: "Vocal Technique", skillTag: "vocal",
-    difficulty: "Beginner", estMinutes: 15,
+    difficulty: "Beginner", estMinutes: 27,
     // Rendered by the interactive lesson in js/lessons/vocalAgilityDevelopment.js
     interactive: "vocal-agility-development",
-    subtitle: "Move between nearby notes with control — smooth and slow, never fast and unclear.",
-    description: "An interactive lesson: vocal agility as moving between notes comfortably and accurately, not singing fast. Starts with a simple two-note movement, then a three-note pattern, with an optional five-note pattern for anyone ready to explore further.",
+    subtitle: "Move between notes smoothly and accurately — speed only comes after accuracy and comfort.",
+    description: "An interactive lesson: vocal agility as moving between notes comfortably and accurately, not singing fast. Seven progressive exercises (two/three/four-note patterns, ascending/descending, repeated notes, melodic variations, and a gradual tempo increase), using beginner swara patterns (Sa Ri Sa; Sa Ri Ga Ri Sa; Sa Ri Ga Ma Ga Ri Sa; Sa Ga Ri Ma Ga Ri Sa) built from the learner's own chosen Sa — practice patterns, not named ragas or compositions.",
     content: {
-      whatYoullLearn: "What vocal agility means, how to move between nearby notes with control, how to practise simple ascending and descending melodic patterns, why accuracy and smoothness matter more than speed, and how to gradually improve coordination through repetition and listening.",
+      whatYoullLearn: "What vocal agility means, how to move between notes smoothly and accurately, how to practise simple melodic patterns, how to improve coordination and timing, and why speed should develop only after accuracy and comfort.",
       whyItMatters: "A smooth and accurate slow pattern is more useful than a fast, unclear one. Speed comes later, after coordination improves — there's no benefit to rushing ahead of what feels comfortable.",
-      theory: "Ascending means moving from lower notes to higher notes; descending means moving from higher notes to lower notes. A melodic pattern is a small group of notes arranged in a sequence.",
+      theory: "Vocal agility is not simply singing fast — it's moving between notes with control. Stepwise movement (to a neighbouring note) and larger jumps feel different, and accuracy matters more than speed. These swara patterns are beginner practice patterns, not named ragas or formal compositions.",
       guidedPractice: [
-        "Prepared gently, practised a two-note movement ascending and descending, tried a slow three-note pattern, optionally explored a five-note pattern, reviewed why smoothness comes before speed, and reflected on which pattern and direction felt easiest.",
+        "Recapped Classes 15-17, practised seven progressive exercises (two-note, three-note, four-note, ascending/descending, repeated-note, melodic variations, and a gradual tempo increase), and reflected on which pattern felt most difficult and whether a relaxed voice was maintained.",
       ],
       assignment: {
         instructions: [
-          "A two-note movement, ascending or descending",
-          "The three-note pattern, if comfortable",
-          "The five-note pattern, only if comfortable",
+          "At least one of the seven guided exercises",
+          "The gradual tempo increase, only once accuracy feels comfortable",
         ],
         questions: []
       }
@@ -1546,23 +1545,23 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 19 (interactive) ---------- */
   const toneConsistencyAcrossRangeClass = {
     number: 19, id: "L2C19", section: "Vocal Technique Development", title: "Tone Consistency and Vocal Endurance", category: "Vocal Technique", skillTag: "vocal",
-    difficulty: "Beginner–Intermediate", estMinutes: 15,
+    difficulty: "Beginner–Intermediate", estMinutes: 27,
     // Rendered by the interactive lesson in js/lessons/toneConsistencyAcrossRange.js
     interactive: "tone-consistency-across-range",
     subtitle: "Consistency means comfortable coordination across your range — not making every note sound identical, and not pushing through tiredness.",
-    description: "An interactive lesson: listening to how tone changes across nearby notes, recognising unnecessary tension versus natural variation, and carrying that same comfortable coordination across a slightly longer phrase. Compares a reference note with one nearby higher and lower note, the same vowel across pitches, and a short phrase built up gradually with real rest between attempts.",
+    description: "An interactive lesson: tone consistency and vocal endurance explained separately then practised together — six guided exercises, a short two-to-three-phrase melody application, a vocal practice log (duration, comfort, fatigue — self-reported, never automatically measured), and a knowledge check.",
     content: {
-      whatYoullLearn: "What vocal tone means, why tone can change as pitch changes, the difference between natural register changes and unnecessary tension, how to maintain a comfortable, clear sound across nearby notes, what vocal endurance means and why gradually building phrase length beats suddenly attempting long songs, why breaks are part of good vocal practice, and why consistency does not mean making every note identical or singing for as long as possible.",
-      whyItMatters: "Every voice has natural tonal variation across its range. Learning to notice that variation — rather than fighting it — is what allows comfortable coordination to develop over time. Endurance that comes from forcing volume, range, or duration tends to produce tension and fatigue rather than real progress; comfortable coordination, built gradually with real rest between attempts, is what actually develops.",
-      theory: "Vocal tone is the quality or character of the sound a voice produces. Tone can change naturally with pitch, vowel, register, and coordination; descriptive words like clear, breathier, brighter, darker, lighter, and fuller are listening tools, not judgments. Vocal endurance is about managing effort and coordination comfortably across a phrase — not about singing loudly, reaching higher notes, or singing continuously for as long as possible.",
+      whatYoullLearn: "What tone consistency means, how to maintain a reasonably consistent sound across short phrases, why vocal endurance is different from simply singing for a long time, how to manage practice duration, how to recognise early signs of vocal fatigue, and why regular, comfortable practice is better than exhausting practice.",
+      whyItMatters: "Every voice has natural tonal variation across its range — consistency doesn't mean every note sounds identical. Endurance that comes from forcing volume, range, or duration tends to produce tension and fatigue rather than real progress; regular, comfortable practice with real rest is what actually develops endurance.",
+      theory: "Tone consistency means comfortable coordination across nearby notes, not identical tone on every note — articulation and listening both contribute. Vocal endurance is about managing effort and coordination comfortably across a phrase, not singing loudly, reaching higher notes, or singing for as long as possible. Fatigue is a sign to rest, not a challenge to push through.",
       guidedPractice: [
-        "Prepared gently, found a comfortable reference tone, explored one nearby higher and lower note, compared the same vowel across those notes, optionally tried a short melodic pattern, practised a short phrase a few times and then a slightly longer version, compared how the voice felt before and after a short rest, and reflected on where tone felt most natural versus where it felt forced or tired.",
+        "Recapped Classes 16-18, practised six guided exercises (humming, sustained vowels, repeated-note patterns, short phrase repetition, two-phrase singing, and rest-and-repeat), sang a short two-to-three-phrase melody, logged practice duration and comfort honestly, and reflected on tiredness and breathing.",
       ],
       assignment: {
         instructions: [
-          "A comfortable reference note, one nearby higher note, and one nearby lower note",
-          "The short phrase, repeated a few times",
-          "The slightly longer phrase, if comfortable",
+          "At least one of the six guided exercises",
+          "The short melody application, if comfortable",
+          "The vocal practice log",
         ],
         questions: []
       }
@@ -1572,23 +1571,22 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 20 (interactive) ---------- */
   const articulationAndStyleClass = {
     number: 20, id: "L2C20", section: "Musical Expression and Song Application", title: "Articulation and Style", category: "Vocal Technique", skillTag: "vocal",
-    difficulty: "Beginner–Intermediate", estMinutes: 15,
+    difficulty: "Beginner–Intermediate", estMinutes: 27,
     // Rendered by the interactive lesson in js/lessons/articulationAndStyle.js
     interactive: "articulation-and-style",
-    subtitle: "Clear words without interrupting the melody.",
-    description: "An interactive lesson: pronouncing sung words clearly while keeping a smooth, comfortable tone. Practises simple syllables on a comfortable note, keeping words clear across nearby notes, a short original phrase, and a first look at musical style as natural choices, not imitation.",
+    subtitle: "Clear words without interrupting the melody — and a first look at personal style.",
+    description: "An interactive lesson: articulation as pronouncing sung words clearly while keeping a smooth, comfortable tone, seven guided exercises (with a neutral-syllable and an optional Kannada lyric example), a simple introduction to legato and staccato, a practical application comparing a natural and a smoother delivery, and a short introduction to personal style as something that develops gradually, never by imitating another singer's exact tone.",
     content: {
-      whatYoullLearn: "How vowels and consonants work together while singing, how to make lyrics understandable without interrupting the melody, how to maintain vowel clarity across notes, how articulation and phrasing contribute to natural musical expression, and how to begin exploring personal singing style without imitating others.",
-      whyItMatters: "A listener needs to understand your words, but chasing crisp consonants at the cost of a smooth, sustained vowel works against the music rather than for it. Balancing the two is what makes singing both clear and musical.",
-      theory: "Vowels carry most of the sustained singing sound; consonants help a listener recognise the word. A consonant should never interrupt or cut off the vowel that follows it.",
+      whatYoullLearn: "What articulation means in singing, how consonants and vowels affect lyrics, how to pronounce words clearly without interrupting the melody, how different articulation choices affect musical expression, what legato and staccato mean, and how to begin exploring singing style without imitating another singer.",
+      whyItMatters: "A listener needs to understand your words, but chasing crisp consonants at the cost of a smooth, sustained vowel works against the music rather than for it. Balancing the two is what makes singing both clear and musical — and personal style develops gradually, through natural tone, pronunciation, phrasing and practice.",
+      theory: "Vowels carry most of the sustained singing sound; consonants help a listener recognise the word. A consonant should never interrupt or cut off the vowel that follows it. Legato means smoothly connected notes; staccato means short, separated notes — both are simple, beginner-level ideas here, not advanced technique.",
       guidedPractice: [
-        "Prepared gently, practised simple syllables on a comfortable note, tried keeping words clear while moving to nearby notes, sang a short original phrase, explored the difference between connected and gently separated notes, and reflected on where the melody felt most and least interrupted.",
+        "Practised seven guided exercises (consonant awareness, vowel clarity, speaking and singing a lyric, connected syllables, short phrases, and natural expression), learned legato and staccato in simple terms, compared a natural and a smoother delivery of a short phrase, and reflected on which articulation approach felt comfortable.",
       ],
       assignment: {
         instructions: [
-          "The syllable practice on a comfortable note",
-          "Keeping words clear across nearby notes, if comfortable",
-          "The short practice phrase, if comfortable",
+          "At least one of the seven guided exercises",
+          "The practical phrase, spoken then sung two ways",
         ],
         questions: []
       }
