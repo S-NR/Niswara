@@ -1207,24 +1207,23 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 5 (interactive) ---------- */
   const connectingChestHeadClass = {
     number: 9, id: "L2C05", section: "Vocal Technique Development", title: "Connecting Chest & Head Voice", category: "Vocal Technique", skillTag: "vocal",
-    difficulty: "Beginner", estMinutes: 15,
+    difficulty: "Beginner", estMinutes: 27,
     // Rendered by the interactive lesson in js/lessons/connectingChestHead.js
     interactive: "connecting-chest-head",
-    subtitle: "Begin exploring gentle transitions between comfortable, speech-like and lighter vocal sounds.",
-    description: "An interactive lesson: how the voice can change quality across its range, and a first, gentle exploration of moving between comfortable, speech-like sound (Class 3) and a lighter sound (Class 4). Not a promise of a seamless transition — 'mix voice' is a later skill.",
+    subtitle: "Smooth coordination comes from gentle practice, not force — the passaggio is an area, not a wall.",
+    description: "An interactive lesson: a recap of Classes 7-8's chest/head voice work, an introduction to register transitions and the passaggio, six named guided exercises (humming glide, “oo” glide, lip trill, speech-to-song, two-note and three-note patterns), a progressive coordination routine, and a knowledge check.",
     content: {
-      whatYoullLearn: "That the voice can change in quality across its range, that chest and head voice describe vocal coordination rather than separate sound sources, how to explore small comfortable pitch movements, that transitions may feel uneven or produce a voice break while learning, and why ease and gradual exploration matter more than a perfect transition.",
-      whyItMatters: "One short lesson can't create a seamless register transition, and it isn't trying to. Noticing how the voice moves — evenly or not — is useful information either way, and forcing a transition (through volume or pushing) is exactly what this class asks the learner not to do.",
-      theory: "A transition is a change in how the voice coordinates as pitch or vocal quality changes. It may be smooth, uneven, or noticeable, and the voice doesn't have to sound perfectly blended at this stage. 'Mix voice' is a later skill and shouldn't be forced here.",
+      whatYoullLearn: "What chest-dominant and head-dominant vocal coordination mean, why the voice can feel and sound different as pitch changes, what a register transition is, what singers mean by the passaggio, why smooth transitions require coordination rather than force, and how to explore gentle movement between comfortable lower and higher notes.",
+      whyItMatters: "Forcing chest-dominant coordination upward can cause strain, and abruptly switching registers is never the goal — sensations differ between singers, and a noticeable change or voice break is useful information, not a failure.",
+      theory: "Chest voice and head voice are vocal register or coordination terms — sound does not literally originate in the chest or head. The passaggio is a transition area, not one universal fixed note, and its exact location varies between singers. Smooth coordination develops gradually, through gentle, repeated practice.",
       guidedPractice: [
-        "Reviewed Classes 3 and 4, compared a comfortable 'ah' with a gentle 'oo', tried a small pitch glide, optionally explored a further 'oo' or lip trill, learned what a transition is without needing to force one, and reflected on comfort and tension rather than a perfect result.",
+        "Recapped chest and head voice, learned what a register transition and the passaggio are, practised six gentle guided exercises (humming glide, “oo” glide, lip trill, speech-to-song, two-note and three-note patterns), worked through a progressive coordination routine, and reflected on tension and comfort rather than forcing a perfect transition.",
       ],
       assignment: {
         instructions: [
-          "One short sentence, spoken naturally",
-          "One comfortable “ah”",
-          "One comfortable “oo”",
-          "One small glide, if comfortable",
+          "The recap listening exercise",
+          "At least one of the six guided exercises",
+          "The progressive coordination routine, if comfortable",
         ],
         questions: []
       }
@@ -1234,24 +1233,23 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 6 (interactive) ---------- */
   const introMixedCoordinationClass = {
     number: 10, id: "L2C06", section: "Vocal Technique Development", title: "Introduction to Mixed Coordination", category: "Vocal Technique", skillTag: "vocal",
-    difficulty: "Beginner", estMinutes: 15,
+    difficulty: "Beginner", estMinutes: 27,
     // Rendered by the interactive lesson in js/lessons/introMixedCoordination.js
     interactive: "intro-mixed-coordination",
     subtitle: "A broad, gentle introduction to balancing comfortable chest- and head-voice qualities.",
-    description: "An interactive lesson: mixed coordination as a broad teaching term for balancing qualities commonly associated with chest and head voice — not a literal 50/50 split, not proof via any single sensation, and not something to force into existing in one lesson.",
+    description: "An interactive lesson: mixed coordination as a broad teaching term for balancing qualities commonly associated with chest and head voice, with seven named guided exercises (humming, “ng”, “oo” glide, small-range siren, speech-into-singing, three-note patterns, and light melodic patterns), a coordination practice routine, and a practical application using the learner's own comfortable Sa — never equating mixed voice with any specific swara or fixed Western pitch.",
     content: {
-      whatYoullLearn: "What singers mean by 'mix' or 'mixed coordination', why it isn't simply singing loudly in chest voice or breathily in head voice, why vocal coordination depends on more than one sensation, how to explore comfortable sounds without forcing a transition, and why gradual, consistent practice matters more than achieving a particular sound today.",
-      whyItMatters: "Mixed coordination is a broad teaching term, and singers may use it somewhat differently. No single sensation proves the voice is 'mixed' — comfort and repeatability matter more than chasing a recognisable sound in one short lesson.",
-      theory: "'Mix' describes coordination that balances qualities commonly associated with chest and head voice. It is not a literal 50/50 combination. A voice break is not a failure, and increasing volume is never the solution to a difficult transition.",
+      whatYoullLearn: "What singers commonly mean by mixed voice or mixed coordination, how it relates to chest-dominant and head-dominant coordination, why singers work towards a more connected sound across their range, why mixed coordination is not simply singing loudly, and why it should not be forced or rushed.",
+      whyItMatters: "Mixed coordination is a broad teaching term, and different teachers may use slightly different terminology for it. No single sensation proves a singer is using mixed voice — comfort and repeatability matter more than chasing a recognisable sound in one short lesson.",
+      theory: "'Mix' describes coordination that balances qualities commonly associated with chest and head voice — not a literal 50/50 combination, and not the same as a specific Carnatic swara or fixed Western pitch. Vocal registers and coordination are a separate idea from swara positions, which describe pitch relative to your own chosen Sa.",
       guidedPractice: [
-        "Reviewed Classes 3-5, compared a comfortable 'ah' and 'oo', tried a small upward pitch movement, explored a gentle 'mm-oo' or 'ng-oo' transition (or the easier separate alternative), learned what mixed coordination is not, and reflected on comfort and effort rather than a perfect result.",
+        "Recapped chest voice, head voice, connecting chest and head voice, and register transitions, practised seven gentle guided exercises, worked through a coordination practice routine, and tried a simple melody-like application using comfortable notes and (optionally) a simple swara pattern based on a personally chosen Sa.",
       ],
       assignment: {
         instructions: [
-          "One short sentence, spoken naturally",
-          "One comfortable “ah”",
-          "One comfortable “oo”",
-          "One small movement between pitches, if comfortable",
+          "The recap warm-up",
+          "At least one of the seven guided exercises",
+          "The simple melody-like application, if comfortable",
         ],
         questions: []
       }
@@ -1287,23 +1285,23 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 8 (interactive) ---------- */
   const resonanceToneColourClass = {
     number: 12, id: "L2C08", section: "Vocal Technique Development", title: "Resonance and Tone Colour", category: "Vocal Technique", skillTag: "vocal",
-    difficulty: "Beginner", estMinutes: 15,
+    difficulty: "Beginner", estMinutes: 27,
     // Rendered by the interactive lesson in js/lessons/resonanceToneColour.js
     interactive: "resonance-tone-colour",
-    subtitle: "Explore natural differences in vocal tone colour through comfortable sounds and small vowel changes.",
-    description: "An interactive lesson: tone colour (timbre) as the quality that distinguishes one voice from another — vocal-tract shape, vowel choice and coordination all play a part. Connects directly back to Class 2 (Resonance) and Class 7 (Vowel Modification).",
+    subtitle: "Build on Class 2's foundation with practical listening, tone exploration and controlled variation.",
+    description: "An interactive lesson: building practically on Class 2's introductory resonance theory — bright/warm/light/dark as descriptive listening terms, six guided exercises, an interactive tone-exploration activity, and a practical application comparing two tone colours on the same phrase, optionally using a simple swara or melody on the learner's comfortable shruti.",
     content: {
-      whatYoullLearn: "What singers mean by vocal tone colour or timbre, how vowel shape and vocal-tract configuration influence the sound, how to compare vocal sounds without assuming one is universally better, how to explore small tone-colour changes without pushing volume or pitch, and why a healthy, comfortable sound matters more than imitating another singer's tone.",
-      whyItMatters: "Words like 'bright,' 'warm,' 'dark' and 'light' are descriptive listening terms, not rigid categories or medical assessments. Two people can sing the same note at the same volume and still sound different — and that's normal, not a problem to fix.",
-      theory: "Tone colour is influenced by vocal-tract shape, vowel choice and vocal coordination. A brighter tone isn't automatically better than a warmer one. Consistency and comfort matter more than trying to sound artificially bright, dark or powerful.",
+      whatYoullLearn: "How vocal tract shape influences the sound, how vowels influence tone quality, what singers mean by bright, warm, light and dark tone, how to explore different tone colours naturally, how resonance and articulation influence the perceived sound, and how to maintain vocal comfort while exploring tonal variation.",
+      whyItMatters: "Bright, warm, light and dark are descriptive listening terms, not rigid scientific categories or medical assessments — two people can sing the same note at the same volume and still sound different, and that's normal, not a problem to fix.",
+      theory: "Tone colour is influenced by vocal tract shape, mouth opening, tongue position, jaw relaxation and vowel shape. Resonance is not simply making sound in the nose, chest or head. A brighter tone isn't automatically better than a warmer one — consistency and comfort matter more than imitating another singer's tone.",
       guidedPractice: [
-        "Listened to my natural speaking voice, compared four comfortable vowels, explored two versions of a comfortable 'ah,' listened for contrast between them, tried a vowel on a comfortable note, and reflected on what I noticed without forcing brightness, darkness or volume.",
+        "Recapped Class 2's resonance foundation, practised six guided exercises exploring bright/warm/light/dark tone, used an interactive tone-exploration activity, sang a short phrase with two different tone colours, and reflected on which felt most natural.",
       ],
       assignment: {
         instructions: [
-          "A short sentence, spoken naturally",
-          "“Ah” and “oo,” comfortably",
-          "One “ah” with a small, natural vowel adjustment",
+          "At least one of the six guided exercises",
+          "The interactive tone-exploration activity",
+          "A short phrase sung with two different tone colours",
         ],
         questions: []
       }
@@ -1313,23 +1311,23 @@ const APP_DATA = (() => {
   /* ---------- Level 2, Class 9 (interactive) ---------- */
   const projectionWithoutPushingClass = {
     number: 13, id: "L2C09", section: "Vocal Technique Development", title: "Projection Without Pushing", category: "Vocal Technique", skillTag: "vocal",
-    difficulty: "Beginner", estMinutes: 15,
+    difficulty: "Beginner", estMinutes: 27,
     // Rendered by the interactive lesson in js/lessons/projectionWithoutPushing.js
     interactive: "projection-without-pushing",
     subtitle: "Discover comfortable vocal clarity — the difference between easy, audible singing and forced loudness.",
-    description: "An interactive lesson: vocal projection as being heard clearly for the situation — not shouting. Articulation, vowel shape and comfortable volume all contribute to clarity, which matters more than raw loudness.",
+    description: "An interactive lesson: vocal projection as being heard clearly for the situation — not shouting. Six guided exercises, a practical projection routine, a two-intensity recording activity, and a musical application exploring gentle, comfortable medium and natural expressive intensity.",
     content: {
-      whatYoullLearn: "What vocal projection means in beginner-friendly language, why projection isn't the same as shouting, how comfortable articulation and natural vocal coordination contribute to clarity, how to explore a slightly clearer sound without increasing effort, and why volume, pitch and vocal effort should be managed separately.",
+      whatYoullLearn: "What vocal projection means, the difference between projection and shouting, how comfortable breathing, posture and articulation support an audible voice, why increasing throat pressure is not healthy projection, how to maintain comfortable tone while increasing perceived intensity, and why microphones and room acoustics also affect perceived loudness.",
       whyItMatters: "A louder sound is not automatically a better sound. Microphone use, room acoustics and distance also affect how audible a singer sounds — vocal effort isn't always the solution to an acoustic problem.",
-      theory: "Projection means allowing the voice to be heard clearly for the situation. Clarity can be influenced by articulation, vowel shape, vocal coordination, and appropriate volume — not by forcing more air or tightening the throat.",
+      theory: "Projection means allowing the voice to be heard clearly for the situation. Clarity can be influenced by articulation, vowel shape, vocal coordination, and appropriate volume — not by forcing more air or tightening the throat. Room acoustics and microphone placement also affect perceived loudness.",
       guidedPractice: [
-        "Checked a comfortable speaking baseline, practised clear articulation at the same volume, explored a gentle voiced phrase, compared a natural version with a more clearly articulated one, learned the difference between comfortable effort and forcing, and reflected on volume and tension rather than loudness.",
+        "Prepared gently, practised six guided exercises comparing comfortable projection with shouting, worked through a practical projection routine, recorded the same phrase at two comfortable intensities, and applied gentle, medium and expressive intensity to a short musical phrase.",
       ],
       assignment: {
         instructions: [
-          "One short sentence, spoken naturally",
-          "The same sentence, with clear articulation",
-          "One small portion on a comfortable pitch, if comfortable",
+          "At least one of the six guided exercises",
+          "The practical projection routine, if comfortable",
+          "A short phrase at two comfortable intensities",
         ],
         questions: []
       }

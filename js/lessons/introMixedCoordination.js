@@ -1,121 +1,205 @@
 /* ============================================================
-   LEVEL 2, CLASS 6 — INTRODUCTION TO MIXED COORDINATION
+   LEVEL 2, CLASS 10 — INTRODUCTION TO MIXED COORDINATION
    (interactive lesson)
 
    Rendered by ClassDetailPage for interactive: "intro-mixed-coordination".
 
-   Curriculum identity: Level 2, Class 6 (`number: 6`, `levelId: 2`
-   in data.js, id `L2C06`). Same mechanism Classes 1-5 already
-   proved five times over. This class's own title matches the
-   placeholder list's already-renamed first entry exactly (it was
-   renamed from "Mixed Voice" during Class 5's turn, once that
-   spec named it), so nothing needed renaming here.
+   Curriculum identity: Level 2, Class 10 (`number: 10`, `levelId: 2`
+   in data.js, explicit id `L2C06` — unchanged since the Level 2
+   Curriculum Upgrade). Rebuilt against this class's own later, more
+   detailed spec (a named recap, seven guided exercises each with
+   purpose/instructions/repetitions/rest/listening-focus/mistakes, a
+   coordination-practice routine, a practical application that may
+   optionally use the learner's own comfortable Sa and a simple swara
+   pattern, and a 5-question knowledge check) — supersedes the
+   shorter version first written earlier in the project. Part of a
+   combined rebuild alongside Classes 9, 12 and 13.
 
-   **Level 2's class count grows again.** This spec's own Section K
-   previews the real Class 7 as "Vowel Modification Foundations" —
-   not the placeholder list's "Vocal Range". Following the exact
-   precedent Class 5's entry set (and Level 1's five times before
-   that), `levelClassDefs[2].titles`' next entry was renamed in
-   place, not removed. Level 2 is still provisionally 11 classes;
-   only the still-unbuilt title changed.
-
-   Core idea: "'Mix' describes coordination that balances qualities
-   commonly associated with chest and head voice. It is not a
-   literal 50/50 combination, and there is no single sensation that
-   proves the voice is mixed... The learner does not need to produce
-   a recognisable mix voice today." Explicitly: mixed coordination
-   is a broad teaching term singers use somewhat differently, not
-   one universal, singing-school-specific definition.
+   Core idea: "mix" describes coordination that balances qualities
+   commonly associated with chest and head voice — not a literal
+   50/50 combination, and not the same as a specific Carnatic swara or
+   fixed Western pitch. Vocal registers and coordination are a
+   separate idea from swara positions, which describe pitch relative
+   to the learner's own chosen Sa. No single sensation proves a
+   singer is using mixed voice, and it should never be forced.
 
    Honesty boundaries, matching every earlier class: no fabricated
-   register/mix detection; completion never depends on perfect
-   pitch, a successful transition, a recording, or finishing every
-   optional activity (the spec says this explicitly).
-
-   Like Classes 3-5, Section I is five plain first-person
-   self-attestations, so this file reuses their plain-checkbox
-   completion pattern (Class 10's original `PRE_CHECK_ITEMS` style).
+   mixed-voice detection or automatic coordination analysis;
+   completion never depends on achieving a recognisable "mixed" sound.
 
    Reuses: LessonKit (+ its automatic Warm-up card), VirtualPiano
-   (Class 3), RecordingCard (Class 5), SelfAssessment (Class 4),
-   PersonalNotes, ClassProgress, the green/amber "helpful vs. avoid"
-   comparison card (Class 3's Section F pattern), and Class 5's
-   "single RecordingCard slot that relabels itself based on a prior
-   choice" pattern (Section E here offers 3 options instead of 2).
+   (Class 3), PianoSynth.playSequence (relative-degree patterns,
+   shared across all seven exercises, the routine, and the optional
+   swara-labelled pattern), RecordingCard, SelfAssessment,
+   PersonalNotes, ClassProgress.
    ============================================================ */
 
 const IntroMixedCoordinationLesson = (() => {
   const STAGES = [
+    { id: "recap", label: "Recap" },
     { id: "understand", label: "Understand" },
-    { id: "listen", label: "Listen" },
-    { id: "compare", label: "Compare" },
-    { id: "pitch", label: "Pitch" },
-    { id: "explore", label: "Explore" },
-    { id: "notmix", label: "Not Mix" },
+    { id: "exercises", label: "Exercises" },
+    { id: "practice", label: "Practice" },
+    { id: "apply", label: "Apply" },
     { id: "record", label: "Record" },
-    { id: "mistakes", label: "Mistakes" },
+    { id: "quiz", label: "Quiz" },
     { id: "reflect", label: "Reflect" },
     { id: "complete", label: "Complete" },
   ];
 
   const RANGE = { from: 48, to: 72 };
   const STEP = 2;
-  const SENTENCE = "I am exploring my voice today.";
+  const MAX_UP = 3;
+  const SWARA_SEMITONE = { sa: 0, ri: 2, ga: 4 };
+  const SWARA_LABEL = { sa: "Sa", ri: "Ri", ga: "Ga" };
+
+  const EXERCISES = [
+    {
+      key: "hum", title: "Exercise 1 — Gentle humming", degrees: [0],
+      purpose: "Settle into a light, easy sound before exploring coordination.",
+      instructions: "Hum gently on a comfortable note for a few seconds.",
+      repetitions: "Two or three attempts.", rest: "Rest between attempts.",
+      listening: "Notice whether the hum feels easy and light.", mistakes: "Humming too loudly or too low.",
+    },
+    {
+      key: "ng", title: "Exercise 2 — Comfortable “ng” sound", degrees: [0],
+      purpose: "Explore a forward, light placement often used to find a connected sound.",
+      instructions: "Say “ng” (as in “sing”) gently, then sustain it briefly on a comfortable note.",
+      repetitions: "Two or three attempts.", rest: "Rest between attempts.",
+      listening: "Notice whether the sound feels forward and light rather than heavy.", mistakes: "Pushing the “ng” to sound more resonant.",
+    },
+    {
+      key: "ooGlide", title: "Exercise 3 — Gentle “oo” glide", degrees: [0, 1, 0],
+      purpose: "Carry that light coordination through a small pitch glide.",
+      instructions: "Glide gently on “oo” across a small, comfortable pitch range.",
+      repetitions: "Two or three attempts.", rest: "Rest between attempts.",
+      listening: "Notice whether the light quality stays consistent as pitch moves.", mistakes: "Widening the range too much.",
+    },
+    {
+      key: "siren", title: "Exercise 4 — Small-range siren", degrees: [0, 1, 2, 1, 0],
+      purpose: "Explore a slightly wider, still-gentle glide.",
+      instructions: "On a comfortable “oo” or “ng”, glide smoothly up and back down across a small range — like a gentle siren.",
+      repetitions: "One or two attempts.", rest: "Rest between attempts.",
+      listening: "Notice whether the glide stays smooth, or where it feels less stable.", mistakes: "Making the siren too wide or too fast.",
+    },
+    {
+      key: "speechToSong", title: "Exercise 5 — Speech-like sound moving into singing", degrees: [0],
+      purpose: "Connect a natural, speech-like quality with gentle singing.",
+      instructions: "Speak a short phrase naturally and lightly, then sing it gently on a comfortable note.",
+      repetitions: "Once or twice.", rest: "Rest between attempts.",
+      listening: "Notice how the speech-like quality carries (or doesn't) into singing.", mistakes: "Exaggerating the shift from speech to song.",
+    },
+    {
+      key: "threeNote", title: "Exercise 6 — Simple three-note patterns", degrees: [0, 1, 2, 1, 0],
+      purpose: "Practise the light coordination across a short pattern.",
+      instructions: "Sing a gentle three-note pattern, up and back down, on “oo” or “ng”.",
+      repetitions: "A few comfortable repetitions.", rest: "Rest between repetitions.",
+      listening: "Notice whether the tone stays light and consistent across the pattern.", mistakes: "Rushing through the notes.",
+    },
+    {
+      key: "melodic", title: "Exercise 7 — Light, comfortable melodic patterns", degrees: [0, 2, 1, 0],
+      purpose: "Apply the same light coordination to a slightly more melodic shape.",
+      instructions: "Sing a short, simple melodic pattern gently, keeping the sound light throughout.",
+      repetitions: "A few comfortable repetitions.", rest: "Rest between repetitions.",
+      listening: "Notice whether the pattern feels connected, not pieced together.", mistakes: "Pushing volume to make the pattern feel more 'complete'.",
+    },
+  ];
+
+  const KNOWLEDGE_CHECK = [
+    {
+      key: "whatIsMix",
+      question: "What do singers commonly mean by mixed voice or mixed coordination?",
+      options: [
+        { value: "loud", label: "Singing as loudly as possible in chest voice", correct: false },
+        { value: "balance", label: "A broad term for coordination that balances chest- and head-voice qualities", correct: true },
+        { value: "split", label: "An exact 50/50 split, measurable in a recording", correct: false },
+      ],
+      explain: { loud: "Not quite — mixed coordination isn't about loudness.", balance: "Exactly right.", split: "Not quite — it's not a literal, measurable split." },
+    },
+    {
+      key: "loud",
+      question: "Is mixed coordination simply singing loudly?",
+      options: [
+        { value: "yes", label: "Yes", correct: false },
+        { value: "no", label: "No — it's about balance and connection, not volume", correct: true },
+        { value: "sometimes", label: "Only on higher notes", correct: false },
+      ],
+      explain: { yes: "Not quite — volume isn't the point here.", no: "Right.", sometimes: "Not quite — this holds at every pitch." },
+    },
+    {
+      key: "sensation",
+      question: "Does one single sensation prove you're using mixed voice?",
+      options: [
+        { value: "yes", label: "Yes, there's one definitive sensation", correct: false },
+        { value: "no", label: "No — no single sensation proves it, and sensations vary between singers", correct: true },
+        { value: "unsure", label: "This class doesn't say", correct: false },
+      ],
+      explain: { yes: "Not quite — there's no single proof-sensation.", no: "Exactly right.", unsure: "It does say — Section B is explicit about this." },
+    },
+    {
+      key: "force",
+      question: "Should mixed coordination be forced or rushed in one lesson?",
+      options: [
+        { value: "yes", label: "Yes, with enough effort", correct: false },
+        { value: "no", label: "No — it develops gradually through consistent, comfortable practice", correct: true },
+        { value: "sometimes", label: "Only if the learner is advanced", correct: false },
+      ],
+      explain: { yes: "Not quite — forcing works against comfortable coordination.", no: "Right.", sometimes: "Not quite — this applies to every learner." },
+    },
+    {
+      key: "swara",
+      question: "Is mixed voice the same as a specific Carnatic swara or fixed Western pitch?",
+      options: [
+        { value: "yes", label: "Yes, it corresponds to one specific swara", correct: false },
+        { value: "no", label: "No — vocal registers and coordination are a separate idea from swara positions", correct: true },
+        { value: "sometimes", label: "Only when using a comfortable Sa", correct: false },
+      ],
+      explain: { yes: "Not quite — mixed coordination isn't tied to any particular swara.", no: "Exactly right.", sometimes: "Not quite — this is true regardless of which Sa you choose." },
+    },
+  ];
 
   const CHECKLIST_ITEMS = [
-    { key: "understood", label: "I understand the basic concept of mixed coordination." },
-    { key: "soundsExplored", label: "I explored comfortable “ah” and “oo” sounds." },
-    { key: "movementExplored", label: "I tried a small movement or chose to skip it." },
-    { key: "avoidedForcing", label: "I avoided forcing loudness or pitch." },
-    { key: "reflected", label: "I reflected on my comfort and effort." },
+    { key: "understoodMix", label: "I understand what mixed voice or mixed coordination means." },
+    { key: "triedGentle", label: "I tried at least one gentle exercise (humming, “ng”, “oo” glide, or siren)." },
+    { key: "triedPattern", label: "I tried at least one pattern exercise (speech-to-song, three-note, or melodic)." },
+    { key: "triedRoutine", label: "I practised the coordination routine, or chose to skip it." },
+    { key: "avoidedForcing", label: "I avoided forcing volume or rushing the coordination." },
+    { key: "reflected", label: "I reflected on which exercise felt easiest." },
   ];
   const PROGRESS_ITEMS = CHECKLIST_ITEMS;
 
   const opt = (value, label, tone = "neutral") => ({ value, label, tone });
   const Q = {
-    compareSounds: {
-      question: "Did the “ah” and “oo” feel different, or similar?",
-      options: [opt("different", "They felt different"), opt("similar", "They felt similar"), opt("easier", "One felt easier", "maybe"), opt("unsure", "I'm not sure")],
+    comfortable: { question: "Was the sound comfortable?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
+    pushedVolume: { question: "Did I push for volume?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
+    tensionFree: { question: "Could I move between notes without excessive tension?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
+    abruptChange: { question: "Did I notice an abrupt register change?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
+    easiestExercise: {
+      question: "Which exercise felt easiest?",
+      options: [opt("hum", "Humming"), opt("ng", "“Ng” sound"), opt("oo", "“Oo” glide"), opt("siren", "Siren"), opt("speech", "Speech-to-song"), opt("three", "Three-note pattern"), opt("melodic", "Melodic pattern")],
     },
-    exploreChoice: {
-      question: "Which would you like to try?",
-      options: [opt("mmoo", "Gentle “mm-oo” transition"), opt("ngoo", "Gentle “ng-oo” transition"), opt("separate", "Easier: “ah” and “oo” separately")],
-    },
-    easiestSound: { question: "Which sound felt easiest?", options: [opt("ah", "“ah”"), opt("oo", "“oo”"), opt("sentence", "The spoken sentence"), opt("transition", "The transition"), opt("notsure", "Not sure")] },
-    triedToForce: { question: "Did I try to force a particular sound?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
-    tensionNoticed: { question: "Did I notice tension in my jaw, neck, or throat?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
   };
 
   const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
   const { p, narrow } = LessonKit;
   const A = (rec, g) => rec.answers[g] || {};
-  const filled = (v) => v && String(v).trim();
   const N = (m) => NoteUtils.name(m);
+  const degreesToNotes = (b, degrees) => degrees.map((d) => b + d * STEP);
 
   function baseNote(rec) {
-    const ok = (n) => typeof n === "number" && n >= RANGE.from && n + STEP <= RANGE.to;
+    const ok = (n) => typeof n === "number" && n >= RANGE.from && n + MAX_UP * STEP <= RANGE.to;
     const own = A(rec, "setup").note;
     if (ok(own)) return own;
-    const l2c5 = (ClassActivity.get("L2C05").answers.setup || {}).note;
-    if (ok(l2c5)) return l2c5;
-    const l2c4 = (ClassActivity.get("L2C04").answers.setup || {}).note;
-    if (ok(l2c4)) return l2c4;
-    const l2c3 = (ClassActivity.get("L2C03").answers.setup || {}).note;
-    if (ok(l2c3)) return l2c3;
-    const l2c2 = (ClassActivity.get("L2C02").answers.setup || {}).note;
-    if (ok(l2c2)) return l2c2;
-    const l2c1 = (ClassActivity.get("L2C01").answers.setup || {}).note;
-    if (ok(l2c1)) return l2c1;
-    const c25 = (ClassActivity.get("L1C25").answers.setup || {}).note;
-    if (ok(c25)) return c25;
-    const c2 = (ClassActivity.get("L1C02").answers.setup || {}).note;
-    if (ok(c2)) return c2;
-    return (ClassActivity.get("L1C01").answers.setup || {}).voice === "lower" ? 50 : 60;
+    for (const id of ["L2C05", "L2C04", "L2C03", "L2C02", "L2C01", "L1C25", "L1C02"]) {
+      const n = (ClassActivity.get(id).answers.setup || {}).note;
+      if (ok(n)) return n;
+    }
+    const fallback = (ClassActivity.get("L1C01").answers.setup || {}).voice === "lower" ? 50 : 60;
+    return Math.max(RANGE.from, Math.min(RANGE.to - MAX_UP * STEP, fallback));
   }
 
   const take = (rec, k) => A(rec, "recs")[k] || null;
   const q = (rec, k) => A(rec, "q")[k] || null;
-  const skipped = (rec, k) => !!A(rec, "skip")[k];
   const checklist = (rec) => A(rec, "checklist");
 
   function derivedCheckpoints(rec) {
@@ -127,31 +211,35 @@ const IntroMixedCoordinationLesson = (() => {
 
   /* ---------- small views ---------- */
   const recCard = (k, title, hint, max = 15) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
-  const flowStrip = (steps) => `<div class="flex flex-wrap items-center justify-center gap-2 my-4">${steps.map((s, i, arr) => `<span class="flow-chip !text-sm">${s}</span>${i < arr.length - 1 ? `<span class="text-ink-700 text-xs">→</span>` : ""}`).join("")}</div>`;
   const skipBtn = (k, label = "Skip this exercise") => `<button type="button" data-skip-ex="${k}" class="text-xs text-ink-500 hover:text-ink-300 underline">${label}</button>`;
-  const EXPLORE_LABELS = { mmoo: "Gentle “mm-oo” transition", ngoo: "Gentle “ng-oo” transition", separate: "“ah” and “oo”, separately" };
 
-  function notMixHtml() {
-    return `<div class="grid sm:grid-cols-2 gap-4">
-      <div class="rounded-2xl border border-emerald-400/15 bg-emerald-500/[0.04] p-5">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-emerald-300 mb-3">Helpful approach</p>
-        <ul class="flex flex-col gap-2 text-sm text-ink-200">${["Comfortable volume", "Relaxed jaw and neck", "Small, manageable pitch changes", "Patient exploration", "Rest when needed"].map((t) => `<li class="flex gap-2"><span class="text-emerald-300">✓</span>${t}</li>`).join("")}</ul>
+  const FIELD = (label, value) => `<p class="text-xs text-ink-300 leading-relaxed"><span class="text-ink-500 uppercase tracking-wide text-[10px]">${label}:</span> ${value}</p>`;
+  function exerciseCardHtml(ex) {
+    return `<div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 mb-4" data-exercise-card="${ex.key}">
+      <p class="font-display text-lg text-ink-50 mb-3">${ex.title}</p>
+      <div class="flex flex-col gap-1.5 mb-4">
+        ${FIELD("Purpose", ex.purpose)}
+        ${FIELD("Instructions", ex.instructions)}
+        ${FIELD("Repetitions", ex.repetitions)}
+        ${FIELD("Rest", ex.rest)}
+        ${FIELD("Listening focus", ex.listening)}
+        ${FIELD("Common mistakes", ex.mistakes)}
       </div>
-      <div class="rounded-2xl border border-amber-400/15 bg-amber-500/[0.04] p-5">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-amber-300 mb-3">Avoid</p>
-        <ul class="flex flex-col gap-2 text-sm text-ink-200">${["Shouting to make a sound powerful", "Forcing chest voice higher", "Forcing head voice lower", "Squeezing the throat to prevent a voice break", "Repeating difficult notes until tired", "Trying to copy advanced singers before building basic coordination"].map((t) => `<li class="flex gap-2"><span class="text-amber-300">✕</span>${t}</li>`).join("")}</ul>
+      <div class="flex flex-wrap gap-3 mb-3">
+        <button type="button" data-play-ex="${ex.key}" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen</button>
       </div>
-    </div>
-    <p class="text-xs text-ink-500 mt-3">A voice break is not a failure, and increasing volume is not the solution to every transition.</p>`;
+      ${recCard(`${ex.key}Take`, `Recording for ${ex.title.replace(/^Exercise \d+ — /, "")}`, "Entirely optional.", 15)}
+      <div class="mt-2">${skipBtn(ex.key)}</div>
+    </div>`;
   }
 
   function problems() {
     const items = [
-      ["Trying to create a powerful mix immediately", "Begin with easy, quiet sounds."],
-      ["Thinking mix means exactly half chest voice and half head voice", "It describes a coordination, not a mathematical ratio."],
-      ["Forcing the voice to avoid every break", "Explore small movements and allow natural changes."],
-      ["Assuming a certain vibration proves correct technique", "Sensations differ, so comfort and repeatability matter more."],
-      ["Practising until the voice is tired", "Stop early and rest."],
+      ["Chasing a specific 'mixed voice' sound", "Focus on comfort and consistency instead — the sound develops over time."],
+      ["Singing loudly to feel more connected", "Keep the sound light; volume doesn't create mixed coordination."],
+      ["Forcing a particular sensation because someone else described one", "Sensations vary between singers — trust your own comfort."],
+      ["Rushing through all seven exercises in one sitting", "A few comfortable exercises, done well, are enough for today."],
+      ["Assuming a comfortable Sa or swara pattern defines mixed voice", "Registers and swara positions are separate ideas — don't confuse them."],
     ];
     return `<div class="flex flex-col gap-2">${items.map(([t, a]) => `
       <details class="group rounded-2xl border border-white/5 bg-white/[0.02] px-5 py-4">
@@ -160,20 +248,36 @@ const IntroMixedCoordinationLesson = (() => {
       </details>`).join("")}</div>`;
   }
 
-  function recordReviewHtml(rec) {
-    const sources = [["ahTake", "“ah”"], ["ooTake", "“oo”"], ["exploreTake", "Transition"]];
+  function reviewHtml(rec) {
+    const sources = [...EXERCISES.map((ex) => [`${ex.key}Take`, ex.title.replace(/^Exercise \d+ — /, "")]), ["routineTake", "Coordination practice routine"], ["applyTake", "Melody-like application"]];
     const present = sources.filter(([k]) => take(rec, k));
-    if (!present.length) return "";
+    if (!present.length) return `<p class="text-sm text-ink-500">Record any of the exercises above, then come back here to listen and reflect.</p>`;
     return `<div class="flex flex-wrap gap-2 mb-4">${present.map(([k, label]) => `<button type="button" data-play-review="${k}" class="vr-btn">${icon("play", "w-3.5 h-3.5")} ${label}</button>`).join("")}</div>`;
+  }
+
+  function knowledgeCheckHtml(rec) {
+    return `<div class="flex flex-col gap-5" data-kc>
+      ${KNOWLEDGE_CHECK.map((item) => {
+        const selected = q(rec, `kc_${item.key}`);
+        return `
+        <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-4" data-kc-item="${item.key}">
+          <p class="text-sm text-ink-200 mb-2.5">${item.question}</p>
+          <div class="flex flex-wrap gap-2">
+            ${item.options.map((o) => `<button type="button" data-kc-choice="${o.value}" class="ex-chip ${selected === o.value ? "is-selected" : ""}">${o.label}</button>`).join("")}
+          </div>
+          ${selected ? `<p class="text-xs mt-2.5 ${item.options.find((o) => o.value === selected).correct ? "text-emerald-300" : "text-amber-300"}">${item.explain[selected]}</p>` : ""}
+        </div>`;
+      }).join("")}
+      <p class="text-xs text-ink-500">This is a quick concept check, not a vocal-performance score.</p>
+    </div>`;
   }
 
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
         <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 10 milestone</p>
-        <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Coordination, not a recipe.</p>
-        <p class="text-sm text-ink-300">A recognisable "mix" isn't the goal of one lesson — patient, comfortable exploration is.</p>
-        <p class="text-sm text-ink-100">No single sensation proves anything. Comfort and repeatability matter more.</p>
+        <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Exploring coordination, not chasing a sound.</p>
+        <p class="text-sm text-ink-300">No single sensation proves mixed voice — comfort and repeatability matter more.</p>
       </div>`;
   }
 
@@ -187,7 +291,7 @@ const IntroMixedCoordinationLesson = (() => {
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
         <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 11 — Vowel Modification Foundations</p>
-        <p class="text-sm text-ink-300 leading-relaxed">The next lesson will introduce how vowel shapes can affect the sound and ease of singing — no advanced vowel modification or high-note techniques yet.</p>
+        <p class="text-sm text-ink-300 leading-relaxed">The next lesson explores how vowel shape affects vocal tone and clarity.</p>
       </div>`;
     if (status === "completed") {
       return `
@@ -195,7 +299,7 @@ const IntroMixedCoordinationLesson = (() => {
           ${milestone()}
           <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.05] p-6 sm:p-8 text-center">
             <p class="text-[11px] tracking-[0.25em] uppercase text-emerald-300 mb-2">Class complete</p>
-            <h3 class="font-display text-2xl text-ink-50 mb-5">A broad, gentle introduction to mixed coordination — no forcing, no single right sensation.</h3>
+            <h3 class="font-display text-2xl text-ink-50 mb-5">Mixed coordination is a broad teaching term — not a 50/50 split, not proof via any single sensation.</h3>
             <ul class="inline-flex flex-col gap-2 text-left mx-auto">${lines}</ul>
             ${preview}
             ${next ? `
@@ -236,7 +340,6 @@ const IntroMixedCoordinationLesson = (() => {
     const sel = (k) => q(rec, k);
     const growth = A(rec, "growth");
     const c = checklist(rec);
-    const exploreChoice = sel("exploreChoice") || "mmoo";
 
     return `
     <div class="pitch-lesson">
@@ -245,82 +348,76 @@ const IntroMixedCoordinationLesson = (() => {
 
       <div class="max-w-5xl mx-auto px-5 lg:px-8 py-12 flex flex-col gap-20">
 
-        ${chapter("understand", 1, "Section A — Welcome and concept", `
-          ${narrow(`
-            ${p("Class 3 explored comfortable, speech-like sounds. Class 4 introduced lighter vocal sounds. Class 5 explored small transitions between different vocal qualities. Now we introduce mixed coordination.")}
-            ${p("Singers often use “mix” to describe coordination that balances qualities commonly associated with chest and head voice. It is not a literal 50/50 combination, and there is no single sensation that proves the voice is mixed.")}
-            ${p("A mix does not have to be loud, powerful, or high. You don't need to produce a recognisable mix voice today — this is a broad teaching term, and singers may use it somewhat differently.")}
-          `)}
-          ${flowStrip(["REVIEW", "COMPARE", "EXPLORE", "REFLECT"])}
+        ${chapter("recap", 1, "Section A — Recap", `
+          ${narrow(p("Chest voice, head voice, and connecting chest and head voice have all explored different vocal coordination patterns. This class introduces mixed coordination — a gentle warm-up first."))}
+          <div class="flex flex-wrap gap-3 mb-2">
+            <button type="button" data-play-recap class="vr-btn">${icon("play", "w-4 h-4")} Gentle warm-up</button>
+          </div>
           <div data-lesson-viewed-sentinel class="h-px"></div>
         `)}
 
-        ${chapter("listen", 2, "Section B — Comfortable baseline", `
+        ${chapter("understand", 2, "Section B — Understanding mixed coordination", `
           ${narrow(`
-            <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed">
-              ${["Relax the jaw and shoulders.", "Say a short sentence naturally — e.g. “" + SENTENCE + "”", "Make one easy “mmm” sound, if comfortable.", "Rest and check for tension."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
-            </ol>
-            <p class="text-xs text-ink-500 mt-4">Keep breathing natural — no breath-holding or strenuous breathing exercises.</p>
+            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-4">
+              ${["'Mix' or 'mixed coordination' describes balancing qualities commonly associated with chest and head voice.", "It's useful because it supports a more connected sound across your range.", "It relates directly to the register transitions explored in earlier classes.", "Different teachers may use slightly different terminology for this idea.", "There is no single sensation that proves a singer is using mixed voice."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
+            </ul>
+            <p class="text-sm text-ink-300 leading-relaxed">You're exploring coordination here — not trying to produce a powerful, professional mixed voice immediately.</p>
           `)}
         `)}
 
-        ${chapter("compare", 3, "Section C — Compare comfortable “ah” and “oo” sounds", `
-          ${narrow(p("A gentle, short “ah” near a comfortable speaking pitch, then a gentle, short “oo” at a comfortable pitch — a brief rest between attempts, two or three repetitions at most."))}
-          ${recCard("ahTake", "Gentle “ah”", "", 10)}
-          ${narrow(`<div class="mt-3 mb-6">${skipBtn("ah")}</div>`)}
-          ${recCard("ooTake", "Gentle “oo”", "", 10)}
-          ${narrow(`
-            <div class="mt-3">${skipBtn("oo")}</div>
-            <div class="mt-5">${SelfAssessment.render("compareSounds-q", { ...Q.compareSounds, selected: sel("compareSounds") })}</div>
-            <p class="text-xs text-ink-500 mt-2">Every answer is accepted — these aren't being labelled as definite vocal registers based only on sensation.</p>
-          `)}
-        `)}
-
-        ${chapter("pitch", 4, "Section D — Small, comfortable pitch movement", `
-          ${narrow(p("Listen to a comfortable reference note, then imitate it without forcing. If comfortable, move slightly upward and return. Rest after each attempt. Repeat no more than two or three times."))}
+        ${chapter("exercises", 3, "Section C — Guided exercises", `
+          ${narrow(p("All seven exercises share one comfortable reference note — choose it on the piano below."))}
           <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-3">
             ${VirtualPiano.render("imc-piano", { controls: false, keyboard: true, display: true })}
           </div>
           ${narrow(`<p class="text-sm text-ink-300 mb-5">Your note: <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong></p>`)}
-          <div class="flex flex-wrap gap-3 mb-4">
-            <button type="button" data-play-pitch="base" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Reference note</button>
-            <button type="button" data-play-pitch="up" class="vr-btn">${icon("play", "w-4 h-4")} Slightly upward, then return</button>
-          </div>
-          ${recCard("pitchTake", "Imitate the note, if comfortable", "Entirely optional.", 10)}
-          ${narrow(`<div class="mt-3">${skipBtn("pitch")}</div>`)}
+          ${EXERCISES.map((ex) => exerciseCardHtml(ex)).join("")}
         `, { wide: true })}
 
-        ${chapter("explore", 5, "Section E — Explore ease rather than force", `
+        ${chapter("practice", 4, "Section D — Coordination practice", `
           ${narrow(`
-            ${p("Only if comfortable and suitable: a gentle, short “mm-oo” or “ng-oo” transition, quiet and easy, with a small pitch movement if any. Avoid pressing the sound forward, squeezing the throat, or pushing volume. Rest between attempts, and stop if tension develops.")}
-            ${SelfAssessment.render("exploreChoice-q", { ...Q.exploreChoice, selected: exploreChoice })}
-            <p class="text-xs text-ink-500 mt-2 mb-4">The easier alternative — “ah” and “oo” separately, not connected — is just as valid. You're exploring coordination, not producing a true mixed sound today.</p>
+            <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-4">
+              ${["A light, comfortable sound.", "Smooth movement across a small range.", "Consistent tone without pushing.", "Gradual repetition.", "A relaxed jaw and throat."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
+            </ol>
+            <p class="text-xs text-ink-500 mb-4">No excessive breath pressure, shouting, throat constriction, or deliberate vocal strain.</p>
           `)}
-          <div data-explore-rec-host>${recCard("exploreTake", EXPLORE_LABELS[exploreChoice], "", 10)}</div>
-          ${narrow(`<div class="mt-3">${skipBtn("explore")}</div>`)}
+          <div class="flex flex-wrap gap-3 mb-4">
+            <button type="button" data-play-routine class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen to the routine</button>
+          </div>
+          ${recCard("routineTake", "The coordination practice routine", "Entirely optional.", 20)}
         `)}
 
-        ${chapter("notmix", 6, "Section F — What mixed coordination is not", notMixHtml())}
+        ${chapter("apply", 5, "Section E — Practical application", `
+          ${narrow(p("A simple melody-like exercise using comfortable notes and syllables. If you'd like, you can use the same swara-style labels from Classes 3-6, built from this same reference note (or your own chosen Sa) — the swara names here are just labels, not a claim that mixed voice equals any particular swara."))}
+          <div class="flex flex-wrap gap-3 mb-3">
+            <button type="button" data-play-apply="numbers" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen: 1–3–2–1</button>
+            <button type="button" data-play-apply="swara" class="vr-btn">${icon("play", "w-4 h-4")} Listen: Sa–Ga–Ri–Sa</button>
+          </div>
+          ${recCard("applyTake", "Singing the melody-like application", "Entirely optional.", 15)}
+        `)}
 
-        ${chapter("record", 7, "Section G — Optional recording and reflection", `
-          ${narrow(p("Recording is entirely optional — nothing here is automatically analyzed, and no recording is sent anywhere outside your own account."))}
-          ${recCard("spokenSentence", "A short spoken sentence", "", 10)}
-          <div data-review-host class="mt-2">${recordReviewHtml(rec)}</div>
+        ${chapter("record", 6, "Section F — Recording and evaluation", `
+          ${narrow(p("Recording is entirely optional — nothing here is automatically analyzed, and no recording is sent anywhere outside your own account. This app cannot automatically detect a 'mixed voice' sound."))}
+          <div data-review-host>${reviewHtml(rec)}</div>
           ${narrow(`
             <div class="flex flex-col gap-4 mt-5">
-              ${SelfAssessment.render("easiestSound-q", { ...Q.easiestSound, selected: sel("easiestSound") })}
-              ${SelfAssessment.render("triedToForce-q", { ...Q.triedToForce, selected: sel("triedToForce") })}
-              ${SelfAssessment.render("tensionNoticed-q", { ...Q.tensionNoticed, selected: sel("tensionNoticed") })}
-              <div><label class="block text-sm text-ink-200 mb-1.5" for="imc-again">What would I like to practise again?</label><textarea id="imc-again" data-growth="practiceAgain" rows="2" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.practiceAgain || "")}</textarea></div>
+              ${SelfAssessment.render("comfortable-q", { ...Q.comfortable, selected: sel("comfortable") })}
+              ${SelfAssessment.render("pushedVolume-q", { ...Q.pushedVolume, selected: sel("pushedVolume") })}
+              ${SelfAssessment.render("tensionFree-q", { ...Q.tensionFree, selected: sel("tensionFree") })}
+              ${SelfAssessment.render("abruptChange-q", { ...Q.abruptChange, selected: sel("abruptChange") })}
+              ${SelfAssessment.render("easiestExercise-q", { ...Q.easiestExercise, selected: sel("easiestExercise") })}
             </div>
           `)}
         `)}
 
-        ${chapter("mistakes", 8, "Section H — Common beginner mistakes", problems())}
+        ${chapter("quiz", 7, "Section G — Knowledge check", `
+          ${narrow(p("A quick concept check — not a vocal-performance score."))}
+          ${knowledgeCheckHtml(rec)}
+        `)}
 
-        ${chapter("reflect", 9, "Section I — Reflection and completion", `
+        ${chapter("reflect", 8, "Reflection and completion", `
           ${narrow(`
-            ${p("A simple checklist — tick what's true for you. Completion doesn't require perfect pitch, a successful transition, a recording, or finishing every optional activity.")}
+            ${p("A simple checklist — tick what's true for you. Completion doesn't depend on achieving a recognisable 'mixed' sound.")}
             <div class="flex flex-col gap-1 mb-5">
               ${CHECKLIST_ITEMS.map((item, i) => `
                 <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">
@@ -331,15 +428,17 @@ const IntroMixedCoordinationLesson = (() => {
           `)}
         `)}
 
+        ${chapter("complete", 9, "Common beginner mistakes", problems())}
+
         ${chapter("complete", 10, "My Notes", `
           ${p("Your private notebook for this class. Only you can see it.")}
-          ${PersonalNotes.render("notes-imc", { placeholder: "e.g. How the “ah” compared to the “oo”... Whether the transition felt forced anywhere... What I want to try next time..." })}
+          ${PersonalNotes.render("notes-imc", { placeholder: "e.g. Which exercise felt easiest... Whether I noticed an abrupt change... What I want to try next time..." })}
         `)}
 
-        ${chapter("complete", 11, "Section J — Optional home practice", `
+        ${chapter("complete", 11, "Vocal safety", `
           ${narrow(`
-            ${p("About 2–3 optional minutes: say a short sentence naturally, make one comfortable “ah,” make one comfortable “oo,” try one small movement between pitches if comfortable, then rest and record one observation. No need for excessive repetitions or practice through discomfort.")}
-            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort.")}
+            ${p("Never force high or low notes, and never shout. Avoid excessive breath pressure or throat constriction. Rest between exercises.")}
+            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort. If discomfort repeatedly occurs, seek guidance from a qualified voice professional.")}
             <div data-warmup-note></div>
           `)}
         `)}
@@ -380,20 +479,56 @@ const IntroMixedCoordinationLesson = (() => {
     }));
     LessonKit.loadAndRefresh(container, classId, params);
 
-    /* ---- Section D: piano + playback ---- */
+    /* ---- Section A: recap playback ---- */
+    function onPlayRecap(e) {
+      if (!e.target.closest("[data-play-recap]")) return;
+      PianoSynth.playSequence(degreesToNotes(base(), [0, 1, 0]), { duration: 0.6, gap: 0.2 });
+    }
+    container.addEventListener("click", onPlayRecap);
+    cleanups.push(() => container.removeEventListener("click", onPlayRecap));
+
+    /* ---- knowledge check ---- */
+    function onKcChoice(e) {
+      const btn = e.target.closest("[data-kc-choice]");
+      if (!btn) return;
+      const itemEl = btn.closest("[data-kc-item]");
+      const key = itemEl.dataset.kcItem;
+      set("q", `kc_${key}`, btn.dataset.kcChoice);
+      $("[data-kc]").outerHTML = knowledgeCheckHtml(rec0());
+    }
+    container.addEventListener("click", onKcChoice);
+    cleanups.push(() => container.removeEventListener("click", onKcChoice));
+
+    /* ---- Section C: piano + exercise playback ---- */
     own(VirtualPiano.wire(container, "imc-piano", {
       range: RANGE, keyboard: true,
-      onNote: ({ midi }) => { if (midi >= RANGE.from && midi + STEP <= RANGE.to) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
+      onNote: ({ midi }) => { if (midi >= RANGE.from && midi + MAX_UP * STEP <= RANGE.to) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
     }));
-    function onPlayPitch(e) {
-      const btn = e.target.closest("[data-play-pitch]");
+    function onPlayEx(e) {
+      const btn = e.target.closest("[data-play-ex]");
       if (!btn) return;
-      const b = base();
-      if (btn.dataset.playPitch === "base") PianoSynth.play(b, { duration: 1.2, velocity: 0.5 });
-      else PianoSynth.playSequence([b + STEP, b], { duration: 0.9, gap: 0.3 });
+      const ex = EXERCISES.find((x) => x.key === btn.dataset.playEx);
+      if (ex) PianoSynth.playSequence(degreesToNotes(base(), ex.degrees), { duration: 0.7, gap: 0.3 });
     }
-    container.addEventListener("click", onPlayPitch);
-    cleanups.push(() => container.removeEventListener("click", onPlayPitch));
+    container.addEventListener("click", onPlayEx);
+    cleanups.push(() => container.removeEventListener("click", onPlayEx));
+
+    /* ---- Section D: routine playback ---- */
+    function onPlayRoutine(e) {
+      if (!e.target.closest("[data-play-routine]")) return;
+      PianoSynth.playSequence(degreesToNotes(base(), [0, 1, 2, 1, 0]), { duration: 0.6, gap: 0.25 });
+    }
+    container.addEventListener("click", onPlayRoutine);
+    cleanups.push(() => container.removeEventListener("click", onPlayRoutine));
+
+    /* ---- Section E: application playback (numbers vs swara labels, same intervals) ---- */
+    function onPlayApply(e) {
+      const btn = e.target.closest("[data-play-apply]");
+      if (!btn) return;
+      PianoSynth.playSequence(degreesToNotes(base(), [0, 2, 1, 0]), { duration: 0.6, gap: 0.25 });
+    }
+    container.addEventListener("click", onPlayApply);
+    cleanups.push(() => container.removeEventListener("click", onPlayApply));
 
     /* ---- skip buttons ---- */
     function onSkip(e) {
@@ -409,40 +544,19 @@ const IntroMixedCoordinationLesson = (() => {
     /* ---- recordings ---- */
     function refreshReviewHost() {
       const host = $("[data-review-host]");
-      if (host) host.innerHTML = recordReviewHtml(rec0());
+      if (host) host.innerHTML = reviewHtml(rec0());
     }
-    const NAMES = { ahTake: "“ah”", ooTake: "“oo”", pitchTake: "Pitch exploration", exploreTake: "Transition exploration", spokenSentence: "Spoken sentence" };
-    const MAX_SECONDS = { ahTake: 10, ooTake: 10, pitchTake: 10, exploreTake: 10, spokenSentence: 10 };
-    const REVIEW_SOURCE_KEYS = ["ahTake", "ooTake", "exploreTake"];
-    function wireRecordingCard(k) {
-      return RecordingCard.wire(container, `rc-${k}`, {
-        classId, take: take(rec0(), k), maxSeconds: MAX_SECONDS[k],
-        meta: { name: `Level 2, Class 6 — ${NAMES[k]}`, exercise: `intro-mixed-coordination-${k}` },
-        onSaved: (t) => {
-          set("recs", k, t); ClassActivity.bump(classId, "recordings");
-          if (REVIEW_SOURCE_KEYS.includes(k)) refreshReviewHost();
-        },
-      });
-    }
-    Object.keys(NAMES).filter((k) => k !== "exploreTake").forEach((k) => own(wireRecordingCard(k)));
+    const EX_NAMES = Object.fromEntries(EXERCISES.map((ex) => [`${ex.key}Take`, ex.title]));
+    const NAMES = { ...EX_NAMES, routineTake: "Coordination practice routine", applyTake: "Melody-like application" };
+    Object.keys(NAMES).forEach((k) => {
+      own(RecordingCard.wire(container, `rc-${k}`, {
+        classId, take: take(rec0(), k), maxSeconds: k === "applyTake" ? 15 : (k === "routineTake" ? 20 : 15),
+        meta: { name: `Level 2, Class 10 — ${NAMES[k]}`, exercise: `intro-mixed-coordination-${k}` },
+        onSaved: (t) => { set("recs", k, t); ClassActivity.bump(classId, "recordings"); refreshReviewHost(); },
+      }));
+    });
 
-    /* ---- Section E: explore choice (re-wires its own RecordingCard when the label changes) ---- */
-    let exploreApi = own(wireRecordingCard("exploreTake"));
-    function onExploreChoice(e) {
-      const chip = e.target.closest('[data-assess="exploreChoice-q"] [data-assess-choice]');
-      if (!chip) return;
-      const value = chip.dataset.assessChoice;
-      set("q", "exploreChoice", value);
-      const host = $("[data-explore-rec-host]");
-      if (exploreApi) exploreApi.destroy();
-      host.innerHTML = recCard("exploreTake", EXPLORE_LABELS[value], "", 10);
-      exploreApi = wireRecordingCard("exploreTake");
-      if (REVIEW_SOURCE_KEYS.includes("exploreTake")) refreshReviewHost();
-    }
-    container.addEventListener("click", onExploreChoice);
-    cleanups.push(() => { container.removeEventListener("click", onExploreChoice); if (exploreApi) exploreApi.destroy(); });
-
-    /* ---- Section G: play-to-review ---- */
+    /* ---- Section F: play-to-review ---- */
     function onPlayReview(e) {
       const btn = e.target.closest("[data-play-review]");
       if (!btn) return;
@@ -453,7 +567,7 @@ const IntroMixedCoordinationLesson = (() => {
     cleanups.push(() => container.removeEventListener("click", onPlayReview));
 
     /* ---- generic self-assess dispatcher ---- */
-    const assessMap = { "compareSounds-q": "compareSounds", "easiestSound-q": "easiestSound", "triedToForce-q": "triedToForce", "tensionNoticed-q": "tensionNoticed" };
+    const assessMap = { "comfortable-q": "comfortable", "pushedVolume-q": "pushedVolume", "tensionFree-q": "tensionFree", "abruptChange-q": "abruptChange", "easiestExercise-q": "easiestExercise" };
     function onAssess(e) {
       const chip = e.target.closest("[data-assess-choice]");
       if (!chip) return;
@@ -466,14 +580,7 @@ const IntroMixedCoordinationLesson = (() => {
     container.addEventListener("click", onAssess);
     cleanups.push(() => container.removeEventListener("click", onAssess));
 
-    /* ---- growth textarea ---- */
-    container.querySelectorAll("[data-growth]").forEach((ta) => {
-      const key = ta.dataset.growth;
-      const save = Utils.debounce((v) => set("growth", key, v), 500);
-      ta.addEventListener("input", () => save(ta.value));
-    });
-
-    /* ---- Section I: completion checklist ---- */
+    /* ---- completion checklist ---- */
     function onChecklist(e) {
       const cb = e.target.closest("[data-checklist]");
       if (!cb) return;
@@ -496,15 +603,14 @@ const IntroMixedCoordinationLesson = (() => {
     function onComplete(e) {
       const btn = e.target.closest("[data-complete-class]");
       if (!btn || btn.disabled) return;
-      const rec = rec0();
       Store.completeClass(classId);
       ClassActivity.markCompleted(classId);
       Store.addJournalEntry({
         classId,
         classTitle: `Level 2, Class ${cls.number} — ${cls.title}`,
-        learned: "Mixed coordination is a broad teaching term, not a literal 50/50 split or a single sensation to prove — comfort and repeatability matter more than one perfect sound.",
-        struggled: q(rec, "tensionNoticed") === "yes" || q(rec, "tensionNoticed") === "alittle" ? "Noticed some jaw/neck/throat tension." : "",
-        toPractice: A(rec, "growth").practiceAgain || "",
+        learned: "Mixed coordination is a broad teaching term for balancing chest- and head-voice qualities — no single sensation proves it, and it shouldn't be forced.",
+        struggled: "",
+        toPractice: "",
         thoughts: "",
       });
       Router.softRefresh(container, ClassDetailPage, params);

@@ -1,124 +1,190 @@
 /* ============================================================
-   LEVEL 2, CLASS 9 — PROJECTION WITHOUT PUSHING (interactive
-   lesson)
+   LEVEL 2, CLASS 13 — PROJECTION WITHOUT PUSHING
+   (interactive lesson)
 
    Rendered by ClassDetailPage for interactive: "projection-without-pushing".
 
-   Curriculum identity: Level 2, Class 9 (`number: 9`, `levelId: 2`
-   in data.js, id `L2C09`). Same mechanism Classes 1-8 already
-   proved eight times over. This class's own title matched the
-   placeholder list's already-renamed entry exactly (renamed from
-   "Expression" during Class 8's turn), so nothing needed renaming
-   to add Class 9 itself.
+   Curriculum identity: Level 2, Class 13 (`number: 13`, `levelId: 2`
+   in data.js, explicit id `L2C09` — unchanged since the Level 2
+   Curriculum Upgrade). Rebuilt against this class's own later, more
+   detailed spec (a gentle preparation section, six named guided
+   exercises each with purpose/instructions/repetitions/rest/
+   listening-focus/mistakes, a practical projection routine, a two-
+   intensity recording activity, a musical application at three
+   intensities, and a 5-question knowledge check) — supersedes the
+   shorter version first written earlier in the project. Last of a
+   combined rebuild alongside Classes 9, 10 and 12.
 
-   **Level 2's class count grows a fifth time.** This spec's own
-   Section K previews the real Class 10 as "Register Transitions and
-   Vocal Continuity" — not the placeholder list's "Phrasing".
-   Following the same precedent Classes 5-8 all set (and Level 1's
-   five times before that), `levelClassDefs[2].titles`' next entry
-   was renamed in place, not removed.
-
-   Core idea: "Projection means allowing the voice to be heard
-   clearly for the situation. Shouting is not the same as healthy
-   vocal projection... A louder sound is not automatically a better
-   sound... Vocal effort is not always the solution to an acoustic
-   problem." Explicitly never promises a short lesson will make the
-   voice powerful or loud.
+   Core idea: vocal projection means being heard clearly for the
+   situation — not shouting. Clarity comes from articulation, vowel
+   shape, vocal coordination and appropriate volume, not from forcing
+   more air or tightening the throat. Room acoustics and microphone
+   placement also affect perceived loudness — vocal effort isn't
+   always the solution to an acoustic problem.
 
    Honesty boundaries, matching every earlier class: no fabricated
-   loudness/clarity/vocal-health analysis; completion never depends
-   on recording, loudness, perfect articulation, or finishing every
-   optional exercise (the spec says this explicitly).
-
-   Section I is five plain first-person self-attestations again, so
-   this file reuses Classes 3-8's plain-checkbox completion pattern
-   (Class 10's original `PRE_CHECK_ITEMS` style).
+   automatic projection measurement; completion never depends on
+   achieving maximum loudness, a recording, or finishing every
+   optional activity.
 
    Reuses: LessonKit (+ its automatic Warm-up card), VirtualPiano
    (Class 3), RecordingCard (Class 5), SelfAssessment (Class 4),
-   PersonalNotes, ClassProgress, the green/amber "comfortable vs.
-   avoid" comparison card (Class 3's Section F pattern). Section G
-   reuses Section E's own two phrase recordings rather than asking
-   again — the spec's literal "once naturally... once with clearer
-   articulation" is exactly what Section E's Version A/B already are.
+   PersonalNotes, ClassProgress.
    ============================================================ */
 
 const ProjectionWithoutPushingLesson = (() => {
   const STAGES = [
     { id: "understand", label: "Understand" },
-    { id: "baseline", label: "Baseline" },
-    { id: "clarity", label: "Clarity" },
-    { id: "phrase", label: "Phrase" },
-    { id: "compare", label: "Compare" },
-    { id: "effort", label: "Effort" },
+    { id: "prepare", label: "Prepare" },
+    { id: "exercises", label: "Exercises" },
+    { id: "practice", label: "Practice" },
     { id: "record", label: "Record" },
-    { id: "mistakes", label: "Mistakes" },
+    { id: "apply", label: "Apply" },
+    { id: "quiz", label: "Quiz" },
     { id: "reflect", label: "Reflect" },
     { id: "complete", label: "Complete" },
   ];
 
   const RANGE = { from: 48, to: 72 };
   const STEP = 2;
-  const GREETING = "Hello, how are you?";
-  const PHRASE = "Today, I am learning to sing with ease.";
+  const SENTENCE = "I am exploring my voice today.";
+
+  const EXERCISES = [
+    {
+      key: "speak", title: "Exercise 1 — Speak a short phrase naturally", degrees: null,
+      purpose: "Establish a natural, comfortable speaking baseline.",
+      instructions: `Say “${SENTENCE}” naturally, at your normal speaking volume.`,
+      repetitions: "Once or twice.", rest: "Rest briefly.",
+      listening: "Notice your natural volume and clarity.", mistakes: "Speaking more loudly than usual because you're being recorded.",
+    },
+    {
+      key: "articulate", title: "Exercise 2 — Repeat with clear articulation", degrees: null,
+      purpose: "Notice how articulation alone changes clarity, without changing volume.",
+      instructions: "Say the same phrase again, at the same volume, but with slightly clearer articulation.",
+      repetitions: "Once or twice.", rest: "Rest briefly.",
+      listening: "Notice whether clarity improves even though the volume hasn't changed.", mistakes: "Increasing volume instead of articulation.",
+    },
+    {
+      key: "singGently", title: "Exercise 3 — Sing the same phrase gently", degrees: [0],
+      purpose: "Carry the same clarity into gentle singing.",
+      instructions: "Sing the same phrase gently on a comfortable note.",
+      repetitions: "Once or twice.", rest: "Rest between attempts.",
+      listening: "Notice whether the phrase stays as clear when sung as when spoken.", mistakes: "Singing louder than needed to 'perform' the phrase.",
+    },
+    {
+      key: "focused", title: "Exercise 4 — A slightly more focused sound", degrees: [0],
+      purpose: "Explore a touch more clarity and focus, without increasing strain.",
+      instructions: "Sing the phrase again, with a slightly more focused, clear sound — not louder, just clearer.",
+      repetitions: "Once or twice.", rest: "Rest between attempts.",
+      listening: "Notice whether this feels like more effort or just more focus.", mistakes: "Tightening the throat to feel 'more focused'.",
+    },
+    {
+      key: "farther", title: "Exercise 5 — As if communicating with someone farther away", degrees: [0],
+      purpose: "Explore natural, comfortable projection — not shouting.",
+      instructions: "Sing the phrase as if speaking to someone a little farther away than usual — still comfortable, never straining.",
+      repetitions: "Once or twice.", rest: "Rest between attempts.",
+      listening: "Notice whether clarity and comfortable intensity increase together, naturally.", mistakes: "Treating 'farther away' as permission to shout.",
+    },
+    {
+      key: "compare", title: "Exercise 6 — Compare comfortable projection with shouting", degrees: null,
+      purpose: "Hear the difference between comfortable projection and shouting, directly.",
+      instructions: "If comfortable, briefly compare a gentle shout with your comfortably projected version from Exercise 5 — notice the difference, don't repeat the shout.",
+      repetitions: "Once, briefly.", rest: "Rest afterward.",
+      listening: "Notice how shouting feels different in the throat compared to comfortable projection.", mistakes: "Repeating the shouted version more than once.",
+    },
+  ];
+
+  const KNOWLEDGE_CHECK = [
+    {
+      key: "whatIsProjection",
+      question: "What does vocal projection mean?",
+      options: [
+        { value: "shout", label: "Shouting as loudly as possible", correct: false },
+        { value: "heard", label: "Being heard clearly for the situation", correct: true },
+        { value: "highnote", label: "Singing the highest note you can", correct: false },
+      ],
+      explain: { shout: "Not quite — projection isn't the same as shouting.", heard: "Exactly right.", highnote: "Not quite — projection is about clarity, not pitch." },
+    },
+    {
+      key: "louder",
+      question: "Does louder always mean better?",
+      options: [
+        { value: "yes", label: "Yes, louder is always better", correct: false },
+        { value: "no", label: "No — a louder sound is not automatically a better sound", correct: true },
+        { value: "sometimes", label: "Only in a large room", correct: false },
+      ],
+      explain: { yes: "Not quite — loudness alone doesn't improve projection.", no: "Right.", sometimes: "Not quite — this holds regardless of room size." },
+    },
+    {
+      key: "helps",
+      question: "What helps a voice carry, besides volume?",
+      options: [
+        { value: "articulation", label: "Clear articulation and vocal efficiency", correct: true },
+        { value: "nothing", label: "Nothing — volume is the only factor", correct: false },
+        { value: "shouting", label: "Shouting as much as possible", correct: false },
+      ],
+      explain: { articulation: "Exactly right.", nothing: "Not quite — articulation and efficiency matter a great deal.", shouting: "Not quite — shouting tends to reduce sound quality, not help it carry." },
+    },
+    {
+      key: "acoustics",
+      question: "Do room acoustics and microphone placement affect perceived loudness?",
+      options: [
+        { value: "yes", label: "Yes, they genuinely affect how audible a singer sounds", correct: true },
+        { value: "no", label: "No, only vocal effort matters", correct: false },
+        { value: "unsure", label: "This class doesn't say", correct: false },
+      ],
+      explain: { yes: "Exactly right.", no: "Not quite — acoustics and microphone placement matter too.", unsure: "It does say — Section A states this explicitly." },
+    },
+    {
+      key: "throatPressure",
+      question: "Is increasing throat pressure healthy projection?",
+      options: [
+        { value: "yes", label: "Yes, more pressure means more projection", correct: false },
+        { value: "no", label: "No — increasing throat pressure is not healthy projection", correct: true },
+        { value: "sometimes", label: "Only for advanced singers", correct: false },
+      ],
+      explain: { yes: "Not quite — throat pressure works against healthy projection.", no: "Exactly right.", sometimes: "Not quite — this applies to every singer." },
+    },
+  ];
 
   const CHECKLIST_ITEMS = [
-    { key: "understood", label: "I understand the difference between projection and shouting." },
-    { key: "articulationPractised", label: "I practised clear articulation." },
-    { key: "volumeComfortable", label: "I kept my volume comfortable." },
-    { key: "tensionChecked", label: "I checked for jaw and throat tension." },
-    { key: "reflected", label: "I reflected on my effort." },
+    { key: "understoodProjection", label: "I understand what vocal projection means, and that it isn't shouting." },
+    { key: "triedExercise", label: "I tried at least one guided exercise." },
+    { key: "triedRoutine", label: "I practised the projection routine, or chose to skip it." },
+    { key: "recordedTwoIntensities", label: "I recorded the same phrase at two intensities, or chose not to record." },
+    { key: "stayedComfortable", label: "I kept the sound comfortable and avoided forcing it." },
+    { key: "reflected", label: "I reflected on whether increasing intensity reduced sound quality." },
   ];
   const PROGRESS_ITEMS = CHECKLIST_ITEMS;
 
   const opt = (value, label, tone = "neutral") => ({ value, label, tone });
   const Q = {
-    effortRating: { question: "How would you rate the effort?", options: [opt("veryeasy", "Very easy", "good"), opt("mostlyeasy", "Mostly easy", "good"), opt("effortful", "A little effortful", "maybe"), opt("unsure", "Unsure")] },
-    easierToUnderstand: { question: "Which version was easier to understand?", options: [opt("a", "Version A"), opt("b", "Version B"), opt("similar", "They seemed similar"), opt("unsure", "Not sure")] },
-    increasedVolume: { question: "Did I increase my volume unintentionally?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
-    tensionNoticed: { question: "Did my jaw or throat become tense?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
-    secondVersionFelt: { question: "Did the second version feel easier, similar, or harder?", options: [opt("easier", "Easier", "good"), opt("similar", "Similar", "good"), opt("harder", "Harder", "maybe"), opt("unsure", "Not sure")] },
-    wordsUnderstandable: { question: "Were the words understandable?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
-    maintainedComfortVolume: { question: "Did I maintain a comfortable volume?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
-    throatJawTension: { question: "Did I feel any throat or jaw tension?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
+    clearPronunciation: { question: "Is the pronunciation clear?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
+    comfortable: { question: "Is the sound comfortable?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
+    throatTight: { question: "Did the throat become tight?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
+    qualityReduced: { question: "Did increasing loudness reduce sound quality?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
+    stillNatural: { question: "Was the phrase still natural?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
   };
 
   const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
   const { p, narrow } = LessonKit;
   const A = (rec, g) => rec.answers[g] || {};
-  const filled = (v) => v && String(v).trim();
   const N = (m) => NoteUtils.name(m);
+  const degreesToNotes = (b, degrees) => degrees.map((d) => b + d * STEP);
 
   function baseNote(rec) {
     const ok = (n) => typeof n === "number" && n >= RANGE.from && n + STEP <= RANGE.to;
     const own = A(rec, "setup").note;
     if (ok(own)) return own;
-    const l2c8 = (ClassActivity.get("L2C08").answers.setup || {}).note;
-    if (ok(l2c8)) return l2c8;
-    const l2c7 = (ClassActivity.get("L2C07").answers.setup || {}).note;
-    if (ok(l2c7)) return l2c7;
-    const l2c6 = (ClassActivity.get("L2C06").answers.setup || {}).note;
-    if (ok(l2c6)) return l2c6;
-    const l2c5 = (ClassActivity.get("L2C05").answers.setup || {}).note;
-    if (ok(l2c5)) return l2c5;
-    const l2c4 = (ClassActivity.get("L2C04").answers.setup || {}).note;
-    if (ok(l2c4)) return l2c4;
-    const l2c3 = (ClassActivity.get("L2C03").answers.setup || {}).note;
-    if (ok(l2c3)) return l2c3;
-    const l2c2 = (ClassActivity.get("L2C02").answers.setup || {}).note;
-    if (ok(l2c2)) return l2c2;
-    const l2c1 = (ClassActivity.get("L2C01").answers.setup || {}).note;
-    if (ok(l2c1)) return l2c1;
-    const c25 = (ClassActivity.get("L1C25").answers.setup || {}).note;
-    if (ok(c25)) return c25;
-    const c2 = (ClassActivity.get("L1C02").answers.setup || {}).note;
-    if (ok(c2)) return c2;
+    for (const id of ["L2C08", "L2C07", "L2C06", "L2C05", "L2C04", "L2C03", "L2C02", "L2C01", "L1C25", "L1C02"]) {
+      const n = (ClassActivity.get(id).answers.setup || {}).note;
+      if (ok(n)) return n;
+    }
     return (ClassActivity.get("L1C01").answers.setup || {}).voice === "lower" ? 50 : 60;
   }
 
   const take = (rec, k) => A(rec, "recs")[k] || null;
   const q = (rec, k) => A(rec, "q")[k] || null;
-  const skipped = (rec, k) => !!A(rec, "skip")[k];
   const checklist = (rec) => A(rec, "checklist");
 
   function derivedCheckpoints(rec) {
@@ -129,31 +195,34 @@ const ProjectionWithoutPushingLesson = (() => {
   }
 
   /* ---------- small views ---------- */
-  const recCard = (k, title, hint, max = 12) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
-  const flowStrip = (steps) => `<div class="flex flex-wrap items-center justify-center gap-2 my-4">${steps.map((s, i, arr) => `<span class="flow-chip !text-sm">${s}</span>${i < arr.length - 1 ? `<span class="text-ink-700 text-xs">→</span>` : ""}`).join("")}</div>`;
+  const recCard = (k, title, hint, max = 15) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
   const skipBtn = (k, label = "Skip this exercise") => `<button type="button" data-skip-ex="${k}" class="text-xs text-ink-500 hover:text-ink-300 underline">${label}</button>`;
 
-  function effortHtml() {
-    return `<div class="grid sm:grid-cols-2 gap-4">
-      <div class="rounded-2xl border border-emerald-400/15 bg-emerald-500/[0.04] p-5">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-emerald-300 mb-3">Comfortable approach</p>
-        <ul class="flex flex-col gap-2 text-sm text-ink-200">${["Clear words", "Relaxed jaw and neck", "Natural breathing", "Comfortable volume", "Easy repetition"].map((t) => `<li class="flex gap-2"><span class="text-emerald-300">✓</span>${t}</li>`).join("")}</ul>
+  const FIELD = (label, value) => `<p class="text-xs text-ink-300 leading-relaxed"><span class="text-ink-500 uppercase tracking-wide text-[10px]">${label}:</span> ${value}</p>`;
+  function exerciseCardHtml(ex) {
+    return `<div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 mb-4" data-exercise-card="${ex.key}">
+      <p class="font-display text-lg text-ink-50 mb-3">${ex.title}</p>
+      <div class="flex flex-col gap-1.5 mb-4">
+        ${FIELD("Purpose", ex.purpose)}
+        ${FIELD("Instructions", ex.instructions)}
+        ${FIELD("Repetitions", ex.repetitions)}
+        ${FIELD("Rest", ex.rest)}
+        ${FIELD("Listening focus", ex.listening)}
+        ${FIELD("Common mistakes", ex.mistakes)}
       </div>
-      <div class="rounded-2xl border border-amber-400/15 bg-amber-500/[0.04] p-5">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-amber-300 mb-3">Avoid</p>
-        <ul class="flex flex-col gap-2 text-sm text-ink-200">${["Shouting", "Pushing excessive air", "Tightening the throat", "Raising the chin to force sound", "Singing louder when a phrase feels difficult", "Continuing when the voice feels tired or uncomfortable"].map((t) => `<li class="flex gap-2"><span class="text-amber-300">✕</span>${t}</li>`).join("")}</ul>
-      </div>
-    </div>
-    <p class="text-xs text-ink-500 mt-3">Microphone use, room acoustics and distance also affect how audible a singer sounds — vocal effort isn't always the solution to an acoustic problem.</p>`;
+      ${ex.degrees ? `<div class="flex flex-wrap gap-3 mb-3"><button type="button" data-play-ex="${ex.key}" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Reference note</button></div>` : ""}
+      ${recCard(`${ex.key}Take`, `Recording for ${ex.title.replace(/^Exercise \d+ — /, "")}`, "Entirely optional.", 15)}
+      <div class="mt-2">${skipBtn(ex.key)}</div>
+    </div>`;
   }
 
   function problems() {
     const items = [
-      ["Shouting to make the voice louder", "Return to comfortable volume and focus on clear words."],
-      ["Pushing extra air through every phrase", "Use natural breathing and pause when needed."],
-      ["Tightening the jaw to pronounce words", "Keep the jaw relaxed and movements natural."],
-      ["Trying to sing a phrase on one breath at any cost", "Breathe normally and shorten the phrase if needed."],
-      ["Assuming projection means sounding powerful", "Start with clarity, comfort, and consistency."],
+      ["Increasing throat pressure to sound louder", "Projection comes from clarity and coordination, not throat pressure."],
+      ["Assuming projection means shouting", "Comfortable clarity, not raw loudness, is the goal."],
+      ["Forcing more air to 'push' the sound out", "Comfortable, natural breath support is enough."],
+      ["Ignoring room acoustics or microphone placement", "These genuinely affect how audible you sound — vocal effort isn't the only factor."],
+      ["Repeating the shouting comparison multiple times", "Once is enough to notice the difference — don't repeat it."],
     ];
     return `<div class="flex flex-col gap-2">${items.map(([t, a]) => `
       <details class="group rounded-2xl border border-white/5 bg-white/[0.02] px-5 py-4">
@@ -163,19 +232,35 @@ const ProjectionWithoutPushingLesson = (() => {
   }
 
   function reviewHtml(rec) {
-    const sources = [["versionA", "Version A — natural"], ["versionB", "Version B — clearer articulation"]];
+    const sources = [...EXERCISES.map((ex) => [`${ex.key}Take`, ex.title.replace(/^Exercise \d+ — /, "")]), ["routineTake", "Projection routine"], ["intensityOneTake", "Phrase, first intensity"], ["intensityTwoTake", "Phrase, second intensity"], ["applyTake", "Musical application"]];
     const present = sources.filter(([k]) => take(rec, k));
-    if (!present.length) return `<p class="text-sm text-ink-500">Record Version A and B in Section E above, then come back here to listen and reflect.</p>`;
+    if (!present.length) return `<p class="text-sm text-ink-500">Record any of the exercises above, then come back here to listen and reflect.</p>`;
     return `<div class="flex flex-wrap gap-2 mb-4">${present.map(([k, label]) => `<button type="button" data-play-review="${k}" class="vr-btn">${icon("play", "w-3.5 h-3.5")} ${label}</button>`).join("")}</div>`;
+  }
+
+  function knowledgeCheckHtml(rec) {
+    return `<div class="flex flex-col gap-5" data-kc>
+      ${KNOWLEDGE_CHECK.map((item) => {
+        const selected = q(rec, `kc_${item.key}`);
+        return `
+        <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-4" data-kc-item="${item.key}">
+          <p class="text-sm text-ink-200 mb-2.5">${item.question}</p>
+          <div class="flex flex-wrap gap-2">
+            ${item.options.map((o) => `<button type="button" data-kc-choice="${o.value}" class="ex-chip ${selected === o.value ? "is-selected" : ""}">${o.label}</button>`).join("")}
+          </div>
+          ${selected ? `<p class="text-xs mt-2.5 ${item.options.find((o) => o.value === selected).correct ? "text-emerald-300" : "text-amber-300"}">${item.explain[selected]}</p>` : ""}
+        </div>`;
+      }).join("")}
+      <p class="text-xs text-ink-500">This is a quick concept check, not a vocal-performance score.</p>
+    </div>`;
   }
 
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
         <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 13 milestone</p>
-        <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Clarity, not volume.</p>
-        <p class="text-sm text-ink-300">Projection means being heard clearly for the situation — it isn't the same as shouting.</p>
-        <p class="text-sm text-ink-100">A louder sound is not automatically a better sound.</p>
+        <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Clarity, not loudness.</p>
+        <p class="text-sm text-ink-300">Projection means being heard clearly for the situation — never shouting.</p>
       </div>`;
   }
 
@@ -189,7 +274,7 @@ const ProjectionWithoutPushingLesson = (() => {
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
         <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 14 — Register Transitions and Coordination</p>
-        <p class="text-sm text-ink-300 leading-relaxed">The next lesson will continue exploring comfortable changes in vocal quality — no promise of a perfectly seamless transition, and no demanding range exercises yet.</p>
+        <p class="text-sm text-ink-300 leading-relaxed">The next lesson explores how the voice travels across its range, and how to practise that journey gently.</p>
       </div>`;
     if (status === "completed") {
       return `
@@ -197,7 +282,7 @@ const ProjectionWithoutPushingLesson = (() => {
           ${milestone()}
           <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.05] p-6 sm:p-8 text-center">
             <p class="text-[11px] tracking-[0.25em] uppercase text-emerald-300 mb-2">Class complete</p>
-            <h3 class="font-display text-2xl text-ink-50 mb-5">Comfortable vocal clarity — the difference between easy, audible singing and forced loudness.</h3>
+            <h3 class="font-display text-2xl text-ink-50 mb-5">Vocal projection is about being heard clearly for the situation — not shouting.</h3>
             <ul class="inline-flex flex-col gap-2 text-left mx-auto">${lines}</ul>
             ${preview}
             ${next ? `
@@ -236,7 +321,6 @@ const ProjectionWithoutPushingLesson = (() => {
     const pct = ClassProgress.percent(PROGRESS_ITEMS, rec.checkpoints);
     const b = baseNote(rec);
     const sel = (k) => q(rec, k);
-    const growth = A(rec, "growth");
     const c = checklist(rec);
 
     return `
@@ -246,80 +330,75 @@ const ProjectionWithoutPushingLesson = (() => {
 
       <div class="max-w-5xl mx-auto px-5 lg:px-8 py-12 flex flex-col gap-20">
 
-        ${chapter("understand", 1, "Section A — Welcome and concept", `
+        ${chapter("understand", 1, "Section A — Understanding projection", `
           ${narrow(`
-            ${p("Projection means allowing the voice to be heard clearly for the situation. Shouting is not the same as healthy vocal projection.")}
-            ${p("Clarity can be influenced by articulation, vowel shape, vocal coordination, and appropriate volume. A louder sound is not automatically a better sound — you don't need to force more air or tighten the throat to project.")}
-            ${p("Think of speaking to a nearby person versus speaking to someone farther away — not shouting across a room.")}
+            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed">
+              ${["Vocal projection means being heard clearly for the situation — not shouting.", "A louder sound is not automatically a better sound.", "Vocal efficiency and clear articulation help a voice carry.", "Increasing throat pressure is not healthy projection.", "Room acoustics and microphone placement also affect how audible a singer sounds."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
+            </ul>
           `)}
-          ${flowStrip(["LISTEN", "ARTICULATE", "COMPARE", "REFLECT"])}
           <div data-lesson-viewed-sentinel class="h-px"></div>
         `)}
 
-        ${chapter("baseline", 2, "Section B — Comfortable speaking baseline", `
+        ${chapter("prepare", 2, "Section B — Preparation", `
           ${narrow(`
-            <p class="dc-lyric font-display text-2xl sm:text-3xl text-ink-50 my-3">“${GREETING}”</p>
-            ${p("Say it naturally, then repeat it at the same comfortable volume. Notice whether the words are clear. Relax the jaw and shoulders. Rest.")}
+            <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed">
+              ${["Find a comfortable standing or sitting posture.", "Relax your shoulders and jaw.", "Breathe gently, with awareness — nothing forceful.", "Hum lightly for a moment.", "Say a short, comfortable phrase."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
+            </ol>
+            <p class="text-xs text-ink-500 mt-3">No forceful breathing exercises today.</p>
           `)}
-          ${recCard("greetingTake", "Say the greeting", "", 10)}
-          ${narrow(`<div class="mt-5">${SelfAssessment.render("effortRating-q", { ...Q.effortRating, selected: sel("effortRating") })}</div>`)}
         `)}
 
-        ${chapter("clarity", 3, "Section C — Clear words without extra volume", `
-          ${narrow(`
-            <p class="dc-lyric font-display text-2xl sm:text-3xl text-ink-50 my-3">“${PHRASE}”</p>
-            ${p("Speak it naturally, then repeat it slowly with clear articulation — same comfortable volume throughout. Notice whether the words become easier to understand without speaking louder. No exaggerated consonants or jaw movements.")}
-          `)}
-          ${recCard("clarityTake", "Natural, then slow and clear", "", 15)}
-        `)}
-
-        ${chapter("phrase", 4, "Section D — Gentle voiced phrase", `
-          ${narrow(p("Speak the phrase again, then — only if comfortable — use a gentle, comfortable pitch on a short portion of it. Don't stretch beyond a comfortable breath; allow normal breathing between attempts, and stop if the throat begins to feel tight."))}
+        ${chapter("exercises", 3, "Section C — Guided exercises", `
+          ${narrow(p("Some exercises share one comfortable reference note — choose it on the piano below."))}
           <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-3">
             ${VirtualPiano.render("pwp-piano", { controls: false, keyboard: true, display: true })}
           </div>
           ${narrow(`<p class="text-sm text-ink-300 mb-5">Your note: <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong></p>`)}
-          <div class="flex flex-wrap gap-3 mb-4">
-            <button type="button" data-play-pitch class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Reference note</button>
-          </div>
-          ${recCard("phraseTake", "The phrase, with a short gentle pitch if comfortable", "Entirely optional.", 15)}
-          ${narrow(`<div class="mt-3">${skipBtn("phrase")}</div>`)}
+          ${EXERCISES.map((ex) => exerciseCardHtml(ex)).join("")}
         `, { wide: true })}
 
-        ${chapter("compare", 5, "Section E — Compare comfort and clarity", `
-          ${narrow(p("Two versions of the phrase: Version A — natural speaking or gentle singing at a comfortable volume. Version B — repeat with clearer word articulation, keeping approximately the same volume and effort. This is about awareness, not a perfect result."))}
-          ${recCard("versionA", "Version A — natural", "", 12)}
-          ${recCard("versionB", "Version B — clearer articulation, similar volume", "", 12)}
+        ${chapter("practice", 4, "Section D — Practical projection routine", `
+          ${narrow(`
+            <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-4">
+              ${["Natural speaking volume.", "Comfortable singing volume.", "Clear and focused articulation.", "Slightly stronger but still comfortable singing."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
+            </ol>
+            <p class="text-xs text-ink-500 mb-4">The goal is clarity and ease, not maximum loudness.</p>
+          `)}
+          <div class="flex flex-wrap gap-3 mb-4">
+            <button type="button" data-play-routine class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Reference note</button>
+          </div>
+          ${recCard("routineTake", "The practical projection routine", "Entirely optional.", 20)}
+        `)}
+
+        ${chapter("record", 5, "Section E — Recording activity", `
+          ${narrow(p("Record the same phrase at two comfortable intensities."))}
+          ${recCard("intensityOneTake", "The phrase, first comfortable intensity", "", 12)}
+          ${recCard("intensityTwoTake", "The phrase, second comfortable intensity", "", 12)}
+          <div data-review-host class="mt-2">${reviewHtml(rec)}</div>
           ${narrow(`
             <div class="flex flex-col gap-4 mt-5">
-              ${SelfAssessment.render("easierToUnderstand-q", { ...Q.easierToUnderstand, selected: sel("easierToUnderstand") })}
-              ${SelfAssessment.render("increasedVolume-q", { ...Q.increasedVolume, selected: sel("increasedVolume") })}
-              ${SelfAssessment.render("tensionNoticed-q", { ...Q.tensionNoticed, selected: sel("tensionNoticed") })}
-              ${SelfAssessment.render("secondVersionFelt-q", { ...Q.secondVersionFelt, selected: sel("secondVersionFelt") })}
+              ${SelfAssessment.render("clearPronunciation-q", { ...Q.clearPronunciation, selected: sel("clearPronunciation") })}
+              ${SelfAssessment.render("comfortable-q", { ...Q.comfortable, selected: sel("comfortable") })}
+              ${SelfAssessment.render("throatTight-q", { ...Q.throatTight, selected: sel("throatTight") })}
+              ${SelfAssessment.render("qualityReduced-q", { ...Q.qualityReduced, selected: sel("qualityReduced") })}
+              ${SelfAssessment.render("stillNatural-q", { ...Q.stillNatural, selected: sel("stillNatural") })}
             </div>
           `)}
         `)}
 
-        ${chapter("effort", 6, "Section F — Understanding vocal effort", effortHtml())}
-
-        ${chapter("record", 7, "Section G — Optional recording and reflection", `
-          ${narrow(p("Recording is entirely optional — nothing here is automatically analyzed, and no recording is sent anywhere outside your own account."))}
-          <div data-review-host>${reviewHtml(rec)}</div>
-          ${narrow(`
-            <div class="flex flex-col gap-4 mt-5">
-              ${SelfAssessment.render("wordsUnderstandable-q", { ...Q.wordsUnderstandable, selected: sel("wordsUnderstandable") })}
-              ${SelfAssessment.render("maintainedComfortVolume-q", { ...Q.maintainedComfortVolume, selected: sel("maintainedComfortVolume") })}
-              ${SelfAssessment.render("throatJawTension-q", { ...Q.throatJawTension, selected: sel("throatJawTension") })}
-              <div><label class="block text-sm text-ink-200 mb-1.5" for="pwp-improve">What would I like to improve gently?</label><textarea id="pwp-improve" data-growth="improveAgain" rows="2" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.improveAgain || "")}</textarea></div>
-            </div>
-          `)}
+        ${chapter("apply", 6, "Section F — Musical application", `
+          ${narrow(p("Sing a simple original phrase or melody-like pattern with gentle intensity, then comfortable medium intensity, then natural expressive emphasis — never forcing loud singing."))}
+          ${recCard("applyTake", "The phrase at three intensities", "Entirely optional.", 20)}
         `)}
 
-        ${chapter("mistakes", 8, "Section H — Common beginner mistakes", problems())}
+        ${chapter("quiz", 7, "Section G — Knowledge check", `
+          ${narrow(p("A quick concept check — not a vocal-performance score."))}
+          ${knowledgeCheckHtml(rec)}
+        `)}
 
-        ${chapter("reflect", 9, "Section I — Reflection and completion", `
+        ${chapter("reflect", 8, "Reflection and completion", `
           ${narrow(`
-            ${p("A simple checklist — tick what's true for you. Completion doesn't depend on recording, loudness, perfect articulation, or completing every optional exercise.")}
+            ${p("A simple checklist — tick what's true for you.")}
             <div class="flex flex-col gap-1 mb-5">
               ${CHECKLIST_ITEMS.map((item, i) => `
                 <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">
@@ -330,15 +409,17 @@ const ProjectionWithoutPushingLesson = (() => {
           `)}
         `)}
 
+        ${chapter("complete", 9, "Common beginner mistakes", problems())}
+
         ${chapter("complete", 10, "My Notes", `
           ${p("Your private notebook for this class. Only you can see it.")}
-          ${PersonalNotes.render("notes-pwp", { placeholder: "e.g. Which version was clearer... Whether I noticed any tension... What I want to try next time..." })}
+          ${PersonalNotes.render("notes-pwp", { placeholder: "e.g. Whether clarity changed with intensity... Any tension I noticed... What I want to try next time..." })}
         `)}
 
-        ${chapter("complete", 11, "Section J — Optional home practice", `
+        ${chapter("complete", 11, "Vocal safety", `
           ${narrow(`
-            ${p("About 2–3 optional minutes: speak one short sentence naturally, repeat it with clear words, optionally say a small portion on a comfortable pitch, rest, then write down one observation. No need for excessive practice.")}
-            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort.")}
+            ${p("Never force high or low notes, and never shout or apply excessive vocal pressure. Avoid prolonged or exhausting exercises, and rest between them.")}
+            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort. If discomfort repeatedly occurs, seek guidance from a qualified voice professional.")}
             <div data-warmup-note></div>
           `)}
         `)}
@@ -379,17 +460,39 @@ const ProjectionWithoutPushingLesson = (() => {
     }));
     LessonKit.loadAndRefresh(container, classId, params);
 
-    /* ---- Section D: piano + playback ---- */
+    /* ---- knowledge check ---- */
+    function onKcChoice(e) {
+      const btn = e.target.closest("[data-kc-choice]");
+      if (!btn) return;
+      const itemEl = btn.closest("[data-kc-item]");
+      const key = itemEl.dataset.kcItem;
+      set("q", `kc_${key}`, btn.dataset.kcChoice);
+      $("[data-kc]").outerHTML = knowledgeCheckHtml(rec0());
+    }
+    container.addEventListener("click", onKcChoice);
+    cleanups.push(() => container.removeEventListener("click", onKcChoice));
+
+    /* ---- Section C: piano + exercise playback ---- */
     own(VirtualPiano.wire(container, "pwp-piano", {
       range: RANGE, keyboard: true,
       onNote: ({ midi }) => { if (midi >= RANGE.from && midi + STEP <= RANGE.to) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
     }));
-    function onPlayPitch(e) {
-      if (!e.target.closest("[data-play-pitch]")) return;
+    function onPlayEx(e) {
+      const btn = e.target.closest("[data-play-ex]");
+      if (!btn) return;
+      const ex = EXERCISES.find((x) => x.key === btn.dataset.playEx);
+      if (ex && ex.degrees) PianoSynth.playSequence(degreesToNotes(base(), ex.degrees), { duration: 0.9, gap: 0.3 });
+    }
+    container.addEventListener("click", onPlayEx);
+    cleanups.push(() => container.removeEventListener("click", onPlayEx));
+
+    /* ---- Section D: routine playback ---- */
+    function onPlayRoutine(e) {
+      if (!e.target.closest("[data-play-routine]")) return;
       PianoSynth.play(base(), { duration: 1.2, velocity: 0.5 });
     }
-    container.addEventListener("click", onPlayPitch);
-    cleanups.push(() => container.removeEventListener("click", onPlayPitch));
+    container.addEventListener("click", onPlayRoutine);
+    cleanups.push(() => container.removeEventListener("click", onPlayRoutine));
 
     /* ---- skip buttons ---- */
     function onSkip(e) {
@@ -407,21 +510,18 @@ const ProjectionWithoutPushingLesson = (() => {
       const host = $("[data-review-host]");
       if (host) host.innerHTML = reviewHtml(rec0());
     }
-    const NAMES = { greetingTake: "Greeting", clarityTake: "Clear articulation", phraseTake: "Phrase with pitch", versionA: "Version A — natural", versionB: "Version B — clearer articulation" };
-    const MAX_SECONDS = { greetingTake: 10, clarityTake: 15, phraseTake: 15, versionA: 12, versionB: 12 };
-    const REVIEW_KEYS = ["versionA", "versionB"];
+    const EX_NAMES = Object.fromEntries(EXERCISES.map((ex) => [`${ex.key}Take`, ex.title]));
+    const NAMES = { ...EX_NAMES, routineTake: "Projection routine", intensityOneTake: "Phrase, first intensity", intensityTwoTake: "Phrase, second intensity", applyTake: "Musical application" };
+    const REVIEW_KEYS = ["intensityOneTake", "intensityTwoTake"];
     Object.keys(NAMES).forEach((k) => {
       own(RecordingCard.wire(container, `rc-${k}`, {
-        classId, take: take(rec0(), k), maxSeconds: MAX_SECONDS[k],
-        meta: { name: `Level 2, Class 9 — ${NAMES[k]}`, exercise: `projection-without-pushing-${k}` },
-        onSaved: (t) => {
-          set("recs", k, t); ClassActivity.bump(classId, "recordings");
-          if (REVIEW_KEYS.includes(k)) refreshReviewHost();
-        },
+        classId, take: take(rec0(), k), maxSeconds: k === "routineTake" || k === "applyTake" ? 20 : (k.startsWith("intensity") ? 12 : 15),
+        meta: { name: `Level 2, Class 13 — ${NAMES[k]}`, exercise: `projection-without-pushing-${k}` },
+        onSaved: (t) => { set("recs", k, t); ClassActivity.bump(classId, "recordings"); if (REVIEW_KEYS.includes(k)) refreshReviewHost(); },
       }));
     });
 
-    /* ---- Section G: play-to-review ---- */
+    /* ---- Section E: play-to-review ---- */
     function onPlayReview(e) {
       const btn = e.target.closest("[data-play-review]");
       if (!btn) return;
@@ -432,11 +532,7 @@ const ProjectionWithoutPushingLesson = (() => {
     cleanups.push(() => container.removeEventListener("click", onPlayReview));
 
     /* ---- generic self-assess dispatcher ---- */
-    const assessMap = {
-      "effortRating-q": "effortRating", "easierToUnderstand-q": "easierToUnderstand", "increasedVolume-q": "increasedVolume",
-      "tensionNoticed-q": "tensionNoticed", "secondVersionFelt-q": "secondVersionFelt",
-      "wordsUnderstandable-q": "wordsUnderstandable", "maintainedComfortVolume-q": "maintainedComfortVolume", "throatJawTension-q": "throatJawTension",
-    };
+    const assessMap = { "clearPronunciation-q": "clearPronunciation", "comfortable-q": "comfortable", "throatTight-q": "throatTight", "qualityReduced-q": "qualityReduced", "stillNatural-q": "stillNatural" };
     function onAssess(e) {
       const chip = e.target.closest("[data-assess-choice]");
       if (!chip) return;
@@ -449,14 +545,7 @@ const ProjectionWithoutPushingLesson = (() => {
     container.addEventListener("click", onAssess);
     cleanups.push(() => container.removeEventListener("click", onAssess));
 
-    /* ---- growth textarea ---- */
-    container.querySelectorAll("[data-growth]").forEach((ta) => {
-      const key = ta.dataset.growth;
-      const save = Utils.debounce((v) => set("growth", key, v), 500);
-      ta.addEventListener("input", () => save(ta.value));
-    });
-
-    /* ---- Section I: completion checklist ---- */
+    /* ---- completion checklist ---- */
     function onChecklist(e) {
       const cb = e.target.closest("[data-checklist]");
       if (!cb) return;
@@ -485,9 +574,9 @@ const ProjectionWithoutPushingLesson = (() => {
       Store.addJournalEntry({
         classId,
         classTitle: `Level 2, Class ${cls.number} — ${cls.title}`,
-        learned: "Projection means being heard clearly for the situation — it isn't the same as shouting, and a louder sound isn't automatically a better one.",
-        struggled: q(rec, "tensionNoticed") === "yes" || q(rec, "tensionNoticed") === "alittle" ? "Noticed some jaw/throat tension." : "",
-        toPractice: A(rec, "growth").improveAgain || "",
+        learned: "Vocal projection means being heard clearly for the situation, not shouting — clarity and comfortable coordination matter more than raw loudness.",
+        struggled: q(rec, "throatTight") === "yes" || q(rec, "throatTight") === "alittle" ? "Noticed some throat tension." : "",
+        toPractice: "",
         thoughts: "",
       });
       Router.softRefresh(container, ClassDetailPage, params);

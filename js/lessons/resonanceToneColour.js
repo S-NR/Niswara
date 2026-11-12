@@ -1,133 +1,205 @@
 /* ============================================================
-   LEVEL 2, CLASS 8 — RESONANCE AND TONE COLOUR (interactive
-   lesson)
+   LEVEL 2, CLASS 12 — RESONANCE AND TONE COLOUR
+   (interactive lesson)
 
    Rendered by ClassDetailPage for interactive: "resonance-tone-colour".
 
-   Curriculum identity: Level 2, Class 8 (`number: 8`, `levelId: 2`
-   in data.js, id `L2C08`). Same mechanism Classes 1-7 already
-   proved seven times over. This class's own title matched the
-   placeholder list's already-renamed entry exactly (renamed from
-   "Dynamics" during Class 7's turn), so nothing needed renaming to
-   add Class 8 itself.
+   Curriculum identity: Level 2, Class 12 (`number: 12`, `levelId: 2`
+   in data.js, explicit id `L2C08` — unchanged since the Level 2
+   Curriculum Upgrade). Rebuilt against this class's own later, more
+   detailed spec — explicitly NOT a repeat of Class 2's introductory
+   resonance theory, but a practical build on it: bright/warm/light/
+   dark as descriptive listening terms, six guided exercises, an
+   interactive tone-exploration activity, a practical application
+   comparing two tone colours on the same phrase, a 5-question
+   knowledge check, and a 6-item checklist. Part of a combined
+   rebuild alongside Classes 9, 10 and 13.
 
-   **Level 2's class count grows a fourth time.** This spec's own
-   Section K previews the real Class 9 as "Projection Without
-   Pushing" — not the placeholder list's "Expression". Following the
-   same precedent Classes 5, 6 and 7 all set (and Level 1's five
-   times before that), `levelClassDefs[2].titles`' next entry was
-   renamed in place, not removed.
-
-   Core idea: "Tone colour, also called timbre, is the quality that
-   helps distinguish one voice or sound from another... A brighter
-   tone is not automatically better than a warmer tone... words such
-   as 'bright,' 'warm,' 'dark,' and 'light' are descriptive listening
-   terms, not rigid categories or medical assessments." Directly
-   continues Class 2 (Resonance) and Class 7 (Vowel Modification) —
-   this class's own Section A explicitly connects back to both.
+   Core idea: tone colour is influenced by vocal tract shape, mouth
+   opening, tongue position, jaw relaxation and vowel shape — bright,
+   warm, light and dark are descriptive listening terms, not rigid
+   scientific categories or medical assessments. A brighter tone isn't
+   automatically better than a warmer one; comfort and consistency
+   matter more than imitating another singer's tone.
 
    Honesty boundaries, matching every earlier class: no fabricated
-   tone-colour/voice-quality analysis; completion never depends on
-   producing a particular tone colour, a recording, or finishing
-   every optional activity (the spec says this explicitly).
-
-   Section I is five plain first-person self-attestations again, so
-   this file reuses Classes 3-7's plain-checkbox completion pattern
-   (Class 10's original `PRE_CHECK_ITEMS` style).
+   tone-colour analysis; no claim that a real studio comparison
+   recording exists (none does — the listening activity is learner-
+   led, comparing the learner's own sounds, not a fabricated
+   demonstration); completion never depends on achieving a particular
+   tone colour.
 
    Reuses: LessonKit (+ its automatic Warm-up card), VirtualPiano
    (Class 3), RecordingCard (Class 5), SelfAssessment (Class 4),
-   PersonalNotes, ClassProgress, Class 7's "one exercise card per
-   vowel" grid pattern (Section C, 4 vowels this time). Section E
-   reuses Section D's own two "ah" recordings rather than asking
-   again — the spec's own instructions describe literally the same
-   two takes — and Section G needs zero new recordings at all, since
-   every one of its 4 requested sounds was already captured earlier
-   in the same lesson (Sections B, C and D).
+   PersonalNotes, ClassProgress.
    ============================================================ */
 
 const ResonanceToneColourLesson = (() => {
   const STAGES = [
+    { id: "recap", label: "Recap" },
     { id: "understand", label: "Understand" },
     { id: "listen", label: "Listen" },
-    { id: "vowels", label: "Vowels" },
+    { id: "exercises", label: "Exercises" },
     { id: "explore", label: "Explore" },
-    { id: "contrast", label: "Contrast" },
-    { id: "singing", label: "Singing" },
+    { id: "apply", label: "Apply" },
     { id: "record", label: "Record" },
-    { id: "mistakes", label: "Mistakes" },
+    { id: "quiz", label: "Quiz" },
     { id: "reflect", label: "Reflect" },
     { id: "complete", label: "Complete" },
   ];
 
   const RANGE = { from: 48, to: 72 };
   const STEP = 2;
-  const SENTENCE = "I am exploring my voice today.";
-  const VOWELS = [
-    { key: "ah", label: "“Ah”" },
-    { key: "oh", label: "“Oh”" },
-    { key: "oo", label: "“Oo”" },
-    { key: "ee", label: "“Ee”" },
+
+  const TONE_LABELS = [
+    { key: "bright", label: "Bright", desc: "A forward, clear quality — often associated with a smaller mouth opening and a more forward tongue position." },
+    { key: "warm", label: "Warm", desc: "A rounder, fuller quality — often associated with a slightly more relaxed, open vocal tract." },
+    { key: "light", label: "Light", desc: "An easy, less weighty quality — often associated with less overall vocal effort." },
+    { key: "dark", label: "Dark", desc: "A deeper, more rounded quality — often associated with a lower tongue position and more space in the mouth." },
+  ];
+
+  const EXERCISES = [
+    {
+      key: "humObserve", title: "Exercise 1 — Gentle humming and observation", degrees: [0],
+      purpose: "Notice your own natural tone without judging it.",
+      instructions: "Hum gently on a comfortable note, and simply notice the quality of the sound.",
+      repetitions: "Two or three attempts.", rest: "Rest between attempts.",
+      listening: "Notice whether the hum feels bright, warm, light or dark to you — none is more correct.",
+      mistakes: "Trying to force a particular tone quality.",
+    },
+    {
+      key: "humVowel", title: "Exercise 2 — Humming into an open vowel", degrees: [0],
+      purpose: "Carry your natural tone from a hum into an open vowel.",
+      instructions: "Hum gently, then open into a comfortable “ah”.",
+      repetitions: "Two or three attempts.", rest: "Rest between attempts.",
+      listening: "Notice whether the tone quality changes as you open into the vowel.",
+      mistakes: "Opening the mouth too wide, too suddenly.",
+    },
+    {
+      key: "ooAh", title: "Exercise 3 — Comfortable “oo” and “ah” comparison", degrees: [0],
+      purpose: "Compare tone quality across two different vowels.",
+      instructions: "Sing a comfortable “oo”, then a comfortable “ah”, on the same note.",
+      repetitions: "Once or twice.", rest: "Rest between attempts.",
+      listening: "Notice how the two vowels naturally differ in tone.",
+      mistakes: "Trying to make both vowels sound identical.",
+    },
+    {
+      key: "brightWarm", title: "Exercise 4 — Bright versus warm tone exploration", degrees: [0],
+      purpose: "Explore two different tone colours on the same vowel.",
+      instructions: "Sing a comfortable “ah”, first with a slightly brighter quality, then a slightly warmer one — small, natural adjustments only.",
+      repetitions: "One or two attempts per quality.", rest: "Rest between attempts.",
+      listening: "Notice the difference without judging one as better.",
+      mistakes: "Exaggerating either quality until it feels forced.",
+    },
+    {
+      key: "speakSing", title: "Exercise 5 — Natural speaking voice versus singing voice", degrees: [0],
+      purpose: "Compare your tone quality between speaking and singing.",
+      instructions: "Speak a short phrase naturally, then sing the same phrase gently on a comfortable note.",
+      repetitions: "Once or twice.", rest: "Rest between attempts.",
+      listening: "Notice what stays the same and what changes between speaking and singing.",
+      mistakes: "Deliberately making the singing voice sound very different from the speaking voice.",
+    },
+    {
+      key: "vowelMelody", title: "Exercise 6 — Simple vowel-based melodic pattern", degrees: [0, 1, 2, 1, 0],
+      purpose: "Notice how tone colour holds up across a short melodic pattern.",
+      instructions: "Sing a short, gentle melodic pattern on one comfortable vowel.",
+      repetitions: "A few comfortable repetitions.", rest: "Rest between repetitions.",
+      listening: "Notice whether the tone quality stays consistent across the pattern.",
+      mistakes: "Pushing volume or pitch to make the pattern feel more impressive.",
+    },
+  ];
+
+  const KNOWLEDGE_CHECK = [
+    {
+      key: "labels",
+      question: "What do bright, warm, light and dark describe in this class?",
+      options: [
+        { value: "scientific", label: "Rigid scientific categories", correct: false },
+        { value: "descriptive", label: "Descriptive listening terms, not rigid categories or measurements", correct: true },
+        { value: "medical", label: "A medical assessment of vocal health", correct: false },
+      ],
+      explain: { scientific: "Not quite — these are listening descriptions, not scientific categories.", descriptive: "Exactly right.", medical: "Not quite — this has nothing to do with vocal health assessment." },
+    },
+    {
+      key: "influences",
+      question: "What influences vocal tone colour?",
+      options: [
+        { value: "volume", label: "Only how loudly you sing", correct: false },
+        { value: "shape", label: "Vocal tract shape, mouth opening, tongue position, jaw relaxation and vowel shape", correct: true },
+        { value: "nothing", label: "Tone colour can't be influenced at all", correct: false },
+      ],
+      explain: { volume: "Not quite — tone colour isn't primarily about volume.", shape: "Exactly right.", nothing: "Not quite — tone colour genuinely changes with these factors." },
+    },
+    {
+      key: "nasal",
+      question: "Is resonance about pushing sound into the nose, chest or head?",
+      options: [
+        { value: "yes", label: "Yes, that's exactly what resonance means", correct: false },
+        { value: "no", label: "No — that's not what this class teaches", correct: true },
+        { value: "sometimes", label: "Only for a dark tone", correct: false },
+      ],
+      explain: { yes: "Not quite — this class explicitly avoids that framing.", no: "Right.", sometimes: "Not quite — this applies to every tone quality." },
+    },
+    {
+      key: "better",
+      question: "Is one tone colour universally better than another?",
+      options: [
+        { value: "yes", label: "Yes, bright is always best", correct: false },
+        { value: "no", label: "No — a brighter tone isn't automatically better than a warmer one", correct: true },
+        { value: "yes2", label: "Yes, warm is always best", correct: false },
+      ],
+      explain: { yes: "Not quite — no tone quality is universally better.", no: "Exactly right.", yes2: "Not quite — no tone quality is universally better." },
+    },
+    {
+      key: "objective",
+      question: "Are the tone-quality labels in this class objective measurements?",
+      options: [
+        { value: "yes", label: "Yes, they're precisely measurable", correct: false },
+        { value: "no", label: "No — they're subjective listening descriptions", correct: true },
+        { value: "unsure", label: "This class doesn't say", correct: false },
+      ],
+      explain: { yes: "Not quite — this app doesn't measure tone colour.", no: "Exactly right.", unsure: "It does say — Section E states this explicitly." },
+    },
   ];
 
   const CHECKLIST_ITEMS = [
-    { key: "understood", label: "I understand the basic meaning of tone colour." },
-    { key: "vowelsExplored", label: "I explored different vowels." },
-    { key: "comparisonExplored", label: "I compared two comfortable sounds or chose to skip the comparison." },
-    { key: "avoidedForcing", label: "I avoided forcing brightness, darkness, or volume." },
-    { key: "reflected", label: "I reflected on what I noticed." },
+    { key: "understoodLabels", label: "I understand what tone colour (bright/warm/light/dark) means as a listening description." },
+    { key: "triedExercise", label: "I explored at least one guided exercise." },
+    { key: "comparedTones", label: "I compared two tone qualities." },
+    { key: "practisedTwoTones", label: "I practised a short phrase with two different tone colours." },
+    { key: "stayedComfortable", label: "I maintained clear pronunciation and comfort throughout." },
+    { key: "reflected", label: "I reflected on which tone felt most natural." },
   ];
   const PROGRESS_ITEMS = CHECKLIST_ITEMS;
 
   const opt = (value, label, tone = "neutral") => ({ value, label, tone });
   const Q = {
-    naturalVoice: {
-      question: "How did your voice seem?",
-      options: [opt("light", "Light"), opt("warm", "Warm"), opt("clear", "Clear"), opt("breathy", "Breathy"), opt("hard", "Difficult to describe"), opt("unsure", "Not sure")],
-    },
-    clearer: { question: "Which version sounds clearer?", options: [opt("first", "The first"), opt("second", "The second"), opt("similar", "They seem similar"), opt("hard", "Difficult to describe")] },
-    warmer: { question: "Which version sounds warmer to you?", options: [opt("first", "The first"), opt("second", "The second"), opt("similar", "They seem similar"), opt("hard", "Difficult to describe")] },
-    similar: { question: "Do the sounds seem similar overall?", options: [opt("yes", "Yes"), opt("no", "No"), opt("unsure", "Not sure")] },
-    easiestSound: { question: "Which sound felt easiest?", options: [opt("sentence", "The spoken sentence"), opt("ah", "“ah”"), opt("oo", "“oo”"), opt("variation", "The “ah” variation"), opt("notsure", "Not sure")] },
-    preferredSound: { question: "Which sound did I prefer listening to?", options: [opt("sentence", "The spoken sentence"), opt("ah", "“ah”"), opt("oo", "“oo”"), opt("variation", "The “ah” variation"), opt("notsure", "Not sure")] },
-    mouthShapeChanged: { question: "Did I change the mouth shape naturally?", options: [opt("yes", "Yes", "good"), opt("no", "No", "neutral"), opt("unsure", "Not sure")] },
-    triedToForce: { question: "Did I try to force a different sound?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
+    mostNatural: { question: "Which tone quality felt most natural?", options: [opt("bright", "Bright"), opt("warm", "Warm"), opt("light", "Light"), opt("dark", "Dark"), opt("notsure", "Not sure")] },
+    heardDifference: { question: "Could I hear a difference?", options: [opt("yes", "Yes", "good"), opt("alittle", "A little"), opt("no", "Not really"), opt("unsure", "Not sure")] },
+    clearPronunciation: { question: "Did I maintain clear pronunciation?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
+    tensionNoticed: { question: "Did I experience unnecessary tension?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
+    mostComfortable: { question: "Which version sounded most comfortable?", options: [opt("natural", "My natural tone"), opt("adjusted", "The adjusted tone"), opt("both", "Both, about equally"), opt("unsure", "Not sure")] },
   };
 
   const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
   const { p, narrow } = LessonKit;
   const A = (rec, g) => rec.answers[g] || {};
-  const filled = (v) => v && String(v).trim();
   const N = (m) => NoteUtils.name(m);
+  const degreesToNotes = (b, degrees) => degrees.map((d) => b + d * STEP);
 
   function baseNote(rec) {
     const ok = (n) => typeof n === "number" && n >= RANGE.from && n + STEP <= RANGE.to;
     const own = A(rec, "setup").note;
     if (ok(own)) return own;
-    const l2c7 = (ClassActivity.get("L2C07").answers.setup || {}).note;
-    if (ok(l2c7)) return l2c7;
-    const l2c6 = (ClassActivity.get("L2C06").answers.setup || {}).note;
-    if (ok(l2c6)) return l2c6;
-    const l2c5 = (ClassActivity.get("L2C05").answers.setup || {}).note;
-    if (ok(l2c5)) return l2c5;
-    const l2c4 = (ClassActivity.get("L2C04").answers.setup || {}).note;
-    if (ok(l2c4)) return l2c4;
-    const l2c3 = (ClassActivity.get("L2C03").answers.setup || {}).note;
-    if (ok(l2c3)) return l2c3;
-    const l2c2 = (ClassActivity.get("L2C02").answers.setup || {}).note;
-    if (ok(l2c2)) return l2c2;
-    const l2c1 = (ClassActivity.get("L2C01").answers.setup || {}).note;
-    if (ok(l2c1)) return l2c1;
-    const c25 = (ClassActivity.get("L1C25").answers.setup || {}).note;
-    if (ok(c25)) return c25;
-    const c2 = (ClassActivity.get("L1C02").answers.setup || {}).note;
-    if (ok(c2)) return c2;
+    for (const id of ["L2C07", "L2C06", "L2C05", "L2C04", "L2C03", "L2C02", "L2C01", "L1C25", "L1C02"]) {
+      const n = (ClassActivity.get(id).answers.setup || {}).note;
+      if (ok(n)) return n;
+    }
     return (ClassActivity.get("L1C01").answers.setup || {}).voice === "lower" ? 50 : 60;
   }
 
   const take = (rec, k) => A(rec, "recs")[k] || null;
   const q = (rec, k) => A(rec, "q")[k] || null;
-  const skipped = (rec, k) => !!A(rec, "skip")[k];
   const checklist = (rec) => A(rec, "checklist");
 
   function derivedCheckpoints(rec) {
@@ -138,31 +210,47 @@ const ResonanceToneColourLesson = (() => {
   }
 
   /* ---------- small views ---------- */
-  const recCard = (k, title, hint, max = 10) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
-  const flowStrip = (steps) => `<div class="flex flex-wrap items-center justify-center gap-2 my-4">${steps.map((s, i, arr) => `<span class="flow-chip !text-sm">${s}</span>${i < arr.length - 1 ? `<span class="text-ink-700 text-xs">→</span>` : ""}`).join("")}</div>`;
+  const recCard = (k, title, hint, max = 15) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
   const skipBtn = (k, label = "Skip this exercise") => `<button type="button" data-skip-ex="${k}" class="text-xs text-ink-500 hover:text-ink-300 underline">${label}</button>`;
 
-  function vowelCardsHtml() {
-    return `<div class="grid sm:grid-cols-2 gap-3">${VOWELS.map((v) => recCard(`${v.key}Take`, v.label, "", 8)).join("")}</div>`;
+  const FIELD = (label, value) => `<p class="text-xs text-ink-300 leading-relaxed"><span class="text-ink-500 uppercase tracking-wide text-[10px]">${label}:</span> ${value}</p>`;
+  function exerciseCardHtml(ex) {
+    return `<div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 mb-4" data-exercise-card="${ex.key}">
+      <p class="font-display text-lg text-ink-50 mb-3">${ex.title}</p>
+      <div class="flex flex-col gap-1.5 mb-4">
+        ${FIELD("Purpose", ex.purpose)}
+        ${FIELD("Instructions", ex.instructions)}
+        ${FIELD("Repetitions", ex.repetitions)}
+        ${FIELD("Rest", ex.rest)}
+        ${FIELD("Listening focus", ex.listening)}
+        ${FIELD("Common mistakes", ex.mistakes)}
+      </div>
+      <div class="flex flex-wrap gap-3 mb-3">
+        <button type="button" data-play-ex="${ex.key}" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen</button>
+      </div>
+      ${recCard(`${ex.key}Take`, `Recording for ${ex.title.replace(/^Exercise \d+ — /, "")}`, "Entirely optional.", 15)}
+      <div class="mt-2">${skipBtn(ex.key)}</div>
+    </div>`;
   }
 
-  function contrastHtml(rec) {
-    const a = take(rec, "ahNatural"), b = take(rec, "ahVariation");
-    if (!a && !b) return `<p class="text-sm text-ink-500">Record both “ah” versions in Section D above, then come back here to compare them.</p>`;
-    return `
+  function toneLabelsHtml(rec) {
+    const selected = A(rec, "tone").selected;
+    const t = TONE_LABELS.find((x) => x.key === selected);
+    return `<div data-tone-labels>
       <div class="flex flex-wrap gap-2 mb-4">
-        <button type="button" data-play-contrast="ahNatural" class="vr-btn" ${a ? "" : "disabled"}>${icon("play", "w-3.5 h-3.5")} First “ah”</button>
-        <button type="button" data-play-contrast="ahVariation" class="vr-btn" ${b ? "" : "disabled"}>${icon("play", "w-3.5 h-3.5")} Second “ah”</button>
-      </div>`;
+        ${TONE_LABELS.map((x) => `<button type="button" data-tone-select="${x.key}" class="ex-chip ${selected === x.key ? "is-selected" : ""}">${x.label}</button>`).join("")}
+      </div>
+      ${t ? `<p class="text-sm text-ink-300 mb-3">${t.desc}</p>` : `<p class="text-sm text-ink-500 mb-3">Select a tone quality above to read about it and practise.</p>`}
+    </div>`;
   }
 
   function problems() {
     const items = [
-      ["Trying to make the voice brighter by shouting", "Keep the volume comfortable."],
-      ["Making the voice artificially dark or deep", "Use your natural speaking range and avoid forcing the throat."],
-      ["Exaggerating vowel shapes", "Make small, comfortable adjustments."],
-      ["Believing one tone colour is always correct", "Tone colour depends on musical context and personal preference."],
-      ["Comparing your voice harshly with a professional singer", "Listen for your own changes rather than expecting an identical sound."],
+      ["Pushing sound into the nose to sound 'brighter'", "Explore brightness through vowel shape and tongue position, not nasal pushing."],
+      ["Forcing the jaw down to sound 'darker'", "A relaxed, natural adjustment is enough."],
+      ["Believing one tone colour is objectively correct", "These are listening descriptions, not a hierarchy."],
+      ["Losing clear pronunciation while exploring a new tone", "Keep the words understandable throughout."],
+      ["Comparing your tone to another singer's and judging it", "Your own natural tone is the starting point — not a flaw to fix."],
     ];
     return `<div class="flex flex-col gap-2">${items.map(([t, a]) => `
       <details class="group rounded-2xl border border-white/5 bg-white/[0.02] px-5 py-4">
@@ -172,19 +260,35 @@ const ResonanceToneColourLesson = (() => {
   }
 
   function reviewHtml(rec) {
-    const sources = [["spokenSentence", "Spoken sentence"], ["ahTake", "“ah”"], ["ooTake", "“oo”"], ["ahVariation", "“ah” variation"]];
+    const sources = [...EXERCISES.map((ex) => [`${ex.key}Take`, ex.title.replace(/^Exercise \d+ — /, "")]), ["exploreTake", "Tone exploration"], ["applyTake", "Two tone colours, applied"]];
     const present = sources.filter(([k]) => take(rec, k));
-    if (!present.length) return `<p class="text-sm text-ink-500">Record any of the sounds above, then come back here to listen and reflect.</p>`;
+    if (!present.length) return `<p class="text-sm text-ink-500">Record any of the exercises above, then come back here to listen and reflect.</p>`;
     return `<div class="flex flex-wrap gap-2 mb-4">${present.map(([k, label]) => `<button type="button" data-play-review="${k}" class="vr-btn">${icon("play", "w-3.5 h-3.5")} ${label}</button>`).join("")}</div>`;
+  }
+
+  function knowledgeCheckHtml(rec) {
+    return `<div class="flex flex-col gap-5" data-kc>
+      ${KNOWLEDGE_CHECK.map((item) => {
+        const selected = q(rec, `kc_${item.key}`);
+        return `
+        <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-4" data-kc-item="${item.key}">
+          <p class="text-sm text-ink-200 mb-2.5">${item.question}</p>
+          <div class="flex flex-wrap gap-2">
+            ${item.options.map((o) => `<button type="button" data-kc-choice="${o.value}" class="ex-chip ${selected === o.value ? "is-selected" : ""}">${o.label}</button>`).join("")}
+          </div>
+          ${selected ? `<p class="text-xs mt-2.5 ${item.options.find((o) => o.value === selected).correct ? "text-emerald-300" : "text-amber-300"}">${item.explain[selected]}</p>` : ""}
+        </div>`;
+      }).join("")}
+      <p class="text-xs text-ink-500">This is a quick concept check, not a vocal-performance score.</p>
+    </div>`;
   }
 
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
         <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 12 milestone</p>
-        <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Noticing tone colour is enough for today.</p>
-        <p class="text-sm text-ink-300">“Bright,” “warm,” “dark” and “light” are listening words, not rigid categories.</p>
-        <p class="text-sm text-ink-100">A comfortable, healthy sound matters more than imitating anyone else's tone.</p>
+        <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Your tone, noticed — not judged.</p>
+        <p class="text-sm text-ink-300">Bright, warm, light and dark are listening words, not a ranking.</p>
       </div>`;
   }
 
@@ -198,7 +302,7 @@ const ResonanceToneColourLesson = (() => {
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
         <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 13 — Projection Without Pushing</p>
-        <p class="text-sm text-ink-300 leading-relaxed">The next lesson will introduce the difference between comfortable vocal clarity and simply singing louder — no forceful projection or belting yet.</p>
+        <p class="text-sm text-ink-300 leading-relaxed">The next lesson explores comfortable vocal clarity — being heard without shouting.</p>
       </div>`;
     if (status === "completed") {
       return `
@@ -206,7 +310,7 @@ const ResonanceToneColourLesson = (() => {
           ${milestone()}
           <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.05] p-6 sm:p-8 text-center">
             <p class="text-[11px] tracking-[0.25em] uppercase text-emerald-300 mb-2">Class complete</p>
-            <h3 class="font-display text-2xl text-ink-50 mb-5">Exploring natural differences in vocal tone colour through comfortable sounds and small vowel changes.</h3>
+            <h3 class="font-display text-2xl text-ink-50 mb-5">Bright, warm, light and dark are descriptive listening terms — never a ranking.</h3>
             <ul class="inline-flex flex-col gap-2 text-left mx-auto">${lines}</ul>
             ${preview}
             ${next ? `
@@ -255,81 +359,74 @@ const ResonanceToneColourLesson = (() => {
 
       <div class="max-w-5xl mx-auto px-5 lg:px-8 py-12 flex flex-col gap-20">
 
-        ${chapter("understand", 1, "Section A — Welcome and concept", `
+        ${chapter("recap", 1, "Section A — Recap", `
           ${narrow(`
-            ${p("Tone colour, also called timbre, is the quality that helps distinguish one voice or sound from another. Two people can sing the same note at the same volume and still sound different.")}
-            ${p("Vocal-tract shape, vowel choice, and vocal coordination all influence tone colour. A brighter tone is not automatically better than a warmer tone — and you don't need to change your natural voice to sound like a favourite singer.")}
-            ${p("This builds on Class 2, which introduced resonance, and Class 7, which explored vowel shapes.")}
+            ${p("Class 2 introduced resonance: the vocal tract shaping the sound your vocal folds produce. This class builds on that foundation practically — listening, exploring, and gently varying your own natural tone colour.")}
           `)}
-          ${flowStrip(["LISTEN", "COMPARE", "EXPLORE", "REFLECT"])}
           <div data-lesson-viewed-sentinel class="h-px"></div>
         `)}
 
-        ${chapter("listen", 2, "Section B — Listen to your natural voice", `
+        ${chapter("understand", 2, "Section B — Understanding tone colour", `
           ${narrow(`
-            <p class="dc-lyric font-display text-2xl sm:text-3xl text-ink-50 my-3">“${SENTENCE}”</p>
-            ${p("Say it naturally, then repeat it without deliberately changing your voice. Notice whether the sound seems light, warm, clear, breathy, or difficult to describe. Rest. “Not sure” is a perfectly valid answer.")}
-          `)}
-          ${recCard("spokenSentence", "Say the sentence", "", 10)}
-          ${narrow(`<div class="mt-5">${SelfAssessment.render("naturalVoice-q", { ...Q.naturalVoice, selected: sel("naturalVoice") })}</div>`)}
-        `)}
-
-        ${chapter("vowels", 3, "Section C — Compare comfortable vowels", `
-          ${narrow(p("A comfortable speaking pitch, natural mouth movements. Notice how the sound changes as the vowel changes — no forced tongue position or mouth opening."))}
-          ${vowelCardsHtml()}
-        `, { wide: true })}
-
-        ${chapter("explore", 4, "Section D — Explore gentle tone-colour changes", `
-          ${narrow(p("Produce a comfortable “ah” naturally, then repeat it with a slightly different, comfortable mouth shape. Compare the two. Rest. Repeat only once if comfortable. Not louder, no squeezing the throat, no exaggerated mouth shapes — this is exploration, not a test."))}
-          ${recCard("ahNatural", "“ah” — natural", "", 8)}
-          ${recCard("ahVariation", "“ah” — a different, comfortable shape", "", 8)}
-          ${narrow(`<div class="mt-3">${skipBtn("explore")}</div>`)}
-        `)}
-
-        ${chapter("contrast", 5, "Section E — Listen for contrast", `
-          ${narrow(p("Compare your two “ah” recordings from Section D. These are subjective listening observations — there's no required answer, and you shouldn't force a bright or dark sound."))}
-          <div data-contrast-host>${contrastHtml(rec)}</div>
-          ${narrow(`
-            <div class="flex flex-col gap-4 mt-5">
-              ${SelfAssessment.render("clearer-q", { ...Q.clearer, selected: sel("clearer") })}
-              ${SelfAssessment.render("warmer-q", { ...Q.warmer, selected: sel("warmer") })}
-              ${SelfAssessment.render("similar-q", { ...Q.similar, selected: sel("similar") })}
-            </div>
+            <div class="flex flex-wrap gap-2 mb-4">${TONE_LABELS.map((t) => `<span class="flow-chip !text-sm">${t.label}</span>`).join("")}</div>
+            ${p("These are descriptive listening terms, not rigid scientific categories. Tone colour is shaped by:")}
+            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-3">
+              ${["Vocal tract shape.", "Mouth opening.", "Tongue position.", "Jaw relaxation.", "Vowel shape."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
+            </ul>
+            <p class="text-xs text-ink-500">Resonance isn't about pushing sound into the nose, chest or head.</p>
           `)}
         `)}
 
-        ${chapter("singing", 6, "Section F — Tone colour in singing", `
-          ${narrow(p("Choose one comfortable reference note and explore “ah” and “oo” on it, only if comfortable. Different vowels naturally produce different sound qualities, and tone colour may change as pitch and vocal coordination change. Consistency and comfort matter more than sounding artificially bright, dark, or powerful — advanced tonal shaping comes in later training."))}
+        ${chapter("listen", 3, "Section C — Listening activity", `
+          ${narrow(p("No studio comparison recording exists in this app — this is a learner-led activity. Hum gently, then compare it with an open vowel, noticing differences in tone quality as you go."))}
+          <div class="flex flex-wrap gap-3 mb-2">
+            <button type="button" data-play-pitch class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Reference note</button>
+          </div>
+        `)}
+
+        ${chapter("exercises", 4, "Section D — Guided exercises", `
+          ${narrow(p("All six exercises share one comfortable reference note — choose it on the piano below."))}
           <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-3">
             ${VirtualPiano.render("rtc-piano", { controls: false, keyboard: true, display: true })}
           </div>
           ${narrow(`<p class="text-sm text-ink-300 mb-5">Your note: <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong></p>`)}
-          <div class="flex flex-wrap gap-3 mb-4">
-            <button type="button" data-play-pitch class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Reference note</button>
-          </div>
-          ${recCard("pitchToneTake", "“ah,” then “oo,” on your note — if comfortable", "Entirely optional.", 15)}
-          ${narrow(`<div class="mt-3">${skipBtn("singing")}</div>`)}
+          ${EXERCISES.map((ex) => exerciseCardHtml(ex)).join("")}
         `, { wide: true })}
 
-        ${chapter("record", 7, "Section G — Optional recording and reflection", `
+        ${chapter("explore", 5, "Section E — Interactive tone exploration", `
+          ${narrow(p("Select a tone-quality label, read about it, then practise and optionally record. These labels are subjective listening descriptions, not objective measurements."))}
+          <div data-tone-labels-host>${toneLabelsHtml(rec)}</div>
+          ${recCard("exploreTake", "Practising the selected tone quality", "Entirely optional.", 15)}
+          ${narrow(`<div><label class="block text-sm text-ink-200 mb-1.5" for="rtc-notice">What did you notice?</label><textarea id="rtc-notice" data-growth="toneNotice" rows="2" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.toneNotice || "")}</textarea></div>`)}
+        `)}
+
+        ${chapter("apply", 6, "Section F — Practical musical application", `
+          ${narrow(p("Sing a short, comfortable phrase twice: first in your natural tone, then exploring a slightly different tone colour — without losing comfortable pronunciation or vocal ease. If you'd like, you can use a simple melody or swara pattern on your comfortable shruti instead of a spoken phrase."))}
+          ${recCard("applyTake", "The phrase, sung with two tone colours", "Entirely optional.", 20)}
+        `)}
+
+        ${chapter("record", 7, "Section G — Recording and evaluation", `
           ${narrow(p("Recording is entirely optional — nothing here is automatically analyzed, and no recording is sent anywhere outside your own account."))}
           <div data-review-host>${reviewHtml(rec)}</div>
           ${narrow(`
             <div class="flex flex-col gap-4 mt-5">
-              ${SelfAssessment.render("easiestSound-q", { ...Q.easiestSound, selected: sel("easiestSound") })}
-              ${SelfAssessment.render("preferredSound-q", { ...Q.preferredSound, selected: sel("preferredSound") })}
-              ${SelfAssessment.render("mouthShapeChanged-q", { ...Q.mouthShapeChanged, selected: sel("mouthShapeChanged") })}
-              ${SelfAssessment.render("triedToForce-q", { ...Q.triedToForce, selected: sel("triedToForce") })}
-              <div><label class="block text-sm text-ink-200 mb-1.5" for="rtc-again">What would I like to explore again?</label><textarea id="rtc-again" data-growth="exploreAgain" rows="2" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.exploreAgain || "")}</textarea></div>
+              ${SelfAssessment.render("mostNatural-q", { ...Q.mostNatural, selected: sel("mostNatural") })}
+              ${SelfAssessment.render("heardDifference-q", { ...Q.heardDifference, selected: sel("heardDifference") })}
+              ${SelfAssessment.render("clearPronunciation-q", { ...Q.clearPronunciation, selected: sel("clearPronunciation") })}
+              ${SelfAssessment.render("tensionNoticed-q", { ...Q.tensionNoticed, selected: sel("tensionNoticed") })}
+              ${SelfAssessment.render("mostComfortable-q", { ...Q.mostComfortable, selected: sel("mostComfortable") })}
             </div>
           `)}
         `)}
 
-        ${chapter("mistakes", 8, "Section H — Common beginner mistakes", problems())}
+        ${chapter("quiz", 8, "Section H — Knowledge check", `
+          ${narrow(p("A quick concept check — not a vocal-performance score."))}
+          ${knowledgeCheckHtml(rec)}
+        `)}
 
-        ${chapter("reflect", 9, "Section I — Reflection and completion", `
+        ${chapter("reflect", 9, "Reflection and completion", `
           ${narrow(`
-            ${p("A simple checklist — tick what's true for you. Completion doesn't depend on producing a particular tone colour, making a recording, or completing every optional activity.")}
+            ${p("A simple checklist — tick what's true for you.")}
             <div class="flex flex-col gap-1 mb-5">
               ${CHECKLIST_ITEMS.map((item, i) => `
                 <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">
@@ -340,22 +437,24 @@ const ResonanceToneColourLesson = (() => {
           `)}
         `)}
 
-        ${chapter("complete", 10, "My Notes", `
+        ${chapter("complete", 10, "Common beginner mistakes", problems())}
+
+        ${chapter("complete", 11, "My Notes", `
           ${p("Your private notebook for this class. Only you can see it.")}
-          ${PersonalNotes.render("notes-rtc", { placeholder: "e.g. How my voice seemed today... Which sound felt clearer or warmer... What I want to try next time..." })}
+          ${PersonalNotes.render("notes-rtc", { placeholder: "e.g. Which tone colour felt easiest... Whether I could hear a difference... What I want to try next time..." })}
         `)}
 
-        ${chapter("complete", 11, "Section J — Optional home practice", `
+        ${chapter("complete", 12, "Vocal safety", `
           ${narrow(`
-            ${p("About 2–3 optional minutes: say a short sentence naturally, say “ah” and “oo” comfortably, notice the difference, then repeat one sound with a small, natural vowel adjustment and write down one observation. No need for excessive repetition.")}
-            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort.")}
+            ${p("Never force a particular tone colour, and don't push volume or pitch to sound 'brighter', 'darker', or more powerful. Rest between exercises.")}
+            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort. If discomfort repeatedly occurs, seek guidance from a qualified voice professional.")}
             <div data-warmup-note></div>
           `)}
         `)}
 
-        ${chapter("complete", 12, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+        ${chapter("complete", 13, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
 
-        ${chapter("complete", 13, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
+        ${chapter("complete", 14, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
       </div>
     </div>`;
   }
@@ -389,17 +488,39 @@ const ResonanceToneColourLesson = (() => {
     }));
     LessonKit.loadAndRefresh(container, classId, params);
 
-    /* ---- Section F: piano + playback ---- */
-    own(VirtualPiano.wire(container, "rtc-piano", {
-      range: RANGE, keyboard: true,
-      onNote: ({ midi }) => { if (midi >= RANGE.from && midi + STEP <= RANGE.to) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
-    }));
+    /* ---- Section C: reference note playback ---- */
     function onPlayPitch(e) {
       if (!e.target.closest("[data-play-pitch]")) return;
       PianoSynth.play(base(), { duration: 1.2, velocity: 0.5 });
     }
     container.addEventListener("click", onPlayPitch);
     cleanups.push(() => container.removeEventListener("click", onPlayPitch));
+
+    /* ---- knowledge check ---- */
+    function onKcChoice(e) {
+      const btn = e.target.closest("[data-kc-choice]");
+      if (!btn) return;
+      const itemEl = btn.closest("[data-kc-item]");
+      const key = itemEl.dataset.kcItem;
+      set("q", `kc_${key}`, btn.dataset.kcChoice);
+      $("[data-kc]").outerHTML = knowledgeCheckHtml(rec0());
+    }
+    container.addEventListener("click", onKcChoice);
+    cleanups.push(() => container.removeEventListener("click", onKcChoice));
+
+    /* ---- Section D: piano + exercise playback ---- */
+    own(VirtualPiano.wire(container, "rtc-piano", {
+      range: RANGE, keyboard: true,
+      onNote: ({ midi }) => { if (midi >= RANGE.from && midi + STEP <= RANGE.to) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
+    }));
+    function onPlayEx(e) {
+      const btn = e.target.closest("[data-play-ex]");
+      if (!btn) return;
+      const ex = EXERCISES.find((x) => x.key === btn.dataset.playEx);
+      if (ex) PianoSynth.playSequence(degreesToNotes(base(), ex.degrees), { duration: 0.7, gap: 0.3 });
+    }
+    container.addEventListener("click", onPlayEx);
+    cleanups.push(() => container.removeEventListener("click", onPlayEx));
 
     /* ---- skip buttons ---- */
     function onSkip(e) {
@@ -412,41 +533,36 @@ const ResonanceToneColourLesson = (() => {
     container.addEventListener("click", onSkip);
     cleanups.push(() => container.removeEventListener("click", onSkip));
 
-    /* ---- recordings ---- */
-    function refreshContrastHost() {
-      const host = $("[data-contrast-host]");
-      if (host) host.innerHTML = contrastHtml(rec0());
+    /* ---- Section E: tone-label selection ---- */
+    function refreshToneLabelsHost() {
+      const host = $("[data-tone-labels-host]");
+      if (host) host.innerHTML = toneLabelsHtml(rec0());
     }
+    function onToneSelect(e) {
+      const btn = e.target.closest("[data-tone-select]");
+      if (!btn) return;
+      set("tone", "selected", btn.dataset.toneSelect);
+      refreshToneLabelsHost();
+    }
+    container.addEventListener("click", onToneSelect);
+    cleanups.push(() => container.removeEventListener("click", onToneSelect));
+
+    /* ---- recordings ---- */
     function refreshReviewHost() {
       const host = $("[data-review-host]");
       if (host) host.innerHTML = reviewHtml(rec0());
     }
-    const VOWEL_NAMES = Object.fromEntries(VOWELS.map((v) => [`${v.key}Take`, v.label]));
-    const NAMES = { spokenSentence: "Spoken sentence", ...VOWEL_NAMES, ahNatural: "“ah” — natural", ahVariation: "“ah” — variation", pitchToneTake: "Tone colour on a note" };
-    const MAX_SECONDS = { spokenSentence: 10, ...Object.fromEntries(VOWELS.map((v) => [`${v.key}Take`, 8])), ahNatural: 8, ahVariation: 8, pitchToneTake: 15 };
-    const CONTRAST_KEYS = ["ahNatural", "ahVariation"];
-    const REVIEW_KEYS = ["spokenSentence", "ahTake", "ooTake", "ahVariation"];
+    const EX_NAMES = Object.fromEntries(EXERCISES.map((ex) => [`${ex.key}Take`, ex.title]));
+    const NAMES = { ...EX_NAMES, exploreTake: "Tone exploration", applyTake: "Two tone colours, applied" };
     Object.keys(NAMES).forEach((k) => {
       own(RecordingCard.wire(container, `rc-${k}`, {
-        classId, take: take(rec0(), k), maxSeconds: MAX_SECONDS[k],
-        meta: { name: `Level 2, Class 8 — ${NAMES[k]}`, exercise: `resonance-tone-colour-${k}` },
-        onSaved: (t) => {
-          set("recs", k, t); ClassActivity.bump(classId, "recordings");
-          if (CONTRAST_KEYS.includes(k)) refreshContrastHost();
-          if (REVIEW_KEYS.includes(k)) refreshReviewHost();
-        },
+        classId, take: take(rec0(), k), maxSeconds: k === "applyTake" ? 20 : 15,
+        meta: { name: `Level 2, Class 12 — ${NAMES[k]}`, exercise: `resonance-tone-colour-${k}` },
+        onSaved: (t) => { set("recs", k, t); ClassActivity.bump(classId, "recordings"); refreshReviewHost(); },
       }));
     });
 
-    /* ---- Section E: play-to-contrast, Section G: play-to-review ---- */
-    function onPlayContrast(e) {
-      const btn = e.target.closest("[data-play-contrast]");
-      if (!btn) return;
-      const t = take(rec0(), btn.dataset.playContrast);
-      if (t) VoiceRecorder.play(t.mediaId);
-    }
-    container.addEventListener("click", onPlayContrast);
-    cleanups.push(() => container.removeEventListener("click", onPlayContrast));
+    /* ---- Section G: play-to-review ---- */
     function onPlayReview(e) {
       const btn = e.target.closest("[data-play-review]");
       if (!btn) return;
@@ -457,10 +573,7 @@ const ResonanceToneColourLesson = (() => {
     cleanups.push(() => container.removeEventListener("click", onPlayReview));
 
     /* ---- generic self-assess dispatcher ---- */
-    const assessMap = {
-      "naturalVoice-q": "naturalVoice", "clearer-q": "clearer", "warmer-q": "warmer", "similar-q": "similar",
-      "easiestSound-q": "easiestSound", "preferredSound-q": "preferredSound", "mouthShapeChanged-q": "mouthShapeChanged", "triedToForce-q": "triedToForce",
-    };
+    const assessMap = { "mostNatural-q": "mostNatural", "heardDifference-q": "heardDifference", "clearPronunciation-q": "clearPronunciation", "tensionNoticed-q": "tensionNoticed", "mostComfortable-q": "mostComfortable" };
     function onAssess(e) {
       const chip = e.target.closest("[data-assess-choice]");
       if (!chip) return;
@@ -480,7 +593,7 @@ const ResonanceToneColourLesson = (() => {
       ta.addEventListener("input", () => save(ta.value));
     });
 
-    /* ---- Section I: completion checklist ---- */
+    /* ---- completion checklist ---- */
     function onChecklist(e) {
       const cb = e.target.closest("[data-checklist]");
       if (!cb) return;
@@ -503,15 +616,14 @@ const ResonanceToneColourLesson = (() => {
     function onComplete(e) {
       const btn = e.target.closest("[data-complete-class]");
       if (!btn || btn.disabled) return;
-      const rec = rec0();
       Store.completeClass(classId);
       ClassActivity.markCompleted(classId);
       Store.addJournalEntry({
         classId,
         classTitle: `Level 2, Class ${cls.number} — ${cls.title}`,
-        learned: "Tone colour words like \"bright,\" \"warm\" and \"dark\" are descriptive listening terms, not rigid categories — a comfortable, healthy sound matters more than imitating anyone else's tone.",
+        learned: "Bright, warm, light and dark are descriptive listening terms, not a hierarchy — comfort and consistency matter more than imitating anyone else's tone.",
         struggled: "",
-        toPractice: A(rec, "growth").exploreAgain || "",
+        toPractice: A(rec0(), "growth").toneNotice || "",
         thoughts: "",
       });
       Router.softRefresh(container, ClassDetailPage, params);

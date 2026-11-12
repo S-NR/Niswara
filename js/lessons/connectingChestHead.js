@@ -1,120 +1,211 @@
 /* ============================================================
-   LEVEL 2, CLASS 5 — CONNECTING CHEST & HEAD VOICE (interactive
-   lesson)
+   LEVEL 2, CLASS 9 — CONNECTING CHEST AND HEAD VOICE
+   (interactive lesson)
 
    Rendered by ClassDetailPage for interactive: "connecting-chest-head".
 
-   Curriculum identity: Level 2, Class 5 (`number: 5`, `levelId: 2`
-   in data.js, id `L2C05`). Same mechanism Classes 1-4 already
-   proved four times over.
+   Curriculum identity: Level 2, Class 9 (`number: 9`, `levelId: 2`
+   in data.js, explicit id `L2C05` — unchanged since the Level 2
+   Curriculum Upgrade). Rebuilt against this class's own later, more
+   detailed spec (a named recap, an introduction to register
+   transitions and the passaggio, six named guided exercises each
+   with purpose/instructions/repetitions/rest/listening-focus/
+   mistakes/comfort-check — one more field than usual, per this
+   spec's own explicit instruction — a progressive coordination
+   routine, and a 5-question knowledge check) — supersedes the
+   shorter version first written earlier in the project. Part of a
+   combined rebuild alongside Classes 10, 12 and 13 (sent together in
+   one spec), following the same pattern Classes 3-8, 11 and 14
+   already received.
 
-   **Level 2's class count grows past its originally-assumed 10 —
-   the same pattern Level 1 went through five separate times
-   (Classes 21-25).** The original `levelClassDefs[2]` placeholder
-   list put "Mixed Voice" directly after Head Voice Foundations
-   (position 5). This spec inserts "Connecting Chest & Head Voice"
-   there instead, and its own Section K explicitly names the real
-   next class as "Class 6 — Introduction to Mixed Coordination" —
-   not plain "Mixed Voice". So `levelClassDefs[2].titles` had its
-   first entry renamed (not removed — Level 2 now has at least 11
-   classes, not 10) and `startNumber` moved from 5 to 6. Treat this
-   count as provisional, exactly as every Level 1 change log entry
-   from Class 20 onward already treated that level's count.
-
-   Core idea: "Chest voice and head voice are useful descriptions of
-   vocal coordination, not separate sound sources located in the
-   chest and head... Transitions may feel uneven or produce a voice
-   break while learning... ease, comfort, and gradual exploration
-   matter more than producing a perfect transition." Explicitly does
-   NOT promise a seamless register transition from one short lesson,
-   and explicitly defers "mix voice" to a later skill.
+   Core idea: chest voice and head voice are vocal register or
+   coordination terms — sound does not literally originate in the
+   chest or head. A register transition is an area where coordination
+   shifts as pitch changes; the passaggio names that area, not one
+   universal fixed note. Smooth coordination develops gradually,
+   through gentle practice — never by forcing a transition away.
 
    Honesty boundaries, matching every earlier class: no fabricated
-   register/transition analysis; completion never depends on perfect
-   pitch, a smooth glide, a successful recording, or finishing every
-   optional exercise (the spec says this explicitly).
-
-   Like Classes 3-4, Section I is five plain first-person
-   self-attestations, so this file reuses their plain-checkbox
-   completion pattern (Class 10's original `PRE_CHECK_ITEMS` style)
-   rather than exercise-derived checkpoints.
+   register-detection or automatic pitch analysis; completion never
+   depends on a smooth transition, a recording, or finishing every
+   optional activity.
 
    Reuses: LessonKit (+ its automatic Warm-up card), VirtualPiano
-   (Class 3), RecordingCard (Class 5), SelfAssessment (Class 4),
-   PersonalNotes, ClassProgress. The "skip this exercise" button and
-   the "reuse an earlier recording instead of asking again" pattern
-   (Section G reuses Section C's "ah" and Section D's glide) are both
-   reused exactly as Classes 1-4 established them.
+   (Class 3), PianoSynth.playSequence (relative-degree patterns,
+   shared across all six exercises and the routine), RecordingCard,
+   SelfAssessment, PersonalNotes, ClassProgress.
    ============================================================ */
 
 const ConnectingChestHeadLesson = (() => {
   const STAGES = [
+    { id: "recap", label: "Recap" },
     { id: "understand", label: "Understand" },
-    { id: "listen", label: "Listen" },
-    { id: "compare", label: "Compare" },
-    { id: "glide", label: "Glide" },
-    { id: "explore", label: "Explore" },
-    { id: "transition", label: "Transition" },
+    { id: "exercises", label: "Exercises" },
+    { id: "practice", label: "Practice" },
     { id: "record", label: "Record" },
-    { id: "mistakes", label: "Mistakes" },
+    { id: "quiz", label: "Quiz" },
     { id: "reflect", label: "Reflect" },
     { id: "complete", label: "Complete" },
   ];
 
   const RANGE = { from: 48, to: 72 };
   const STEP = 2;
-  const SENTENCE = "I am exploring my voice today.";
+  const MAX_UP = 3;
+
+  // Section C — each exercise carries purpose/instructions/repetitions/rest/listening-focus/
+  // common-mistakes/comfort-check, per this spec's own explicit 7-field structure.
+  const EXERCISES = [
+    {
+      key: "hum", title: "Exercise 1 — Gentle humming glide", degrees: [0, 1, 0],
+      purpose: "Notice how your voice feels gliding gently between two nearby pitches.",
+      instructions: "Hum gently, gliding from a comfortable note to a nearby higher note and back.",
+      repetitions: "Two or three gentle glides.", rest: "Rest between glides.",
+      listening: "Notice where the sound feels smooth, and where it feels less stable.",
+      mistakes: "Pushing the glide too far, or moving too quickly.",
+      comfort: "The hum should feel effortless throughout — if it doesn't, shorten the glide or skip it.",
+    },
+    {
+      key: "ooGlide", title: "Exercise 2 — Comfortable “oo” glide", degrees: [0, 1, 0],
+      purpose: "Explore the same gentle glide using an “oo” vowel.",
+      instructions: "Glide gently on “oo” across a small, comfortable pitch range.",
+      repetitions: "Two or three attempts.", rest: "Rest between attempts.",
+      listening: "Notice any change in tone or stability as the pitch moves.",
+      mistakes: "Widening the range too much, or increasing volume to help the glide.",
+      comfort: "If the “oo” feels pinched or pressed, return to a smaller range.",
+    },
+    {
+      key: "lipTrill", title: "Exercise 3 — Gentle lip trill, if suitable", degrees: [0, 1, 0],
+      purpose: "Use a relaxed lip trill to explore pitch movement with minimal tension.",
+      instructions: "If comfortable, try a gentle lip trill while gliding across a small pitch range. Skip entirely if lip trills are difficult for you.",
+      repetitions: "One or two attempts.", rest: "Rest between attempts.",
+      listening: "Notice whether the trill stays even as the pitch changes.",
+      mistakes: "Forcing a trill that doesn't come naturally.",
+      comfort: "A lip trill should need no extra air pressure — if it keeps stopping, this exercise simply isn't for today.",
+    },
+    {
+      key: "speechToSong", title: "Exercise 4 — Speech-to-song exercise", degrees: [0],
+      purpose: "Connect natural speech with gentle singing.",
+      instructions: "Speak a short phrase naturally, then sing the same phrase gently on a comfortable note.",
+      repetitions: "Once or twice.", rest: "Rest between attempts.",
+      listening: "Notice how speaking and singing the same phrase feel different.",
+      mistakes: "Exaggerating the change from speech to song.",
+      comfort: "The sung version should feel like a natural extension of speaking, not a separate effort.",
+    },
+    {
+      key: "twoNote", title: "Exercise 5 — Two-note patterns", degrees: [0, 1, 0],
+      purpose: "Practise a small, comfortable two-note movement.",
+      instructions: "Move gently between two nearby notes, back and forth.",
+      repetitions: "A few comfortable repetitions.", rest: "Rest between repetitions.",
+      listening: "Notice whether the transition between the two notes feels smooth or noticeable.",
+      mistakes: "Rushing between the two notes.",
+      comfort: "Both notes should feel equally easy — if one feels strained, choose a smaller interval.",
+    },
+    {
+      key: "threeNote", title: "Exercise 6 — Three-note patterns across a comfortable range", degrees: [0, 1, 2, 1, 0],
+      purpose: "Extend the two-note movement into a slightly longer, gentle pattern.",
+      instructions: "Move gently through three nearby notes and back.",
+      repetitions: "A few comfortable repetitions.", rest: "Rest between repetitions.",
+      listening: "Notice how the pattern feels across the slightly wider range.",
+      mistakes: "Trying to move too quickly through all three notes.",
+      comfort: "If the top note of the pattern feels pushed, use a smaller range instead.",
+    },
+  ];
+
+  const KNOWLEDGE_CHECK = [
+    {
+      key: "coordination",
+      question: "What do chest-dominant and head-dominant coordination mean?",
+      options: [
+        { value: "location", label: "Sound physically produced in the chest or head", correct: false },
+        { value: "pattern", label: "Terms for different patterns of vocal coordination and sensation", correct: true },
+        { value: "volume", label: "A measure of how loudly you sing", correct: false },
+      ],
+      explain: { location: "Not quite — the names don't describe a literal sound source.", pattern: "Exactly right.", volume: "Not quite — these terms aren't about loudness." },
+    },
+    {
+      key: "transition",
+      question: "What is a register transition?",
+      options: [
+        { value: "rule", label: "A rule for singing as loudly as possible", correct: false },
+        { value: "shift", label: "An area where the voice's coordination shifts as pitch changes", correct: true },
+        { value: "fixed", label: "A fixed note every singer shares", correct: false },
+      ],
+      explain: { rule: "Not quite — transitions aren't about loudness.", shift: "Exactly right.", fixed: "Not quite — it varies between singers." },
+    },
+    {
+      key: "passaggio",
+      question: "What do singers mean by the passaggio?",
+      options: [
+        { value: "exact", label: "An exact pitch every singer shares", correct: false },
+        { value: "area", label: "A transition area, not a single fixed note", correct: true },
+        { value: "rhythm", label: "A rhythm pattern", correct: false },
+      ],
+      explain: { exact: "Not quite — it's an area, and it varies between singers.", area: "Exactly right.", rhythm: "Not quite — the passaggio is about pitch, not rhythm." },
+    },
+    {
+      key: "forceUp",
+      question: "Should a singer force chest-dominant coordination upward to avoid a transition?",
+      options: [
+        { value: "yes", label: "Yes, that avoids the transition", correct: false },
+        { value: "no", label: "No — this can cause strain", correct: true },
+        { value: "sometimes", label: "Only on very high notes", correct: false },
+      ],
+      explain: { yes: "Not quite — forcing upward tends to create strain, not avoid it.", no: "Exactly right.", sometimes: "Not quite — this holds at every pitch." },
+    },
+    {
+      key: "abrupt",
+      question: "Is abruptly switching registers the goal of this class?",
+      options: [
+        { value: "yes", label: "Yes, that's the goal", correct: false },
+        { value: "no", label: "No — smooth coordination through gentle, gradual practice is the goal", correct: true },
+        { value: "unsure", label: "This class doesn't say", correct: false },
+      ],
+      explain: { yes: "Not quite — abrupt switching isn't the goal here.", no: "Right.", unsure: "It does say — Section B is explicit about this." },
+    },
+  ];
 
   const CHECKLIST_ITEMS = [
-    { key: "reviewed", label: "I reviewed the difference between speech-like and lighter sounds." },
-    { key: "glideExplored", label: "I tried a small pitch glide or chose to skip it." },
-    { key: "avoidedForcing", label: "I avoided forcing a transition." },
-    { key: "checkedComfort", label: "I checked for tension and comfort." },
-    { key: "reflectionRecorded", label: "I recorded a reflection or chose not to." },
+    { key: "understoodCoordination", label: "I understand what chest-dominant and head-dominant coordination mean." },
+    { key: "understoodPassaggio", label: "I understand what the passaggio is." },
+    { key: "triedGlide", label: "I tried at least one glide exercise (humming, “oo”, or lip trill), or chose to skip it." },
+    { key: "triedPattern", label: "I tried at least one pattern exercise (speech-to-song, two-note, or three-note)." },
+    { key: "tensionChecked", label: "I checked for tension and avoided forcing a transition." },
+    { key: "reflected", label: "I reflected on which exercise felt easiest." },
   ];
   const PROGRESS_ITEMS = CHECKLIST_ITEMS;
 
   const opt = (value, label, tone = "neutral") => ({ value, label, tone });
   const Q = {
-    compareSounds: {
-      question: "Did the two sounds feel different, or similar?",
-      options: [opt("different", "They felt different"), opt("similar", "They felt similar"), opt("harder", "One was harder to produce", "maybe"), opt("unsure", "I'm not sure")],
+    feltSmooth: { question: "Did the transition feel smooth?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
+    suddenChange: { question: "Did the sound suddenly change?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
+    throatTension: { question: "Was there any throat tension?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
+    feltNeedToPush: { question: "Did you feel the need to push?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
+    easiestExercise: {
+      question: "Which exercise felt easiest?",
+      options: [opt("hum", "Humming glide"), opt("oo", "“Oo” glide"), opt("trill", "Lip trill"), opt("speech", "Speech-to-song"), opt("two", "Two-note pattern"), opt("three", "Three-note pattern"), opt("notsure", "Not sure")],
     },
-    exploreChoice: { question: "Which would you like to try?", options: [opt("oo", "Gentle “oo” glide"), opt("trill", "Gentle lip trill")] },
-    easiestSound: { question: "Which sound felt easiest?", options: [opt("ah", "“ah”"), opt("oo", "“oo”"), opt("sentence", "The spoken sentence"), opt("notsure", "Not sure")] },
-    qualityChangeNoticed: { question: "Did I notice a change in vocal quality?", options: [opt("yes", "Yes", "good"), opt("no", "No", "neutral"), opt("unsure", "Not sure")] },
-    unevenAnywhere: { question: "Did my voice feel uneven anywhere?", options: [opt("no", "No", "good"), opt("alittle", "A little", "maybe"), opt("yes", "Yes", "maybe"), opt("unsure", "Not sure")] },
-    remainedRelaxed: { question: "Did I remain relaxed?", options: [opt("yes", "Yes", "good"), opt("mostly", "Mostly", "good"), opt("no", "Not really", "maybe"), opt("unsure", "Not sure")] },
   };
 
   const chapter = (...args) => LessonKit.chapter(STAGES, ...args);
   const { p, narrow } = LessonKit;
   const A = (rec, g) => rec.answers[g] || {};
-  const filled = (v) => v && String(v).trim();
   const N = (m) => NoteUtils.name(m);
+  const degreesToNotes = (b, degrees) => degrees.map((d) => b + d * STEP);
 
   function baseNote(rec) {
-    const ok = (n) => typeof n === "number" && n >= RANGE.from && n + STEP <= RANGE.to;
+    const ok = (n) => typeof n === "number" && n >= RANGE.from && n + MAX_UP * STEP <= RANGE.to;
     const own = A(rec, "setup").note;
     if (ok(own)) return own;
-    const l2c4 = (ClassActivity.get("L2C04").answers.setup || {}).note;
-    if (ok(l2c4)) return l2c4;
-    const l2c3 = (ClassActivity.get("L2C03").answers.setup || {}).note;
-    if (ok(l2c3)) return l2c3;
-    const l2c2 = (ClassActivity.get("L2C02").answers.setup || {}).note;
-    if (ok(l2c2)) return l2c2;
-    const l2c1 = (ClassActivity.get("L2C01").answers.setup || {}).note;
-    if (ok(l2c1)) return l2c1;
-    const c25 = (ClassActivity.get("L1C25").answers.setup || {}).note;
-    if (ok(c25)) return c25;
-    const c2 = (ClassActivity.get("L1C02").answers.setup || {}).note;
-    if (ok(c2)) return c2;
-    return (ClassActivity.get("L1C01").answers.setup || {}).voice === "lower" ? 50 : 60;
+    for (const id of ["L2C04", "L2C03", "L2C02", "L2C01", "L1C25", "L1C02"]) {
+      const n = (ClassActivity.get(id).answers.setup || {}).note;
+      if (ok(n)) return n;
+    }
+    const fallback = (ClassActivity.get("L1C01").answers.setup || {}).voice === "lower" ? 50 : 60;
+    return Math.max(RANGE.from, Math.min(RANGE.to - MAX_UP * STEP, fallback));
   }
 
   const take = (rec, k) => A(rec, "recs")[k] || null;
   const q = (rec, k) => A(rec, "q")[k] || null;
-  const skipped = (rec, k) => !!A(rec, "skip")[k];
   const checklist = (rec) => A(rec, "checklist");
 
   function derivedCheckpoints(rec) {
@@ -126,29 +217,36 @@ const ConnectingChestHeadLesson = (() => {
 
   /* ---------- small views ---------- */
   const recCard = (k, title, hint, max = 15) => RecordingCard.render(`rc-${k}`, { title, hint, maxSeconds: max, section: false });
-  const flowStrip = (steps) => `<div class="flex flex-wrap items-center justify-center gap-2 my-4">${steps.map((s, i, arr) => `<span class="flow-chip !text-sm">${s}</span>${i < arr.length - 1 ? `<span class="text-ink-700 text-xs">→</span>` : ""}`).join("")}</div>`;
   const skipBtn = (k, label = "Skip this exercise") => `<button type="button" data-skip-ex="${k}" class="text-xs text-ink-500 hover:text-ink-300 underline">${label}</button>`;
 
-  function transitionCompareHtml() {
-    return `<div class="grid sm:grid-cols-2 gap-4">
-      <div class="rounded-2xl border border-emerald-400/15 bg-emerald-500/[0.04] p-5">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-emerald-300 mb-3">Helpful approach</p>
-        <ul class="flex flex-col gap-2 text-sm text-ink-200">${["Small pitch movements", "Comfortable volume", "Relaxed jaw and neck", "Rest between attempts"].map((t) => `<li class="flex gap-2"><span class="text-emerald-300">✓</span>${t}</li>`).join("")}</ul>
+  const FIELD = (label, value) => `<p class="text-xs text-ink-300 leading-relaxed"><span class="text-ink-500 uppercase tracking-wide text-[10px]">${label}:</span> ${value}</p>`;
+  function exerciseCardHtml(ex) {
+    return `<div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 mb-4" data-exercise-card="${ex.key}">
+      <p class="font-display text-lg text-ink-50 mb-3">${ex.title}</p>
+      <div class="flex flex-col gap-1.5 mb-4">
+        ${FIELD("Purpose", ex.purpose)}
+        ${FIELD("Instructions", ex.instructions)}
+        ${FIELD("Repetitions", ex.repetitions)}
+        ${FIELD("Rest", ex.rest)}
+        ${FIELD("Listening focus", ex.listening)}
+        ${FIELD("Common mistakes", ex.mistakes)}
+        ${FIELD("Comfort check", ex.comfort)}
       </div>
-      <div class="rounded-2xl border border-amber-400/15 bg-amber-500/[0.04] p-5">
-        <p class="text-[11px] uppercase tracking-[0.2em] text-amber-300 mb-3">Avoid</p>
-        <ul class="flex flex-col gap-2 text-sm text-ink-200">${["Pushing higher or lower", "Shouting through a voice break", "Squeezing the throat", "Repeating a difficult glide until tired"].map((t) => `<li class="flex gap-2"><span class="text-amber-300">✕</span>${t}</li>`).join("")}</ul>
+      <div class="flex flex-wrap gap-3 mb-3">
+        <button type="button" data-play-ex="${ex.key}" class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen</button>
       </div>
+      ${recCard(`${ex.key}Take`, `Recording for ${ex.title.replace(/^Exercise \d+ — /, "")}`, "Entirely optional.", 15)}
+      <div class="mt-2">${skipBtn(ex.key)}</div>
     </div>`;
   }
 
   function problems() {
     const items = [
-      ["Trying to eliminate every voice break", "Notice what happens without forcing the voice to change."],
-      ["Increasing volume to get through a transition", "Return to comfortable volume and reduce the pitch movement."],
-      ["Trying to sound like a professional singer", "Focus on learning what feels easy and repeatable."],
-      ["Continuing after the voice feels tired", "Stop and rest. Short, comfortable practice is enough."],
-      ["Assuming the exercise failed because the sounds were similar", "Noticing similarities is also useful information."],
+      ["Trying to remove every voice break immediately", "Explore small pitch changes without forcing the result."],
+      ["Pushing chest-dominant coordination upward", "Stay within a range that feels light and comfortable."],
+      ["Increasing volume during a difficult transition", "Return to a comfortable volume and reduce the pitch movement."],
+      ["Deliberately producing a vocal crack or pushing through a difficult note", "Notice the transition gently — never force through it."],
+      ["Assuming every singer's transition feels identical", "Vocal experiences vary — there are no rigid universal register boundaries."],
     ];
     return `<div class="flex flex-col gap-2">${items.map(([t, a]) => `
       <details class="group rounded-2xl border border-white/5 bg-white/[0.02] px-5 py-4">
@@ -157,20 +255,37 @@ const ConnectingChestHeadLesson = (() => {
       </details>`).join("")}</div>`;
   }
 
-  function recordReviewHtml(rec) {
-    const sources = [["ahTake", "“ah”"], ["glideTake", "Pitch glide"]];
+  function reviewHtml(rec) {
+    const sources = [...EXERCISES.map((ex) => [`${ex.key}Take`, ex.title.replace(/^Exercise \d+ — /, "")]), ["routineTake", "Progressive coordination routine"]];
     const present = sources.filter(([k]) => take(rec, k));
-    if (!present.length) return "";
+    if (!present.length) return `<p class="text-sm text-ink-500">Record any of the exercises above, then come back here to listen and reflect.</p>`;
     return `<div class="flex flex-wrap gap-2 mb-4">${present.map(([k, label]) => `<button type="button" data-play-review="${k}" class="vr-btn">${icon("play", "w-3.5 h-3.5")} ${label}</button>`).join("")}</div>`;
+  }
+
+  function knowledgeCheckHtml(rec) {
+    return `<div class="flex flex-col gap-5" data-kc>
+      ${KNOWLEDGE_CHECK.map((item) => {
+        const selected = q(rec, `kc_${item.key}`);
+        return `
+        <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-4" data-kc-item="${item.key}">
+          <p class="text-sm text-ink-200 mb-2.5">${item.question}</p>
+          <div class="flex flex-wrap gap-2">
+            ${item.options.map((o) => `<button type="button" data-kc-choice="${o.value}" class="ex-chip ${selected === o.value ? "is-selected" : ""}">${o.label}</button>`).join("")}
+          </div>
+          ${selected ? `<p class="text-xs mt-2.5 ${item.options.find((o) => o.value === selected).correct ? "text-emerald-300" : "text-amber-300"}">${item.explain[selected]}</p>` : ""}
+        </div>`;
+      }).join("")}
+      <p class="text-xs text-ink-500">This is a quick concept check, not a vocal-performance score.</p>
+    </div>`;
   }
 
   function milestone() {
     return `
       <div class="rounded-3xl border border-gold-400/20 bg-gradient-to-br from-gold-500/[0.08] via-transparent to-teal-500/[0.06] p-6 sm:p-10 text-center">
         <p class="text-[11px] tracking-[0.3em] uppercase text-gold-400/80 mb-3">Level 2, Class 9 milestone</p>
-        <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Noticing movement is enough for today.</p>
-        <p class="text-sm text-ink-300">A perfectly smooth transition isn't the goal of one short lesson — gentle exploration is.</p>
-        <p class="text-sm text-ink-100">Uneven, noticeable, or unchanged — all of it is useful information.</p>
+        <p class="font-display text-2xl sm:text-3xl text-ink-50 mb-5">Connecting, not forcing.</p>
+        <p class="text-sm text-ink-300">The passaggio is an area to notice gently, not a wall to push through.</p>
+        <p class="text-sm text-ink-100">Smooth coordination develops gradually, through practice — not in one lesson.</p>
       </div>`;
   }
 
@@ -184,7 +299,7 @@ const ConnectingChestHeadLesson = (() => {
     const preview = `
       <div class="rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-left mt-6">
         <p class="text-[11px] uppercase tracking-[0.2em] text-gold-400/80 mb-2">Up Next: Level 2, Class 10 — Introduction to Mixed Coordination</p>
-        <p class="text-sm text-ink-300 leading-relaxed">The next lesson will introduce the concept of mixed coordination in simple terms — no advanced belting, high-volume singing, or forceful mix exercises yet.</p>
+        <p class="text-sm text-ink-300 leading-relaxed">The next lesson introduces mixed coordination — a broad teaching term for balancing chest- and head-voice qualities.</p>
       </div>`;
     if (status === "completed") {
       return `
@@ -192,7 +307,7 @@ const ConnectingChestHeadLesson = (() => {
           ${milestone()}
           <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/[0.05] p-6 sm:p-8 text-center">
             <p class="text-[11px] tracking-[0.25em] uppercase text-emerald-300 mb-2">Class complete</p>
-            <h3 class="font-display text-2xl text-ink-50 mb-5">Gentle transitions between comfortable, speech-like and lighter vocal sounds.</h3>
+            <h3 class="font-display text-2xl text-ink-50 mb-5">Smooth transitions require coordination, not force.</h3>
             <ul class="inline-flex flex-col gap-2 text-left mx-auto">${lines}</ul>
             ${preview}
             ${next ? `
@@ -233,7 +348,6 @@ const ConnectingChestHeadLesson = (() => {
     const sel = (k) => q(rec, k);
     const growth = A(rec, "growth");
     const c = checklist(rec);
-    const exploreChoice = sel("exploreChoice") || "oo";
 
     return `
     <div class="pitch-lesson">
@@ -242,95 +356,68 @@ const ConnectingChestHeadLesson = (() => {
 
       <div class="max-w-5xl mx-auto px-5 lg:px-8 py-12 flex flex-col gap-20">
 
-        ${chapter("understand", 1, "Section A — Welcome and review", `
-          ${narrow(`
-            ${p("Class 3 explored comfortable, speech-like vocal sounds. Class 4 introduced gentle, lighter vocal sounds. This class begins exploring how the voice may move between those different qualities.")}
-            ${p("Every voice is different. You don't need to identify your registers perfectly, or feel vibration in a specific part of the body.")}
-          `)}
-          ${flowStrip(["REVIEW", "COMPARE", "GLIDE", "REFLECT"])}
+        ${chapter("recap", 1, "Section A — Recap", `
+          ${narrow(p("Class 7 explored chest-dominant, speech-like coordination. Class 8 explored a lighter, head-dominant coordination. This class begins connecting the two."))}
+          <div class="flex flex-wrap gap-3 mb-2">
+            <button type="button" data-play-recap class="vr-btn">${icon("play", "w-4 h-4")} Quick listen</button>
+          </div>
           <div data-lesson-viewed-sentinel class="h-px"></div>
         `)}
 
-        ${chapter("listen", 2, "Section B — Relaxed starting point", `
+        ${chapter("understand", 2, "Section B — Understanding the connection", `
           ${narrow(`
-            <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed">
-              ${["Sit or stand comfortably.", "Relax the shoulders and jaw.", "Say a short sentence in a natural speaking voice — e.g. “" + SENTENCE + "”", "Make one gentle “mmm” sound if comfortable.", "Rest briefly."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
-            </ol>
-            <p class="text-xs text-ink-500 mt-4">No demanding breathing exercises — breathe normally, and never hold your breath.</p>
+            <ul class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-4">
+              ${["Moving from lower to higher pitches, some singers notice a change in tone or coordination.", "The voice may feel like it cracks, breaks, or feels disconnected during a transition — this is normal while learning, not damage.", "Forcing chest-dominant coordination upward can cause strain.", "Abruptly switching registers is not the goal — smooth coordination develops gradually.", "Chest voice and head voice are vocal register or coordination terms — sound doesn't literally originate in the chest or head.", "Sensations differ between singers and shouldn't be treated as definitive proof of a register."].map((t) => `<li class="flex gap-2"><span class="text-gold-400">•</span>${t}</li>`).join("")}
+            </ul>
+            <p class="text-sm text-ink-300 leading-relaxed"><strong class="text-ink-100">The passaggio</strong> is the term often used for this transition area — a zone, not a single fixed note, and its exact location varies from singer to singer.</p>
           `)}
         `)}
 
-        ${chapter("compare", 3, "Section C — Compare two comfortable sounds", `
-          ${narrow(`
-            <p class="font-display text-lg text-ink-50 mb-2">Sound A — Comfortable speech-like sound</p>
-            ${p("Say “hello” naturally. Optionally sustain a gentle “ah” for around two seconds — without deliberately making it louder or lower.")}
-          `)}
-          ${recCard("ahTake", "“hello” → gentle “ah”", "", 10)}
-          ${narrow(`<div class="mt-3 mb-6">${skipBtn("ah")}</div>`)}
-          ${narrow(`
-            <p class="font-display text-lg text-ink-50 mb-2">Sound B — Gentle, lighter sound</p>
-            ${p("Say “oo” comfortably — soft but easy and clear. Don't force a high pitch.")}
-          `)}
-          ${recCard("ooTake", "Gentle “oo”", "", 10)}
-          ${narrow(`
-            <div class="mt-3">${skipBtn("oo")}</div>
-            <div class="mt-5">${SelfAssessment.render("compareSounds-q", { ...Q.compareSounds, selected: sel("compareSounds") })}</div>
-            <p class="text-xs text-ink-500 mt-2">Every answer is accepted — this isn't a test of whether you've correctly identified chest or head voice.</p>
-          `)}
-        `)}
-
-        ${chapter("glide", 4, "Section D — Small pitch glide", `
-          ${narrow(p("Begin with a comfortable “oo.” Move gently through a small pitch change — as if making a tiny upward-and-downward glide — then return to the starting pitch naturally. Rest. Repeat up to three times only if comfortable."))}
+        ${chapter("exercises", 3, "Section C — Guided exercises", `
+          ${narrow(p("All six exercises share one comfortable reference note — choose it on the piano below."))}
           <div class="rounded-[28px] border border-white/10 bg-gradient-to-b from-ink-900 to-ink-950 p-4 sm:p-6 shadow-2xl mb-3">
             ${VirtualPiano.render("cch-piano", { controls: false, keyboard: true, display: true })}
           </div>
-          ${narrow(`<p class="text-sm text-ink-300 mb-3">Your note: <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong></p>`)}
-          <div class="flex flex-wrap gap-3 mb-4">
-            <button type="button" data-play-glide class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Hear a small glide demo</button>
-          </div>
-          ${narrow(`<p class="text-xs text-ink-500 mb-4">No fixed notes or universal range — never glide as high or low as possible. If the voice changes suddenly, cracks, or feels uneven, that can happen while learning — don't force the sound through it.</p>`)}
-          ${recCard("glideTake", "Your small glide", "", 10)}
-          ${narrow(`<div class="mt-3">${skipBtn("glide")}</div>`)}
+          ${narrow(`<p class="text-sm text-ink-300 mb-5">Your note: <strong class="text-ink-50 font-display text-xl" data-base-note>${N(b)}</strong></p>`)}
+          ${EXERCISES.map((ex) => exerciseCardHtml(ex)).join("")}
         `, { wide: true })}
 
-        ${chapter("explore", 5, "Section E — Optional “oo” or lip-trill exploration", `
+        ${chapter("practice", 4, "Section D — Practical coordination", `
           ${narrow(`
-            ${p("Only if comfortable, choose one to explore a little further:")}
-            ${SelfAssessment.render("exploreChoice-q", { ...Q.exploreChoice, selected: exploreChoice })}
-            <p class="text-xs text-ink-500 mt-2 mb-4">Lip trills aren't mandatory — if difficult, return to “oo” or skip this exercise. Never force airflow or continue if the lips or face feel tense.</p>
+            <ol class="flex flex-col gap-2 text-sm text-ink-300 leading-relaxed mb-4">
+              ${["Begin in a comfortable range.", "Move gradually through a small range.", "Observe any tone changes.", "Maintain an easy, unforced sound.", "Repeat only when comfortable."].map((t, i) => `<li class="flex gap-2"><span class="text-gold-400">${i + 1}.</span>${t}</li>`).join("")}
+            </ol>
+            <p class="text-xs text-ink-500 mb-4">This isn't about deliberately producing a vocal crack or pushing through a difficult note — just a gentle, progressive routine.</p>
           `)}
-          <div data-explore-rec-host>${recCard("exploreTake", exploreChoice === "trill" ? "Gentle lip trill" : "Gentle “oo” glide", "", 10)}</div>
-          ${narrow(`<div class="mt-3">${skipBtn("explore")}</div>`)}
+          <div class="flex flex-wrap gap-3 mb-4">
+            <button type="button" data-play-routine class="vr-btn vr-btn-gold">${icon("play", "w-4 h-4")} Listen to the routine</button>
+          </div>
+          ${recCard("routineTake", "The progressive coordination routine", "Entirely optional.", 20)}
         `)}
 
-        ${chapter("transition", 6, "Section F — Understand what a transition is", `
-          ${narrow(`
-            ${p("A transition is a change in how the voice coordinates as pitch or vocal quality changes. It may be smooth, uneven, or noticeable — the voice doesn't have to sound perfectly blended at this stage.")}
-            ${p("“Mix voice” is a later skill and shouldn't be forced during this lesson. Louder singing is not the solution to an uneven transition.")}
-          `)}
-          ${transitionCompareHtml()}
-        `)}
-
-        ${chapter("record", 7, "Section G — Optional recording and reflection", `
-          ${narrow(p("Recording is entirely optional — nothing here is automatically analyzed, and no recording is sent anywhere outside your own account."))}
-          ${recCard("spokenSentence", "A short spoken sentence", "", 10)}
-          <div data-review-host class="mt-2">${recordReviewHtml(rec)}</div>
+        ${chapter("record", 5, "Section E — Recording and evaluation", `
+          ${narrow(p("Recording is entirely optional — nothing here is automatically analyzed, and no recording is sent anywhere outside your own account. This app cannot automatically identify your register."))}
+          <div data-review-host>${reviewHtml(rec)}</div>
           ${narrow(`
             <div class="flex flex-col gap-4 mt-5">
-              ${SelfAssessment.render("easiestSound-q", { ...Q.easiestSound, selected: sel("easiestSound") })}
-              ${SelfAssessment.render("qualityChangeNoticed-q", { ...Q.qualityChangeNoticed, selected: sel("qualityChangeNoticed") })}
-              ${SelfAssessment.render("unevenAnywhere-q", { ...Q.unevenAnywhere, selected: sel("unevenAnywhere") })}
-              ${SelfAssessment.render("remainedRelaxed-q", { ...Q.remainedRelaxed, selected: sel("remainedRelaxed") })}
-              <div><label class="block text-sm text-ink-200 mb-1.5" for="cch-again">What would I like to try again?</label><textarea id="cch-again" data-growth="tryAgain" rows="2" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.tryAgain || "")}</textarea></div>
+              ${SelfAssessment.render("feltSmooth-q", { ...Q.feltSmooth, selected: sel("feltSmooth") })}
+              ${SelfAssessment.render("suddenChange-q", { ...Q.suddenChange, selected: sel("suddenChange") })}
+              ${SelfAssessment.render("throatTension-q", { ...Q.throatTension, selected: sel("throatTension") })}
+              ${SelfAssessment.render("feltNeedToPush-q", { ...Q.feltNeedToPush, selected: sel("feltNeedToPush") })}
+              ${SelfAssessment.render("easiestExercise-q", { ...Q.easiestExercise, selected: sel("easiestExercise") })}
+              <div><label class="block text-sm text-ink-200 mb-1.5" for="cch-again">What would I like to explore again?</label><textarea id="cch-again" data-growth="exploreAgain" rows="2" class="field" placeholder="Optional…">${Utils.escapeHtml(growth.exploreAgain || "")}</textarea></div>
             </div>
           `)}
         `)}
 
-        ${chapter("mistakes", 8, "Section H — Common beginner mistakes", problems())}
+        ${chapter("quiz", 6, "Section F — Knowledge check", `
+          ${narrow(p("A quick concept check — not a vocal-performance score."))}
+          ${knowledgeCheckHtml(rec)}
+        `)}
 
-        ${chapter("reflect", 9, "Section I — Class reflection and completion", `
+        ${chapter("reflect", 7, "Reflection and completion", `
           ${narrow(`
-            ${p("A simple checklist — tick what's true for you. Completion doesn't depend on perfect pitch, a smooth glide, a successful recording, or finishing every optional exercise.")}
+            ${p("A simple checklist — tick what's true for you. Completion doesn't depend on a smooth transition, recording, or completing optional activities.")}
             <div class="flex flex-col gap-1 mb-5">
               ${CHECKLIST_ITEMS.map((item, i) => `
                 <label class="flex items-start gap-3 rounded-xl px-3 py-2.5 cursor-pointer hover:bg-white/[0.03]">
@@ -341,22 +428,24 @@ const ConnectingChestHeadLesson = (() => {
           `)}
         `)}
 
-        ${chapter("complete", 10, "My Notes", `
+        ${chapter("complete", 8, "Common beginner mistakes", problems())}
+
+        ${chapter("complete", 9, "My Notes", `
           ${p("Your private notebook for this class. Only you can see it.")}
-          ${PersonalNotes.render("notes-cch", { placeholder: "e.g. How the “ah” compared to the “oo”... Whether the glide felt uneven anywhere... What I want to try next time..." })}
+          ${PersonalNotes.render("notes-cch", { placeholder: "e.g. Which exercise felt easiest... Whether I noticed a sudden change anywhere... What I want to try next time..." })}
         `)}
 
-        ${chapter("complete", 11, "Section J — Optional home practice", `
+        ${chapter("complete", 10, "Vocal safety", `
           ${narrow(`
-            ${p("About 2–3 optional minutes: say a short sentence naturally, make one comfortable “ah,” make one comfortable “oo,” try one small glide if it feels easy, then rest and write down one observation. No need for excessive repetitions or singing through discomfort.")}
-            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort.")}
+            ${p("Never force high or low notes, and never shout. Don't push chest-dominant coordination upward or force a high head-dominant sound. Avoid prolonged or exhausting exercises, and rest between them.")}
+            ${p("Stop if there is pain, dizziness, unusual breathlessness, or persistent throat discomfort. If discomfort repeatedly occurs, seek guidance from a qualified voice professional.")}
             <div data-warmup-note></div>
           `)}
         `)}
 
-        ${chapter("complete", 12, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
+        ${chapter("complete", 11, "Your progress", `<div data-lesson-progress>${ClassProgress.render(`Class ${cls.number} Progress`, PROGRESS_ITEMS, rec.checkpoints, progressStats(cls))}</div>`)}
 
-        ${chapter("complete", 13, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
+        ${chapter("complete", 12, status === "completed" ? "Milestone" : "Complete the class", `<div data-lesson-complete>${renderComplete(cls, rec, status)}</div>`)}
       </div>
     </div>`;
   }
@@ -390,18 +479,47 @@ const ConnectingChestHeadLesson = (() => {
     }));
     LessonKit.loadAndRefresh(container, classId, params);
 
-    /* ---- Section D: piano + glide demo ---- */
+    /* ---- Section A: recap playback ---- */
+    function onPlayRecap(e) {
+      if (!e.target.closest("[data-play-recap]")) return;
+      PianoSynth.playSequence(degreesToNotes(base(), [0, 1, 0, -1, 0]), { duration: 0.5, gap: 0.12 });
+    }
+    container.addEventListener("click", onPlayRecap);
+    cleanups.push(() => container.removeEventListener("click", onPlayRecap));
+
+    /* ---- knowledge check ---- */
+    function onKcChoice(e) {
+      const btn = e.target.closest("[data-kc-choice]");
+      if (!btn) return;
+      const itemEl = btn.closest("[data-kc-item]");
+      const key = itemEl.dataset.kcItem;
+      set("q", `kc_${key}`, btn.dataset.kcChoice);
+      $("[data-kc]").outerHTML = knowledgeCheckHtml(rec0());
+    }
+    container.addEventListener("click", onKcChoice);
+    cleanups.push(() => container.removeEventListener("click", onKcChoice));
+
+    /* ---- Section C: piano + exercise playback ---- */
     own(VirtualPiano.wire(container, "cch-piano", {
       range: RANGE, keyboard: true,
-      onNote: ({ midi }) => { if (midi >= RANGE.from && midi + STEP <= RANGE.to) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
+      onNote: ({ midi }) => { if (midi >= RANGE.from && midi + MAX_UP * STEP <= RANGE.to) { set("setup", "note", midi); $("[data-base-note]").textContent = N(midi); } },
     }));
-    function onPlayGlide(e) {
-      if (!e.target.closest("[data-play-glide]")) return;
-      const b = base();
-      PianoSynth.playSequence([b, b + STEP, b], { duration: 0.6, gap: 0.2 });
+    function onPlayEx(e) {
+      const btn = e.target.closest("[data-play-ex]");
+      if (!btn) return;
+      const ex = EXERCISES.find((x) => x.key === btn.dataset.playEx);
+      if (ex) PianoSynth.playSequence(degreesToNotes(base(), ex.degrees), { duration: 0.7, gap: 0.3 });
     }
-    container.addEventListener("click", onPlayGlide);
-    cleanups.push(() => container.removeEventListener("click", onPlayGlide));
+    container.addEventListener("click", onPlayEx);
+    cleanups.push(() => container.removeEventListener("click", onPlayEx));
+
+    /* ---- Section D: progressive routine playback ---- */
+    function onPlayRoutine(e) {
+      if (!e.target.closest("[data-play-routine]")) return;
+      PianoSynth.playSequence(degreesToNotes(base(), [0, 1, 2, 3, 2, 1, 0]), { duration: 0.6, gap: 0.25 });
+    }
+    container.addEventListener("click", onPlayRoutine);
+    cleanups.push(() => container.removeEventListener("click", onPlayRoutine));
 
     /* ---- skip buttons ---- */
     function onSkip(e) {
@@ -417,39 +535,19 @@ const ConnectingChestHeadLesson = (() => {
     /* ---- recordings ---- */
     function refreshReviewHost() {
       const host = $("[data-review-host]");
-      if (host) host.innerHTML = recordReviewHtml(rec0());
+      if (host) host.innerHTML = reviewHtml(rec0());
     }
-    const NAMES = { ahTake: "“ah”", ooTake: "“oo”", glideTake: "Pitch glide", exploreTake: "Optional exploration", spokenSentence: "Spoken sentence" };
-    const MAX_SECONDS = { ahTake: 10, ooTake: 10, glideTake: 10, exploreTake: 10, spokenSentence: 10 };
-    const REVIEW_SOURCE_KEYS = ["ahTake", "glideTake"];
-    function wireRecordingCard(k) {
-      return RecordingCard.wire(container, `rc-${k}`, {
-        classId, take: take(rec0(), k), maxSeconds: MAX_SECONDS[k],
-        meta: { name: `Level 2, Class 5 — ${NAMES[k]}`, exercise: `connecting-chest-head-${k}` },
-        onSaved: (t) => {
-          set("recs", k, t); ClassActivity.bump(classId, "recordings");
-          if (REVIEW_SOURCE_KEYS.includes(k)) refreshReviewHost();
-        },
-      });
-    }
-    Object.keys(NAMES).filter((k) => k !== "exploreTake").forEach((k) => own(wireRecordingCard(k)));
+    const EX_NAMES = Object.fromEntries(EXERCISES.map((ex) => [`${ex.key}Take`, ex.title]));
+    const NAMES = { ...EX_NAMES, routineTake: "Progressive coordination routine" };
+    Object.keys(NAMES).forEach((k) => {
+      own(RecordingCard.wire(container, `rc-${k}`, {
+        classId, take: take(rec0(), k), maxSeconds: k === "routineTake" ? 20 : 15,
+        meta: { name: `Level 2, Class 9 — ${NAMES[k]}`, exercise: `connecting-chest-head-${k}` },
+        onSaved: (t) => { set("recs", k, t); ClassActivity.bump(classId, "recordings"); refreshReviewHost(); },
+      }));
+    });
 
-    /* ---- Section E: explore choice (re-wires its own RecordingCard when the label changes) ---- */
-    let exploreApi = own(wireRecordingCard("exploreTake"));
-    function onExploreChoice(e) {
-      const chip = e.target.closest('[data-assess="exploreChoice-q"] [data-assess-choice]');
-      if (!chip) return;
-      const value = chip.dataset.assessChoice;
-      set("q", "exploreChoice", value);
-      const host = $("[data-explore-rec-host]");
-      if (exploreApi) exploreApi.destroy();
-      host.innerHTML = recCard("exploreTake", value === "trill" ? "Gentle lip trill" : "Gentle “oo” glide", "", 10);
-      exploreApi = wireRecordingCard("exploreTake");
-    }
-    container.addEventListener("click", onExploreChoice);
-    cleanups.push(() => { container.removeEventListener("click", onExploreChoice); if (exploreApi) exploreApi.destroy(); });
-
-    /* ---- Section G: play-to-review ---- */
+    /* ---- Section E: play-to-review ---- */
     function onPlayReview(e) {
       const btn = e.target.closest("[data-play-review]");
       if (!btn) return;
@@ -460,7 +558,7 @@ const ConnectingChestHeadLesson = (() => {
     cleanups.push(() => container.removeEventListener("click", onPlayReview));
 
     /* ---- generic self-assess dispatcher ---- */
-    const assessMap = { "compareSounds-q": "compareSounds", "easiestSound-q": "easiestSound", "qualityChangeNoticed-q": "qualityChangeNoticed", "unevenAnywhere-q": "unevenAnywhere", "remainedRelaxed-q": "remainedRelaxed" };
+    const assessMap = { "feltSmooth-q": "feltSmooth", "suddenChange-q": "suddenChange", "throatTension-q": "throatTension", "feltNeedToPush-q": "feltNeedToPush", "easiestExercise-q": "easiestExercise" };
     function onAssess(e) {
       const chip = e.target.closest("[data-assess-choice]");
       if (!chip) return;
@@ -480,7 +578,7 @@ const ConnectingChestHeadLesson = (() => {
       ta.addEventListener("input", () => save(ta.value));
     });
 
-    /* ---- Section I: completion checklist ---- */
+    /* ---- completion checklist ---- */
     function onChecklist(e) {
       const cb = e.target.closest("[data-checklist]");
       if (!cb) return;
@@ -509,9 +607,9 @@ const ConnectingChestHeadLesson = (() => {
       Store.addJournalEntry({
         classId,
         classTitle: `Level 2, Class ${cls.number} — ${cls.title}`,
-        learned: "Transitions may feel uneven while learning, and that's normal — the goal is gentle exploration, not a perfectly blended sound.",
-        struggled: q(rec, "unevenAnywhere") === "yes" || q(rec, "unevenAnywhere") === "alittle" ? "Noticed some unevenness in the transition." : "",
-        toPractice: A(rec, "growth").tryAgain || "",
+        learned: "The passaggio is a transition area, not a single fixed note — smooth coordination between chest and head voice develops gradually, through practice.",
+        struggled: q(rec, "throatTension") === "yes" || q(rec, "throatTension") === "alittle" ? "Noticed some throat tension." : "",
+        toPractice: A(rec, "growth").exploreAgain || "",
         thoughts: "",
       });
       Router.softRefresh(container, ClassDetailPage, params);
