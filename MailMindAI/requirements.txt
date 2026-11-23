@@ -1,0 +1,16 @@
+# MailMind AI backend - pinned to versions verified in development (Python 3.11 / 3.12)
+fastapi==0.165.0
+uvicorn[standard]==0.54.0
+SQLAlchemy==2.1.9
+alembic==1.20.1
+pydantic==2.14.4
+pydantic-settings==2.16.3
+google-api-python-client==2.202.0
+google-auth==2.62.2
+google-auth-oauthlib==1.5.0
+mcp==2.3.0
+anthropic==2.11.0
+beautifulsoup4==4.15.0
+# test
+pytest==9.2.0
+httpx==0.28.1

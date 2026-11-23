@@ -1,0 +1,14 @@
+{
+    "mcpServers":  {
+                       "mailmind":  {
+                                        "args":  [
+                                                     "D:/Projects/MailMindAI/backend/mcp_server/__main__.py"
+                                                 ],
+                                        "env":  {
+
+                                                },
+                                        "command":  "D:/Projects/MailMindAI/.venv/Scripts/python.exe",
+                                        "type":  "stdio"
+                                    }
+                   }
+}
